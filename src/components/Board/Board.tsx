@@ -10,6 +10,7 @@ import { BOARD_W, BOARD_H } from '../../constants/board.js';
 import PhotoElement   from './elements/PhotoElement.jsx';
 import TextElement    from './elements/TextElement.jsx';
 import StickerElement from './elements/StickerElement.jsx';
+import ShapeElement   from './elements/ShapeElement.jsx';
 import styles from './Board.module.css';
 
 function bgToStyle(
@@ -51,7 +52,7 @@ export default function Board() {
   const customBgColor = useBoardStore((s) => s.customBgColor);
   const customBgImage = useBoardStore((s) => s.customBgImage);
 
-  const { fitBoard, zoomIn, zoomOut } = useZoom(canvasRef);
+  const { fitBoard } = useZoom(canvasRef);
   useKeyboardShortcuts();
   usePersistence();
   const { onElPointerDown, onRotatePointerDown, onResizePointerDown, onBoardPointerDown } =
@@ -76,21 +77,17 @@ export default function Board() {
           transform: `translate(${panX}px, ${panY}px) scale(${zoom})`,
           ...boardBg,
         }}
+        onPointerDown={(e) => { if (e.target === e.currentTarget) onBoardPointerDown(e); }}
       >
         {elements.map((el) => {
           if (el.type === 'photo')   return <PhotoElement   key={el.id} el={el} onPointerDown={onElPointerDown} onRotate={onRotatePointerDown} onResize={onResizePointerDown} />;
           if (el.type === 'text')    return <TextElement    key={el.id} el={el} onPointerDown={onElPointerDown} onRotate={onRotatePointerDown} onResize={onResizePointerDown} />;
           if (el.type === 'sticker') return <StickerElement key={el.id} el={el} onPointerDown={onElPointerDown} onRotate={onRotatePointerDown} onResize={onResizePointerDown} />;
+          if (el.type === 'shape')   return <ShapeElement   key={el.id} el={el} onPointerDown={onElPointerDown} onRotate={onRotatePointerDown} onResize={onResizePointerDown} />;
           return null;
         })}
       </div>
 
-      <div className={styles.zoomControls}>
-        <button onClick={zoomIn}   title="Zoom in">+</button>
-        <button onClick={fitBoard} title="Fit to screen">⊡</button>
-        <button onClick={zoomOut}  title="Zoom out">−</button>
-        <span className={styles.zoomPct}>{Math.round(zoom * 100)}%</span>
-      </div>
     </div>
   );
 }

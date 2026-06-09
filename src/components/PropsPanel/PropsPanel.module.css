@@ -1,3 +1,28 @@
+/* Toggle tab — lives on the left edge, always visible */
+.toggleTab {
+  position: relative;
+  align-self: center;
+  width: 16px;
+  height: 48px;
+  border: 1px solid var(--topbar-border);
+  border-right: none;
+  border-radius: var(--r-sm) 0 0 var(--r-sm);
+  background: var(--topbar-bg);
+  color: var(--ink-mid);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: -2px 0 6px rgba(0,0,0,0.05);
+  transition: background var(--t-fast), color var(--t-fast);
+}
+.toggleTab:hover {
+  background: var(--gold-light);
+  color: var(--ink);
+}
+
 .panel {
   width: var(--props-w);
   min-width: var(--props-w);

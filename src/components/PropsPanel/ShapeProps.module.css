@@ -1,17 +1,5 @@
 .root { padding-bottom: 24px; }
 
-.fontBtns {
-  display: flex;
-  gap: 4px;
-  flex: 1;
-}
-
-.swatchLabel {
-  font-size: 10px;
-  color: var(--ink-mid);
-  margin-top: 2px;
-}
-
 .swatchRow {
   display: flex;
   flex-wrap: wrap;
@@ -27,8 +15,8 @@
   transition: transform var(--t-fast);
 }
 
-.swatch:hover     { transform: scale(1.2); }
-.swatchActive     { outline: 2px solid var(--gold); outline-offset: 1px; }
+.swatch:hover  { transform: scale(1.2); }
+.swatchActive  { outline: 2px solid var(--gold); outline-offset: 1px; }
 
 .customRow {
   display: flex;
@@ -37,6 +25,13 @@
   margin-top: 4px;
   padding-top: 4px;
   border-top: 1px dashed var(--topbar-border);
+}
+
+.customLabel {
+  font-size: 10px;
+  color: var(--ink-faint);
+  flex: 1;
+  letter-spacing: 0.03em;
 }
 
 .colorInput {

@@ -8,9 +8,10 @@ export function useZoom(canvasRef: React.RefObject<HTMLElement | null>): {
   zoomIn:   () => void;
   zoomOut:  () => void;
 } {
-  const { zoom, panX, panY, setTransform } = useAppStore((s) => ({
-    zoom: s.zoom, panX: s.panX, panY: s.panY, setTransform: s.setTransform,
-  }));
+  const zoom         = useAppStore((s) => s.zoom);
+  const panX         = useAppStore((s) => s.panX);
+  const panY         = useAppStore((s) => s.panY);
+  const setTransform = useAppStore((s) => s.setTransform);
 
   const stateRef = useRef({ zoom, panX, panY });
   useEffect(() => { stateRef.current = { zoom, panX, panY }; }, [zoom, panX, panY]);

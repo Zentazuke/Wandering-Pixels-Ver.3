@@ -95,10 +95,6 @@ const TextElement = memo(function TextElement({ el, onPointerDown, onRotate, onR
     updateEl(el.id, { content: txt.innerHTML });
   }, [el.id, updateEl]);
 
-  const onInput = useCallback(() => {
-    if (textRef.current) updateEl(el.id, { content: textRef.current.innerHTML });
-  }, [el.id, updateEl]);
-
   const onKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (e.key === 'Escape') { textRef.current?.blur(); return; }
@@ -171,9 +167,9 @@ const TextElement = memo(function TextElement({ el, onPointerDown, onRotate, onR
             pointerEvents: 'none',
           }}
           dangerouslySetInnerHTML={{ __html: el.content || '' }}
-          onInput={onInput}
           onBlur={onBlur}
           onKeyDown={onKeyDown}
+          onPointerDown={(e) => { if (e.currentTarget.contentEditable === 'true') e.stopPropagation(); }}
           onMouseDown={(e) => { if (e.currentTarget.contentEditable === 'true') e.stopPropagation(); }}
         />
       </div>

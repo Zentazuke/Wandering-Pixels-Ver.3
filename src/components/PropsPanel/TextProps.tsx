@@ -43,6 +43,27 @@ const NOTE_FRAMES = [
   { id: 'kraft',      label: 'Kraft'     },
 ];
 
+/** Toggle content between plain text and a bullet list. */
+function toggleBulletList(el: TextElement, update: (id: string, patch: Partial<TextElement>) => void) {
+  const isList = el.content.trimStart().startsWith('<ul');
+  if (isList) {
+    // strip <ul>/<li> tags to plain text
+    const plain = el.content
+      .replace(/<ul[^>]*>/gi, '')
+      .replace(/<\/ul>/gi, '')
+      .replace(/<li[^>]*>/gi, '')
+      .replace(/<\/li>/gi, '\n')
+      .replace(/<br\s*\/?>/gi, '')
+      .trim();
+    update(el.id, { content: plain });
+  } else {
+    // wrap in a <ul>
+    const lines = el.content.replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').split('\n').filter(Boolean);
+    const items = (lines.length ? lines : ['Item 1']).map((l) => `<li>${l.trim()}</li>`).join('');
+    update(el.id, { content: `<ul>${items}</ul>` });
+  }
+}
+
 /** Props panel for a selected text note element. */
 export default function TextProps({ el }: { el: TextElement }) {
   const update     = useBoardStore((s) => s.updateElement);
@@ -54,6 +75,7 @@ export default function TextProps({ el }: { el: TextElement }) {
 
   const upd = (patch: Partial<TextElement>) => update(el.id, patch);
   const activeFrame = el.noteFrame || 'shadow';
+  const isBulletList = el.content.trimStart().startsWith('<ul');
 
   return (
     <div className={styles.root}>
@@ -85,8 +107,11 @@ export default function TextProps({ el }: { el: TextElement }) {
           onChange={(v) => upd({ fontSize: v })} />
 
         <PropRow>
-          <PropBtn active={el.bold}   onClick={() => upd({ bold:   !el.bold })}><b>B</b></PropBtn>
-          <PropBtn active={el.italic} onClick={() => upd({ italic: !el.italic })}><i>I</i></PropBtn>
+          <PropBtn active={el.bold}       onClick={() => upd({ bold:   !el.bold })}><b>B</b></PropBtn>
+          <PropBtn active={el.italic}     onClick={() => upd({ italic: !el.italic })}><i>I</i></PropBtn>
+          <PropBtn active={isBulletList}  onClick={() => toggleBulletList(el, update)} title="Bullet list">• List</PropBtn>
+        </PropRow>
+        <PropRow>
           <PropBtn active={(el.align || 'left') === 'left'}   onClick={() => upd({ align: 'left' })}>≡L</PropBtn>
           <PropBtn active={(el.align || 'left') === 'center'} onClick={() => upd({ align: 'center' })}>≡C</PropBtn>
           <PropBtn active={(el.align || 'left') === 'right'}  onClick={() => upd({ align: 'right' })}>≡R</PropBtn>
@@ -101,7 +126,11 @@ export default function TextProps({ el }: { el: TextElement }) {
               onClick={() => upd({ color: c })}
             />
           ))}
-          <input type="color" className={styles.colorInput} value={el.color?.startsWith('#') ? el.color : '#3b3328'}
+        </div>
+        <div className={styles.customRow}>
+          <span className={styles.swatchLabel}>Custom</span>
+          <input type="color" className={styles.colorInput} title="Pick a custom text colour"
+            value={el.color?.startsWith('#') ? el.color : '#3b3328'}
             onChange={(e) => upd({ color: e.target.value })} />
         </div>
       </PropSection>
@@ -115,7 +144,11 @@ export default function TextProps({ el }: { el: TextElement }) {
               onClick={() => upd({ bg: c })}
             />
           ))}
-          <input type="color" className={styles.colorInput} value={el.bg?.startsWith('#') ? el.bg : '#fff9e6'}
+        </div>
+        <div className={styles.customRow}>
+          <span className={styles.swatchLabel}>Custom</span>
+          <input type="color" className={styles.colorInput} title="Pick a custom background colour"
+            value={el.bg?.startsWith('#') ? el.bg : '#fff9e6'}
             onChange={(e) => upd({ bg: e.target.value })} />
         </div>
       </PropSection>

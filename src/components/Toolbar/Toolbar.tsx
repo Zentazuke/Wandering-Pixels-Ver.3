@@ -1,22 +1,41 @@
 import { useRef, useState } from 'react';
 import useAppStore from '../../store/appStore.js';
 import useBoardStore from '../../store/boardStore.js';
+import { makeShapeElement } from '../../store/boardStore.js';
+import { BOARD_W, BOARD_H } from '../../constants/board.js';
 import StickerPicker from '../ui/StickerPicker.jsx';
 import BgPicker from '../ui/BgPicker.jsx';
 import styles from './Toolbar.module.css';
+import type { ShapeElement } from '../../types';
 
-const TOOLS = [
-  { id: 'select',  icon: '↖', title: 'Select (V)' },
-  { id: 'text',    icon: 'T', title: 'Text note (T)' },
-  { id: 'photo',   icon: '⬜', title: 'Photo (P)' },
-  { id: 'sticker', icon: '★', title: 'Sticker (S)' },
+interface Props {
+  open:     boolean;
+  onToggle: () => void;
+}
+
+const MAIN_TOOLS = [
+  { id: 'select',  icon: '↖',  title: 'Select (V)' },
+  { id: 'photo',   icon: '📷', title: 'Photo (P)'  },
+  { id: 'text',    icon: 'T',  title: 'Text note (T)' },
+  { id: 'sticker', icon: '★',  title: 'Sticker (S)' },
 ] as const;
 
-/** Left toolbar — tool selector, background picker, and element actions. */
-export default function Toolbar() {
+const SHAPE_TOOLS: { id: ShapeElement['shape']; icon: string; title: string }[] = [
+  { id: 'rect',   icon: '□',  title: 'Rectangle' },
+  { id: 'circle', icon: '○',  title: 'Circle / Ellipse' },
+  { id: 'line',   icon: '╱',  title: 'Line' },
+  { id: 'arrow',  icon: '→',  title: 'Arrow' },
+];
+
+/** Left toolbar — tool selector, shape tools, zoom, collapse toggle. */
+export default function Toolbar({ open, onToggle }: Props) {
   const tool    = useAppStore((s) => s.tool);
   const setTool = useAppStore((s) => s.setTool);
   const selId   = useAppStore((s) => s.selId);
+  const zoom    = useAppStore((s) => s.zoom);
+  const panX    = useAppStore((s) => s.panX);
+  const panY    = useAppStore((s) => s.panY);
+  const setTransform = useAppStore((s) => s.setTransform);
 
   const addElement  = useBoardStore((s) => s.addElement);
   const removeEl    = useBoardStore((s) => s.removeElement);
@@ -28,6 +47,19 @@ export default function Toolbar() {
   const [showBg, setShowBg]             = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
+  // ── Zoom helpers (no canvas ref needed — we use direct store values) ─────────
+  function zoomIn()  { setTransform(Math.min(zoom * 1.2, 4), panX, panY); }
+  function zoomOut() { setTransform(Math.max(zoom / 1.2, 0.1), panX, panY); }
+  function fitBoard() {
+    const el = document.querySelector('[data-board-canvas]') as HTMLElement | null;
+    if (!el) return;
+    const ww = el.clientWidth  || 900;
+    const wh = el.clientHeight || 600;
+    const z  = Math.min(ww / BOARD_W, wh / BOARD_H) * 0.9;
+    setTransform(z, (ww - BOARD_W * z) / 2, (wh - BOARD_H * z) / 2);
+  }
+
+  // ── Tool click ────────────────────────────────────────────────────────────────
   function handleToolClick(id: string) {
     if (id === 'photo')   { photoInputRef.current?.click(); return; }
     if (id === 'sticker') { setShowStickers(true); return; }
@@ -39,7 +71,7 @@ export default function Toolbar() {
     const id = addElement({
       type: 'text', x: 100, y: 100, w: 220, h: 120,
       rotation: 0, locked: false,
-      content: 'Type here…', color: '#3b3328', bg: '#fff9e6',
+      content: '', color: '#3b3328', bg: '#fff9e6',
       fontSize: 15, fontFamily: 'Lora', align: 'left',
       bold: false, italic: false, noteFrame: 'shadow',
     });
@@ -47,9 +79,28 @@ export default function Toolbar() {
     setTool('select');
   }
 
+  function addShape(shape: ShapeElement['shape']) {
+    const el = document.querySelector('[data-board-canvas]') as HTMLElement | null;
+    const cw = el?.clientWidth  ?? 900;
+    const ch = el?.clientHeight ?? 600;
+    // centre of visible board area
+    const cx = (cw / 2 - panX) / zoom;
+    const cy = (ch / 2 - panY) / zoom;
+
+    const isLine = shape === 'line' || shape === 'arrow';
+    const extra = isLine
+      ? { x: cx - 90, y: cy, x2: cx + 90, y2: cy }
+      : { x: cx - 80, y: cy - 50 };
+
+    const id = addElement(makeShapeElement(shape, useBoardStore.getState().elements.length, extra));
+    useAppStore.getState().setSelId(id);
+    setTool('select');
+  }
+
   function handlePhotoFiles(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     files.forEach((file, i) => {
+      const isPng = file.type === 'image/png' || file.name.toLowerCase().endsWith('.png');
       const reader = new FileReader();
       reader.onload = (ev) => {
         const img = new Image();
@@ -59,8 +110,8 @@ export default function Toolbar() {
           const id = addElement({
             type: 'photo', x: 100 + i * 30, y: 100 + i * 20, w, h,
             rotation: (Math.random() - 0.5) * 6, locked: false,
-            src: ev.target!.result as string, caption: '', shadow: true,
-            frame: 'polaroid', shape: 'square',
+            src: ev.target!.result as string, caption: '', shadow: !isPng,
+            frame: isPng ? 'none' : 'polaroid', shape: 'square',
             br: 100, co: 100, sa: 100, bl: 0, se: 0, hr: 0, iv: 0, op: 100,
             flipH: false, flipV: false, imgZoom: 1, imgX: 50, imgY: 50,
           });
@@ -76,42 +127,84 @@ export default function Toolbar() {
 
   return (
     <>
-      <aside className={styles.toolbar}>
-        <div className={styles.group}>
-          {TOOLS.map(({ id, icon, title }) => (
-            <button
-              key={id}
-              className={`${styles.toolBtn} ${tool === id ? styles.active : ''}`}
-              title={title}
-              onClick={() => handleToolClick(id)}
-            >
-              {icon}
-            </button>
-          ))}
-        </div>
+      {/* Collapse tab */}
+      <button
+        className={styles.collapseTab}
+        onClick={onToggle}
+        title={open ? 'Hide toolbar' : 'Show toolbar'}
+      >
+        {open ? '‹' : '›'}
+      </button>
 
-        <div className={styles.divider} />
-
-        <div className={styles.group}>
-          <button className={styles.toolBtn} title="Background" onClick={() => setShowBg(true)}>
-            ◫
-          </button>
-        </div>
-
-        <div className={styles.divider} />
-
-        {selId && (
+      {open && (
+        <aside className={styles.toolbar}>
+          {/* ── Main tools ── */}
           <div className={styles.group}>
-            <button className={styles.actionBtn} title="Duplicate (Ctrl+D)" onClick={() => duplicate(selId)}>⧉</button>
-            <button className={styles.actionBtn} title="Bring to front (Ctrl+])" onClick={() => bringFront(selId)}>↑</button>
-            <button className={styles.actionBtn} title="Send to back (Ctrl+[)" onClick={() => sendBack(selId)}>↓</button>
-            <button className={`${styles.actionBtn} ${styles.danger}`} title="Delete"
-              onClick={() => { useAppStore.getState().deselect(); removeEl(selId); }}>✕</button>
+            {MAIN_TOOLS.map(({ id, icon, title }) => (
+              <button
+                key={id}
+                className={`${styles.toolBtn} ${tool === id ? styles.active : ''}`}
+                title={title}
+                onClick={() => handleToolClick(id)}
+              >
+                {icon}
+              </button>
+            ))}
           </div>
-        )}
 
-        <input ref={photoInputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handlePhotoFiles} />
-      </aside>
+          <div className={styles.divider} />
+
+          {/* ── Shape tools ── */}
+          <div className={styles.group}>
+            {SHAPE_TOOLS.map(({ id, icon, title }) => (
+              <button
+                key={id}
+                className={styles.toolBtn}
+                title={title}
+                onClick={() => addShape(id)}
+              >
+                {icon}
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.divider} />
+
+          {/* ── Background ── */}
+          <div className={styles.group}>
+            <button className={styles.toolBtn} title="Background" onClick={() => setShowBg(true)}>◫</button>
+          </div>
+
+          <div className={styles.divider} />
+
+          {/* ── Element actions (when selected) ── */}
+          {selId && (
+            <>
+              <div className={styles.group}>
+                <button className={styles.actionBtn} title="Duplicate (Ctrl+D)" onClick={() => duplicate(selId)}>⧉</button>
+                <button className={styles.actionBtn} title="Bring to front (Ctrl+])" onClick={() => bringFront(selId)}>↑</button>
+                <button className={styles.actionBtn} title="Send to back (Ctrl+[)" onClick={() => sendBack(selId)}>↓</button>
+                <button className={`${styles.actionBtn} ${styles.danger}`} title="Delete"
+                  onClick={() => { useAppStore.getState().deselect(); removeEl(selId); }}>✕</button>
+              </div>
+              <div className={styles.divider} />
+            </>
+          )}
+
+          {/* ── Spacer ── */}
+          <div className={styles.spacer} />
+
+          {/* ── Zoom ── */}
+          <div className={styles.zoomGroup}>
+            <button className={styles.zoomBtn} title="Zoom in (+)" onClick={zoomIn}>+</button>
+            <button className={styles.zoomBtn} title="Fit to screen" onClick={fitBoard}>⊡</button>
+            <button className={styles.zoomBtn} title="Zoom out (-)" onClick={zoomOut}>−</button>
+            <span className={styles.zoomPct}>{Math.round(zoom * 100)}%</span>
+          </div>
+
+          <input ref={photoInputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handlePhotoFiles} />
+        </aside>
+      )}
 
       {showStickers && <StickerPicker onClose={() => setShowStickers(false)} />}
       {showBg       && <BgPicker     onClose={() => setShowBg(false)} />}

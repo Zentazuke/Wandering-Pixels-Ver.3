@@ -3,11 +3,13 @@ import useAppStore from '../store/appStore.js';
 import useBoardStore from '../store/boardStore.js';
 import type { BoardElement } from '../types';
 
-export type ResizeHandle = 'nw' | 'ne' | 'sw' | 'se';
+export type ResizeHandle = 'nw' | 'ne' | 'sw' | 'se' | 'p1' | 'p2';
 
 type InteractionState = {
   zoom: number; panX: number; panY: number; selId: string | null;
   dragging: string | null; dragOX: number; dragOY: number;
+  dragOrigX: number; dragOrigY: number;
+  dragX2: number | null; dragY2: number | null;
   resizing: string | null; resizeHandle: ResizeHandle | null;
   resizeStartX: number; resizeStartY: number;
   resizeStartW: number; resizeStartH: number;
@@ -41,6 +43,7 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
   const ref = useRef<InteractionState>({
     zoom, panX, panY, selId,
     dragging: null, dragOX: 0, dragOY: 0,
+    dragOrigX: 0, dragOrigY: 0, dragX2: null, dragY2: null,
     resizing: null, resizeHandle: null,
     resizeStartX: 0, resizeStartY: 0,
     resizeStartW: 0, resizeStartH: 0,
@@ -76,9 +79,19 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
     const el = ref.current.elements.find((el) => el.id === id);
     if (!el) return;
     const bp = boardPt(e.clientX, e.clientY);
-    ref.current.dragging = id;
-    ref.current.dragOX   = bp.x - el.x;
-    ref.current.dragOY   = bp.y - el.y;
+    ref.current.dragging  = id;
+    ref.current.dragOX    = bp.x - el.x;
+    ref.current.dragOY    = bp.y - el.y;
+    ref.current.dragOrigX = el.x;
+    ref.current.dragOrigY = el.y;
+    // line/arrow: also track second endpoint for co-move
+    if (el.type === 'shape' && (el.shape === 'line' || el.shape === 'arrow')) {
+      ref.current.dragX2 = el.x2 ?? null;
+      ref.current.dragY2 = el.y2 ?? null;
+    } else {
+      ref.current.dragX2 = null;
+      ref.current.dragY2 = null;
+    }
   }, [setSelId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onRotatePointerDown = useCallback((
@@ -120,12 +133,24 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    function onMouseMove(e: MouseEvent) {
+    function onMouseMove(e: PointerEvent) {
       const r = ref.current;
 
       if (r.dragging) {
-        const bp = boardPt(e.clientX, e.clientY);
-        updateEl(r.dragging, { x: bp.x - r.dragOX, y: bp.y - r.dragOY });
+        const bp   = boardPt(e.clientX, e.clientY);
+        const newX = bp.x - r.dragOX;
+        const newY = bp.y - r.dragOY;
+        if (r.dragX2 !== null && r.dragY2 !== null) {
+          const dx = newX - r.dragOrigX;
+          const dy = newY - r.dragOrigY;
+          updateEl(r.dragging, {
+            x: newX, y: newY,
+            x2: r.dragX2 + dx,
+            y2: r.dragY2 + dy,
+          } as Parameters<typeof updateEl>[1]);
+        } else {
+          updateEl(r.dragging, { x: newX, y: newY });
+        }
         return;
       }
 
@@ -141,6 +166,17 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
 
       if (r.resizing) {
         const bp = boardPt(e.clientX, e.clientY);
+
+        // line / arrow endpoint drag
+        if (r.resizeHandle === 'p1') {
+          updateEl(r.resizing, { x: bp.x, y: bp.y } as Parameters<typeof updateEl>[1]);
+          return;
+        }
+        if (r.resizeHandle === 'p2') {
+          updateEl(r.resizing, { x2: bp.x, y2: bp.y } as Parameters<typeof updateEl>[1]);
+          return;
+        }
+
         const dx = bp.x - r.resizeStartX;
         const dy = bp.y - r.resizeStartY;
         let { x, y, w, h } = { x: r.resizeElX, y: r.resizeElY, w: r.resizeStartW, h: r.resizeStartH };
@@ -162,11 +198,13 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
       ref.current.resizing = null;
     }
 
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup',   onMouseUp);
+    document.addEventListener('pointermove',   onMouseMove);
+    document.addEventListener('pointerup',     onMouseUp);
+    document.addEventListener('pointercancel', onMouseUp);
     return () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup',   onMouseUp);
+      document.removeEventListener('pointermove',   onMouseMove);
+      document.removeEventListener('pointerup',     onMouseUp);
+      document.removeEventListener('pointercancel', onMouseUp);
     };
   }, [updateEl]);
 

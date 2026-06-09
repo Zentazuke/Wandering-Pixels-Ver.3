@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { temporal } from 'zundo';
 import type { BoardState } from '../types';
-import type { BoardElement, PhotoElement, TextElement, StickerElement } from '../types/elements';
+import type { BoardElement, PhotoElement, TextElement, StickerElement, ShapeElement } from '../types/elements';
 
 // ─── ID generator ─────────────────────────────────────────────────────────────
 let _nextId = Date.now();
@@ -23,6 +23,19 @@ const genId = () => `el-${(_nextId++).toString(36)}`;
  *  op = opacity     (10–100, default 100) — stored as %, applied as fraction
  */
 export function buildFilter(el: Pick<PhotoElement, 'br'|'co'|'sa'|'bl'|'se'|'hr'|'iv'|'op'>): string {
+  // Return 'none' when everything is at default — avoids creating a GPU compositing
+  // layer that breaks PNG transparency in Chrome.
+  if (
+    (el.br ?? 100) === 100 &&
+    (el.co ?? 100) === 100 &&
+    (el.sa ?? 100) === 100 &&
+    (el.bl ?? 0)   === 0   &&
+    (el.se ?? 0)   === 0   &&
+    (el.hr ?? 0)   === 0   &&
+    (el.iv ?? 0)   === 0   &&
+    (el.op ?? 100) === 100
+  ) return 'none';
+
   return [
     `brightness(${el.br ?? 100}%)`,
     `contrast(${el.co ?? 100}%)`,
@@ -55,6 +68,26 @@ export function makeTextElement(zIndex: number): Omit<TextElement, 'id'> {
     fontFamily: 'Lora', fontSize: 15, bold: false, italic: false,
     align: 'left', color: '#3b3328',
     bg: '#fff9e6', noteFrame: 'shadow',
+  };
+}
+
+export function makeShapeElement(
+  shape: ShapeElement['shape'],
+  zIndex: number,
+  extra?: Partial<Pick<ShapeElement, 'x' | 'y' | 'x2' | 'y2'>>,
+): Omit<ShapeElement, 'id'> {
+  const isLine = shape === 'line' || shape === 'arrow';
+  return {
+    type: 'shape', shape,
+    x: extra?.x ?? 200, y: extra?.y ?? 200,
+    w: isLine ? 0   : 160,
+    h: isLine ? 0   : 100,
+    x2: isLine ? (extra?.x2 ?? (extra?.x ?? 200) + 180) : undefined,
+    y2: isLine ? (extra?.y2 ?? (extra?.y ?? 200))        : undefined,
+    rotation: 0, zIndex, locked: false,
+    fill: 'transparent', stroke: '#b5943a',
+    strokeWidth: 2, fillOpacity: 100,
+    shapeFrame: 'none',
   };
 }
 

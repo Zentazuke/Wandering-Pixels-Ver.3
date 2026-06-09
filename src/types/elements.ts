@@ -78,5 +78,19 @@ export interface StickerElement extends BaseElement {
   opacity?:      number;
 }
 
+// ── Shape ─────────────────────────────────────────────────────────────────────
+export interface ShapeElement extends BaseElement {
+  type:         'shape';
+  shape:        'rect' | 'circle' | 'line' | 'arrow';
+  fill:         string;
+  stroke:       string;
+  strokeWidth:  number;
+  fillOpacity:  number;   // 0–100
+  shapeFrame?:  string;   // preset name for rect/circle
+  // line / arrow — second endpoint in absolute board coordinates
+  x2?:          number;
+  y2?:          number;
+}
+
 // ── Union ─────────────────────────────────────────────────────────────────────
-export type BoardElement = PhotoElement | TextElement | StickerElement;
+export type BoardElement = PhotoElement | TextElement | StickerElement | ShapeElement;

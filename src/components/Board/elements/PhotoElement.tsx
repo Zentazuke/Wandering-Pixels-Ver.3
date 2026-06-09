@@ -47,14 +47,18 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
     ? (fr.shadowOnly ? '0 8px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.25)' : '4px 5px 18px rgba(0,0,0,0.28)')
     : 'none';
 
-  const zoom    = el.imgZoom ?? 1;
-  const flipH   = el.flipH ? -1 : 1;
-  const flipV   = el.flipV ? -1 : 1;
-  const imgTx   = `scaleX(${flipH}) scaleY(${flipV}) scale(${zoom})`;
+  const zoom      = el.imgZoom ?? 1;
+  const flipH     = el.flipH ? -1 : 1;
+  const flipV     = el.flipV ? -1 : 1;
   const imgOrigin = `${el.imgX ?? 50}% ${el.imgY ?? 50}%`;
+  // Omit identity transform — avoids a GPU compositing layer that breaks PNG transparency
+  const imgTx     = (flipH === 1 && flipV === 1 && zoom === 1)
+    ? undefined
+    : `scaleX(${flipH}) scaleY(${flipV}) scale(${zoom})`;
+  // Omit default filter for the same reason
+  const imgFilter = buildFilter(el) === 'none' ? undefined : buildFilter(el);
 
-  const isDouble  = fr.double;
-  const frameBg   = el.frameColor || fr.bg;
+  const frameBg    = el.frameColor || fr.bg;
   const extraStyle = fr.wrapStyle
     ? Object.fromEntries(
         fr.wrapStyle.split(';').filter(Boolean).map((p) => {
@@ -65,9 +69,9 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
       )
     : {};
 
-  const hasCap  = !isFrameless && fr.capColor && el.caption;
-  const padNum  = isFrameless ? 0 : parseInt(fr.pt) || 8;
-  const totalW  = el.w + (isFrameless ? 0 : padNum * 2);
+  const isDouble = frameKey === 'double';
+  const hasCap   = !isFrameless && fr.capColor && el.caption;
+  const totalW   = el.w + (isFrameless ? 0 : (parseInt(fr.pt) || 8) * 2);
 
   return (
     <div
@@ -85,7 +89,7 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
       <div
         className={styles.frameWrap}
         style={{
-          background:    frameBg,
+          background:    isFrameless ? 'transparent' : frameBg,
           padding:       fr.pt,
           boxShadow:     shadow,
           borderRadius:  fr.br,
@@ -109,9 +113,9 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
           style={{
             width:        el.w,
             height:       el.h,
-            borderRadius: shape.br,
-            overflow:     clipOverflow as React.CSSProperties['overflow'],
-            ...clipStyle,
+            borderRadius: isFrameless ? undefined : shape.br,
+            overflow:     isFrameless ? 'visible' : clipOverflow as React.CSSProperties['overflow'],
+            ...(isFrameless ? {} : clipStyle),
           }}
         >
           <img
@@ -125,9 +129,9 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
               objectFit:       'cover',
               objectPosition:  imgOrigin,
               display:         'block',
-              filter:          buildFilter(el),
+              filter:          imgFilter,
               transform:       imgTx,
-              transformOrigin: imgOrigin,
+              transformOrigin: imgTx ? imgOrigin : undefined,
             }}
           />
           {fr.overlay && <div dangerouslySetInnerHTML={{ __html: fr.overlay }} />}

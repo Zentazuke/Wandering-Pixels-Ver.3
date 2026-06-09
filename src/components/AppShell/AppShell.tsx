@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import useAppStore from '../../store/appStore.js';
 import TopBar      from '../TopBar/TopBar.jsx';
 import Board       from '../Board/Board.jsx';
@@ -10,15 +11,18 @@ import styles from './AppShell.module.css';
 /** Main app shell — renders TopBar and the active view body. */
 export default function AppShell() {
   const view = useAppStore((s) => s.view);
+  const [leftOpen,  setLeftOpen]  = useState(true);
+  const [rightOpen, setRightOpen] = useState(true);
+
   return (
     <div className={styles.shell}>
       <TopBar />
       <div className={styles.body}>
         {view === 'board' && (
           <>
-            <Toolbar />
+            <Toolbar open={leftOpen}  onToggle={() => setLeftOpen((o) => !o)} />
             <Board />
-            <PropsPanel />
+            <PropsPanel open={rightOpen} onToggle={() => setRightOpen((o) => !o)} />
           </>
         )}
         {view === 'diary'   && <DiaryView />}
