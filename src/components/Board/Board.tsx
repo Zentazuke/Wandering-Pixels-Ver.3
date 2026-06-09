@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import useAppStore from '../../store/appStore.js';
 import useBoardStore from '../../store/boardStore.js';
 import { useZoom } from '../../hooks/useZoom.js';
@@ -43,9 +43,10 @@ function bgToStyle(
 export default function Board() {
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  const zoom = useAppStore((s) => s.zoom);
-  const panX = useAppStore((s) => s.panX);
-  const panY = useAppStore((s) => s.panY);
+  const zoom  = useAppStore((s) => s.zoom);
+  const panX  = useAppStore((s) => s.panX);
+  const panY  = useAppStore((s) => s.panY);
+  const selId = useAppStore((s) => s.selId);
 
   const elements      = useBoardStore((s) => s.elements);
   const currentBg     = useBoardStore((s) => s.currentBg);
@@ -61,6 +62,18 @@ export default function Board() {
   useEffect(() => { fitBoard(); }, [fitBoard]);
 
   const boardBg = bgToStyle(currentBg, customBgColor, customBgImage);
+
+  // Sort by saved zIndex so DOM paint order matches layer order.
+  // Selected element always goes last so it paints on top of everything.
+  const sortedElements = useMemo(() => {
+    const sorted = [...elements].sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0));
+    const selIdx = sorted.findIndex((e) => e.id === selId);
+    if (selIdx > -1) {
+      const [sel] = sorted.splice(selIdx, 1);
+      sorted.push(sel);
+    }
+    return sorted;
+  }, [elements, selId]);
 
   return (
     <div
@@ -79,7 +92,7 @@ export default function Board() {
         }}
         onPointerDown={(e) => { if (e.target === e.currentTarget) onBoardPointerDown(e); }}
       >
-        {elements.map((el) => {
+        {sortedElements.map((el) => {
           if (el.type === 'photo')   return <PhotoElement   key={el.id} el={el} onPointerDown={onElPointerDown} onRotate={onRotatePointerDown} onResize={onResizePointerDown} />;
           if (el.type === 'text')    return <TextElement    key={el.id} el={el} onPointerDown={onElPointerDown} onRotate={onRotatePointerDown} onResize={onResizePointerDown} />;
           if (el.type === 'sticker') return <StickerElement key={el.id} el={el} onPointerDown={onElPointerDown} onRotate={onRotatePointerDown} onResize={onResizePointerDown} />;

@@ -138,7 +138,7 @@ const TextElement = memo(function TextElement({ el, onPointerDown, onRotate, onR
       className={`${styles.el} ${isSelected ? styles.selected : ''}`}
       style={{
         left: el.x, top: el.y, width: el.w,
-        zIndex: isSelected ? 9999 : (el.zIndex ?? 1),
+        zIndex: el.zIndex ?? 1,
         transform: `rotate(${el.rotation ?? 0}deg)`,
       }}
       onPointerDown={(e) => onPointerDown(e, el.id)}

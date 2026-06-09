@@ -99,7 +99,7 @@ const ShapeElement = memo(function ShapeElement({ el, onPointerDown, onRotate, o
           top:     bb.divTop,
           width:   bb.divW,
           height:  bb.divH,
-          zIndex:  isSelected ? 9999 : (el.zIndex ?? 1),
+          zIndex:  el.zIndex ?? 1,
         }}
         onPointerDown={(e) => onPointerDown(e, el.id)}
       >

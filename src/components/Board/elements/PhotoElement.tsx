@@ -81,7 +81,7 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
         left:      el.x,
         top:       el.y,
         width:     totalW,
-        zIndex:    isSelected ? 9999 : (el.zIndex ?? 1),
+        zIndex:    el.zIndex ?? 1,
         transform: `rotate(${el.rotation ?? 0}deg)`,
       }}
       onPointerDown={(e) => onPointerDown(e, el.id)}

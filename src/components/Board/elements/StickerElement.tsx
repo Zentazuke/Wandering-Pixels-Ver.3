@@ -34,7 +34,7 @@ const StickerElement = memo(function StickerElement({ el, onPointerDown, onRotat
         top:       el.y,
         width:     el.w,
         height:    el.h,
-        zIndex:    isSelected ? 9999 : (el.zIndex ?? 1),
+        zIndex:    el.zIndex ?? 1,
         transform: `rotate(${el.rotation ?? 0}deg)`,
         opacity:   (el.opacity ?? 100) / 100,
       }}
