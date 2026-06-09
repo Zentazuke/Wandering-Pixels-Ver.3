@@ -48,18 +48,29 @@ export default function StickerProps({ el }: { el: StickerElement }) {
               title={c ?? 'Original'}
               onClick={() => upd({ customColor: c ?? undefined })}
               style={{
-                width: 18, height: 18, borderRadius: 3, cursor: 'pointer',
+                width: 22, height: 22,
+                borderRadius: '50%',
+                cursor: 'pointer',
+                flexShrink: 0,
                 background: c || 'conic-gradient(red,yellow,lime,cyan,blue,magenta,red)',
-                border: `1.5px solid ${(el.customColor ?? null) === c ? 'var(--gold)' : 'rgba(0,0,0,0.12)'}`,
-                outline: (el.customColor ?? null) === c ? '2px solid var(--gold)' : 'none',
-                outlineOffset: 1,
+                border: '1.5px solid rgba(0,0,0,0.1)',
+                outline: (el.customColor ?? null) === c ? '2px solid var(--gold)' : '2px solid transparent',
+                outlineOffset: 2,
+                transition: 'outline-color 0.28s cubic-bezier(0.16,1,0.3,1), transform 0.28s cubic-bezier(0.16,1,0.3,1)',
               }}
             />
           ))}
           <input
             type="color"
-            style={{ width: 22, height: 22, border: 'none', borderRadius: 3, padding: 0, cursor: 'pointer' }}
-            value={el.customColor?.startsWith('#') ? el.customColor : '#b5943a'}
+            style={{
+              width: 28, height: 28,
+              border: '1.5px solid rgba(102,90,75,0.12)',
+              borderRadius: '50%',
+              padding: 1,
+              cursor: 'pointer',
+              background: 'none',
+            }}
+            value={el.customColor?.startsWith('#') ? el.customColor : '#A6802B'}
             onChange={(e) => upd({ customColor: e.target.value })}
           />
         </PropRow>

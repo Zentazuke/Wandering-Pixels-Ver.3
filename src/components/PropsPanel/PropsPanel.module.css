@@ -3,24 +3,24 @@
   position: relative;
   align-self: center;
   width: 16px;
-  height: 48px;
+  height: 52px;
   border: 1px solid var(--topbar-border);
   border-right: none;
-  border-radius: var(--r-sm) 0 0 var(--r-sm);
+  border-radius: var(--r-md) 0 0 var(--r-md);
   background: var(--topbar-bg);
-  color: var(--ink-mid);
-  font-size: 13px;
+  color: var(--ink-faint);
+  font-size: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: -2px 0 6px rgba(0,0,0,0.05);
-  transition: background var(--t-fast), color var(--t-fast);
+  box-shadow: -2px 0 8px rgba(41,31,18,0.04);
+  transition: background var(--t-spring), color var(--t-spring);
 }
 .toggleTab:hover {
-  background: var(--gold-light);
-  color: var(--ink);
+  background: var(--gold-08);
+  color: var(--gold);
 }
 
 .panel {
@@ -28,14 +28,15 @@
   min-width: var(--props-w);
   background: var(--topbar-bg);
   border-left: 1px solid var(--topbar-border);
+  box-shadow: var(--shadow-panel);
   overflow-y: auto;
   overflow-x: hidden;
   flex-shrink: 0;
   font-size: 12px;
 }
 
-/* Custom slim scrollbar */
-.panel::-webkit-scrollbar { width: 4px; }
+/* Slim scrollbar */
+.panel::-webkit-scrollbar       { width: 3px; }
 .panel::-webkit-scrollbar-track { background: transparent; }
 .panel::-webkit-scrollbar-thumb { background: var(--gold-mid); border-radius: 2px; }
 
@@ -45,14 +46,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 14px;
   color: var(--ink-faint);
   text-align: center;
-  padding: 24px;
+  padding: 28px 20px;
   line-height: 1.6;
 }
 
 .emptyIcon {
-  font-size: 22px;
+  font-size: 24px;
   color: var(--gold-35);
 }

@@ -1,25 +1,25 @@
 /* ── Collapse tab ───────────────────────────────────────────────────────────── */
 .collapseTab {
   width: 16px;
-  height: 48px;
+  height: 52px;
   align-self: center;
   border: 1px solid var(--topbar-border);
   border-left: none;
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
   background: var(--topbar-bg);
-  color: var(--ink-mid);
-  font-size: 13px;
+  color: var(--ink-faint);
+  font-size: 12px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 2px 0 6px rgba(0,0,0,0.05);
-  transition: background var(--t-fast), color var(--t-fast);
+  box-shadow: 2px 0 8px rgba(41,31,18,0.04);
+  transition: background var(--t-spring), color var(--t-spring);
 }
 .collapseTab:hover {
-  background: var(--gold-light);
-  color: var(--ink);
+  background: var(--gold-08);
+  color: var(--gold);
 }
 
 /* ── Main toolbar ───────────────────────────────────────────────────────────── */
@@ -27,20 +27,20 @@
   width: var(--toolbar-w);
   background: var(--topbar-bg);
   border-right: 1px solid var(--topbar-border);
+  box-shadow: var(--shadow-panel);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 0 8px;
+  padding: 12px 0 10px;
   gap: 4px;
   flex-shrink: 0;
   z-index: 50;
-  box-shadow: var(--shadow-sm);
   overflow-y: auto;
   overflow-x: hidden;
 }
 
 /* slim scrollbar */
-.toolbar::-webkit-scrollbar { width: 3px; }
+.toolbar::-webkit-scrollbar       { width: 3px; }
 .toolbar::-webkit-scrollbar-track { background: transparent; }
 .toolbar::-webkit-scrollbar-thumb { background: var(--gold-mid); border-radius: 2px; }
 
@@ -48,21 +48,22 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   width: 100%;
-  padding: 0 6px;
+  padding: 0 7px;
 }
 
 .divider {
-  width: 28px;
+  width: 24px;
   height: 1px;
   background: var(--topbar-border);
-  margin: 4px 0;
+  margin: 5px 0;
+  border-radius: 1px;
 }
 
 .spacer { flex: 1; }
 
-/* ── Buttons ────────────────────────────────────────────────────────────────── */
+/* ── Tool & action buttons ─────────────────────────────────────────────────── */
 .toolBtn,
 .actionBtn {
   width: 36px;
@@ -77,18 +78,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--t-fast), color var(--t-fast);
+  transition:
+    background var(--t-spring),
+    color var(--t-spring),
+    box-shadow var(--t-spring);
 }
 
 .toolBtn:hover,
 .actionBtn:hover {
-  background: var(--gold-light);
+  background: var(--gold-08);
   color: var(--ink);
 }
 
 .toolBtn.active {
   background: var(--gold-15);
-  color: var(--gold-dark);
+  color: var(--gold);
   box-shadow: inset 0 0 0 1.5px var(--gold-30);
 }
 
@@ -102,9 +106,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
   width: 100%;
-  padding: 4px 6px 2px;
+  padding: 6px 7px 4px;
   border-top: 1px solid var(--topbar-border);
 }
 
@@ -112,7 +116,7 @@
   width: 36px;
   height: 28px;
   border: none;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   background: none;
   color: var(--ink-mid);
   font-size: 15px;
@@ -121,18 +125,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--t-fast), color var(--t-fast);
+  transition: background var(--t-spring), color var(--t-spring);
 }
 
 .zoomBtn:hover {
-  background: var(--gold-light);
+  background: var(--gold-08);
   color: var(--ink);
 }
 
 .zoomPct {
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 500;
   color: var(--ink-faint);
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
   padding-bottom: 2px;
 }

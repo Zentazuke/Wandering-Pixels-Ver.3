@@ -1,31 +1,32 @@
 /* ── Design tokens — single source of truth for all colours, spacing, type ── */
 :root {
-  /* Gold palette — all alpha variants derived from rgb(181,148,58) */
-  --gold:          #b5943a;
-  --gold-dark:     #8a6820;
-  --gold-08:       rgba(181,148,58,0.08);
-  --gold-10:       rgba(181,148,58,0.1);
-  --gold-light:    rgba(181,148,58,0.12);
-  --gold-15:       rgba(181,148,58,0.15);
-  --gold-18:       rgba(181,148,58,0.18);
-  --gold-mid:      rgba(181,148,58,0.25);
-  --gold-border:   rgba(181,148,58,0.2);
-  --gold-30:       rgba(181,148,58,0.3);
-  --gold-35:       rgba(181,148,58,0.35);
-  --gold-50:       rgba(181,148,58,0.5);
-  --gold-55:       rgba(181,148,58,0.55);
-  --gold-60:       rgba(181,148,58,0.6);
-  --gold-70:       rgba(181,148,58,0.7);
+  /* Gold palette — refined muted gold rgb(166,128,43) */
+  --gold:          #A6802B;
+  --gold-dark:     #7a5c1e;
+  --gold-08:       rgba(166,128,43,0.08);
+  --gold-10:       rgba(166,128,43,0.1);
+  --gold-light:    rgba(166,128,43,0.10);
+  --gold-15:       rgba(166,128,43,0.15);
+  --gold-18:       rgba(166,128,43,0.18);
+  --gold-mid:      rgba(166,128,43,0.25);
+  --gold-border:   rgba(166,128,43,0.22);
+  --gold-30:       rgba(166,128,43,0.3);
+  --gold-35:       rgba(166,128,43,0.35);
+  --gold-50:       rgba(166,128,43,0.5);
+  --gold-55:       rgba(166,128,43,0.55);
+  --gold-60:       rgba(166,128,43,0.6);
+  --gold-70:       rgba(166,128,43,0.7);
+  --gold-glow:     rgba(166,128,43,0.08);
 
-  /* Ink / text */
-  --ink:           #2e2416;
-  --ink-mid:       rgba(60,40,10,0.55);
-  --ink-faint:     rgba(60,40,10,0.35);
+  /* Ink / text — deeper, near-black warm tone */
+  --ink:           #1A150E;
+  --ink-mid:       #665A4B;
+  --ink-faint:     #A69C8E;
 
   /* Surfaces */
-  --surface:       #fdfaf4;
-  --surface-alt:   #f2ece0;
-  --surface-card:  #fdfbf7;
+  --surface:       #FDFBF7;
+  --surface-alt:   #F4EFE6;
+  --surface-card:  #FDFBF7;
   --surface-dark:  #1a1712;
 
   /* Semantic */
@@ -34,8 +35,8 @@
 
   /* Topbar */
   --topbar-h:      48px;
-  --topbar-bg:     #fdfbf7;
-  --topbar-border: rgba(143,115,82,0.2);
+  --topbar-bg:     #FDFBF7;
+  --topbar-border: rgba(102,90,75,0.12);
 
   /* Board */
   --board-w:       1400px;
@@ -46,19 +47,27 @@
   --toolbar-w:     52px;
 
   /* Props panel */
-  --props-w:       210px;
+  --props-w:       224px;
 
   /* Radius */
-  --r-sm:  3px;
-  --r-md:  6px;
-  --r-lg:  12px;
+  --r-sm:   4px;
+  --r-md:   8px;
+  --r-lg:   16px;
+  --r-pill: 30px;
 
-  /* Shadow */
-  --shadow-sm:  0 2px 8px rgba(92,75,54,0.08);
-  --shadow-md:  0 4px 20px rgba(92,75,54,0.12);
-  --shadow-lg:  0 8px 40px rgba(92,75,54,0.18);
+  /* Shadow — premium layered depth */
+  --shadow-sm:      0 1px 3px rgba(41,31,18,0.04), 0 4px 12px rgba(41,31,18,0.06);
+  --shadow-md:      0 2px 4px rgba(41,31,18,0.03), 0 12px 32px rgba(41,31,18,0.08);
+  --shadow-lg:      0 4px 8px rgba(41,31,18,0.04), 0 24px 56px rgba(41,31,18,0.12);
+  --shadow-panel:   0 2px 4px rgba(41,31,18,0.02), 0 12px 32px rgba(41,31,18,0.05);
 
   /* Transition */
-  --t-fast: 0.15s ease;
-  --t-mid:  0.22s ease;
+  --t-fast:   0.15s ease;
+  --t-mid:    0.22s ease;
+  --t-spring: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Typography */
+  --font-sans: 'DM Sans', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-mono: 'DM Mono', monospace;
 }

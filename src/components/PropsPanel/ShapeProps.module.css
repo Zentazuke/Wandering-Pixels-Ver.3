@@ -1,51 +1,61 @@
 .root { padding-bottom: 24px; }
 
+/* ── Circular swatch grid ── */
 .swatchRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 7px;
   align-items: center;
 }
 
 .swatch {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
+  aspect-ratio: 1;
+  border-radius: 50%;
   cursor: pointer;
-  transition: transform var(--t-fast);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: transform var(--t-spring), outline-color var(--t-spring);
+  flex-shrink: 0;
 }
 
-.swatch:hover  { transform: scale(1.2); }
-.swatchActive  { outline: 2px solid var(--gold); outline-offset: 1px; }
+.swatch:hover  { transform: scale(1.12); }
+.swatchActive  { outline-color: var(--gold) !important; }
 
+/* Custom row separator */
 .customRow {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 4px;
-  padding-top: 4px;
-  border-top: 1px dashed var(--topbar-border);
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--topbar-border);
 }
 
 .customLabel {
   font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--ink-faint);
   flex: 1;
-  letter-spacing: 0.03em;
 }
 
 .colorInput {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border: 1.5px solid var(--topbar-border);
-  border-radius: var(--r-sm);
+  border-radius: 50%;
   padding: 1px;
   cursor: pointer;
   background: none;
+  transition: border-color var(--t-spring);
 }
 
+.colorInput:hover { border-color: var(--gold); }
+
+/* ── Frame/style pill grid ── */
 .frameGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
+  gap: 5px;
 }
