@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import useAppStore from '../../store/appStore.js';
 import useBoardStore from '../../store/boardStore.js';
 import PhotoProps   from './PhotoProps.jsx';
@@ -25,7 +26,7 @@ export default function PropsPanel({ open, onToggle }: Props) {
         onClick={onToggle}
         title={open ? 'Hide panel' : 'Show panel'}
       >
-        {open ? '›' : '‹'}
+        {open ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
       </button>
 
       {open && (

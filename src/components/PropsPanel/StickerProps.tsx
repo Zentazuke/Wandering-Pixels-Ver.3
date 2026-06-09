@@ -1,8 +1,11 @@
+import { BringToFront, SendToBack, Copy, Trash2 } from 'lucide-react';
 import useBoardStore from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import PropSection from './PropSection.jsx';
 import { PropRow, PropSlider, PropBtn } from './PropRow.jsx';
 import type { StickerElement } from '../../types';
+
+const IC = 13;
 
 const STICKER_COLORS: (string | null)[] = [
   null,
@@ -31,12 +34,12 @@ export default function StickerProps({ el }: { el: StickerElement }) {
         <PropSlider label="Opacity" min={10}   max={100} value={el.opacity ?? 100} unit="%"
           onChange={(v) => upd({ opacity: v })} />
         <PropRow>
-          <PropBtn onClick={() => bringFront(el.id)}>Front</PropBtn>
-          <PropBtn onClick={() => sendBack(el.id)}>Back</PropBtn>
-          <PropBtn onClick={() => duplicate(el.id)}>Copy</PropBtn>
+          <PropBtn onClick={() => bringFront(el.id)} title="Bring to front"><BringToFront size={IC} /></PropBtn>
+          <PropBtn onClick={() => sendBack(el.id)}   title="Send to back"><SendToBack size={IC} /></PropBtn>
+          <PropBtn onClick={() => duplicate(el.id)}  title="Duplicate"><Copy size={IC} /></PropBtn>
         </PropRow>
         <PropRow>
-          <PropBtn danger onClick={() => { deselect(); removeEl(el.id); }} style={{ flex: 1 }}>Delete</PropBtn>
+          <PropBtn danger onClick={() => { deselect(); removeEl(el.id); }} style={{ flex: 1 }} title="Delete"><Trash2 size={IC} /></PropBtn>
         </PropRow>
       </PropSection>
 

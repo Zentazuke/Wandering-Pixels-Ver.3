@@ -1,4 +1,7 @@
 import { useRef } from 'react';
+import { BringToFront, SendToBack, Copy, Trash2, FolderOpen } from 'lucide-react';
+
+const IC = 13;
 import useBoardStore from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import { FILTER_PRESETS } from '../../constants/filterPresets.js';
@@ -58,12 +61,12 @@ export default function PhotoProps({ el }: { el: PhotoElement }) {
         <PropSlider label="Rotate" min={-180} max={180} value={Math.round(el.rotation ?? 0)} unit="°"
           onChange={(v) => upd({ rotation: v })} />
         <PropRow>
-          <PropBtn onClick={() => bringFront(el.id)}>Front</PropBtn>
-          <PropBtn onClick={() => sendBack(el.id)}>Back</PropBtn>
-          <PropBtn onClick={() => duplicate(el.id)}>Copy</PropBtn>
+          <PropBtn onClick={() => bringFront(el.id)} title="Bring to front"><BringToFront size={IC} /></PropBtn>
+          <PropBtn onClick={() => sendBack(el.id)}   title="Send to back"><SendToBack size={IC} /></PropBtn>
+          <PropBtn onClick={() => duplicate(el.id)}  title="Duplicate"><Copy size={IC} /></PropBtn>
         </PropRow>
         <PropRow>
-          <PropBtn danger onClick={() => { deselect(); removeEl(el.id); }} style={{ flex: 1 }}>Delete</PropBtn>
+          <PropBtn danger onClick={() => { deselect(); removeEl(el.id); }} style={{ flex: 1 }} title="Delete"><Trash2 size={IC} /></PropBtn>
         </PropRow>
       </PropSection>
 
@@ -73,7 +76,7 @@ export default function PhotoProps({ el }: { el: PhotoElement }) {
           <PropBtn active={el.flipV} onClick={() => upd({ flipV: !el.flipV })}>⇕ Flip V</PropBtn>
         </PropRow>
         <PropRow>
-          <PropBtn style={{ flex: 1 }} onClick={() => replaceRef.current?.click()}>📂 Replace Photo</PropBtn>
+          <PropBtn style={{ flex: 1 }} onClick={() => replaceRef.current?.click()}><FolderOpen size={IC} />&nbsp;Replace</PropBtn>
           <input ref={replaceRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleReplace} />
         </PropRow>
         <PropSlider label="Zoom"   min={100} max={300} value={Math.round((el.imgZoom ?? 1) * 100)} unit="%"

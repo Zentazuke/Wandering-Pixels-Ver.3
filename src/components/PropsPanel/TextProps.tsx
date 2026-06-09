@@ -1,9 +1,15 @@
+import {
+  BringToFront, SendToBack, Copy, Trash2,
+  Bold, Italic, List, AlignLeft, AlignCenter, AlignRight,
+} from 'lucide-react';
 import useBoardStore from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import PropSection from './PropSection.jsx';
 import { PropRow, PropSlider, PropBtn } from './PropRow.jsx';
 import type { TextElement } from '../../types';
 import styles from './TextProps.module.css';
+
+const IC = 13; // icon size for prop panel buttons
 
 const FONTS = ['Lora', 'Playfair', 'DM Sans'];
 
@@ -83,12 +89,12 @@ export default function TextProps({ el }: { el: TextElement }) {
         <PropSlider label="Rotate" min={-180} max={180} value={Math.round(el.rotation ?? 0)} unit="°"
           onChange={(v) => upd({ rotation: v })} />
         <PropRow>
-          <PropBtn onClick={() => bringFront(el.id)}>Front</PropBtn>
-          <PropBtn onClick={() => sendBack(el.id)}>Back</PropBtn>
-          <PropBtn onClick={() => duplicate(el.id)}>Copy</PropBtn>
+          <PropBtn onClick={() => bringFront(el.id)} title="Bring to front"><BringToFront size={IC} /></PropBtn>
+          <PropBtn onClick={() => sendBack(el.id)}   title="Send to back"><SendToBack size={IC} /></PropBtn>
+          <PropBtn onClick={() => duplicate(el.id)}  title="Duplicate"><Copy size={IC} /></PropBtn>
         </PropRow>
         <PropRow>
-          <PropBtn danger onClick={() => { deselect(); removeEl(el.id); }} style={{ flex: 1 }}>Delete</PropBtn>
+          <PropBtn danger onClick={() => { deselect(); removeEl(el.id); }} style={{ flex: 1 }} title="Delete"><Trash2 size={IC} /></PropBtn>
         </PropRow>
       </PropSection>
 
@@ -107,14 +113,14 @@ export default function TextProps({ el }: { el: TextElement }) {
           onChange={(v) => upd({ fontSize: v })} />
 
         <PropRow>
-          <PropBtn active={el.bold}       onClick={() => upd({ bold:   !el.bold })}><b>B</b></PropBtn>
-          <PropBtn active={el.italic}     onClick={() => upd({ italic: !el.italic })}><i>I</i></PropBtn>
-          <PropBtn active={isBulletList}  onClick={() => toggleBulletList(el, update)} title="Bullet list">• List</PropBtn>
+          <PropBtn active={el.bold}      onClick={() => upd({ bold:   !el.bold })}   title="Bold"><Bold size={IC} /></PropBtn>
+          <PropBtn active={el.italic}    onClick={() => upd({ italic: !el.italic })} title="Italic"><Italic size={IC} /></PropBtn>
+          <PropBtn active={isBulletList} onClick={() => toggleBulletList(el, update)} title="Bullet list"><List size={IC} /></PropBtn>
         </PropRow>
         <PropRow>
-          <PropBtn active={(el.align || 'left') === 'left'}   onClick={() => upd({ align: 'left' })}>≡L</PropBtn>
-          <PropBtn active={(el.align || 'left') === 'center'} onClick={() => upd({ align: 'center' })}>≡C</PropBtn>
-          <PropBtn active={(el.align || 'left') === 'right'}  onClick={() => upd({ align: 'right' })}>≡R</PropBtn>
+          <PropBtn active={(el.align || 'left') === 'left'}   onClick={() => upd({ align: 'left' })}   title="Align left"><AlignLeft size={IC} /></PropBtn>
+          <PropBtn active={(el.align || 'left') === 'center'} onClick={() => upd({ align: 'center' })} title="Align center"><AlignCenter size={IC} /></PropBtn>
+          <PropBtn active={(el.align || 'left') === 'right'}  onClick={() => upd({ align: 'right' })}  title="Align right"><AlignRight size={IC} /></PropBtn>
         </PropRow>
 
         <div className={styles.swatchLabel}>Text Color</div>

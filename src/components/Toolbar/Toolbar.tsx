@@ -1,4 +1,11 @@
 import { useRef, useState } from 'react';
+import {
+  MousePointer2, Image, Type, Sparkles,
+  Square, Circle, Minus, MoveRight,
+  Palette, Copy, BringToFront, SendToBack, Trash2,
+  ZoomIn, ZoomOut, Maximize2,
+  ChevronLeft, ChevronRight,
+} from 'lucide-react';
 import useAppStore from '../../store/appStore.js';
 import useBoardStore from '../../store/boardStore.js';
 import { makeShapeElement } from '../../store/boardStore.js';
@@ -13,18 +20,20 @@ interface Props {
   onToggle: () => void;
 }
 
+const ICON_SIZE = 18;
+
 const MAIN_TOOLS = [
-  { id: 'select',  icon: '↖',  title: 'Select (V)' },
-  { id: 'photo',   icon: '📷', title: 'Photo (P)'  },
-  { id: 'text',    icon: 'T',  title: 'Text note (T)' },
-  { id: 'sticker', icon: '★',  title: 'Sticker (S)' },
+  { id: 'select',  Icon: MousePointer2, title: 'Select (V)' },
+  { id: 'photo',   Icon: Image,         title: 'Photo (P)'  },
+  { id: 'text',    Icon: Type,          title: 'Text note (T)' },
+  { id: 'sticker', Icon: Sparkles,      title: 'Sticker (S)' },
 ] as const;
 
-const SHAPE_TOOLS: { id: ShapeElement['shape']; icon: string; title: string }[] = [
-  { id: 'rect',   icon: '□',  title: 'Rectangle' },
-  { id: 'circle', icon: '○',  title: 'Circle / Ellipse' },
-  { id: 'line',   icon: '╱',  title: 'Line' },
-  { id: 'arrow',  icon: '→',  title: 'Arrow' },
+const SHAPE_TOOLS: { id: ShapeElement['shape']; Icon: React.FC<{ size?: number; style?: React.CSSProperties }>; title: string }[] = [
+  { id: 'rect',   Icon: Square,    title: 'Rectangle' },
+  { id: 'circle', Icon: Circle,    title: 'Circle / Ellipse' },
+  { id: 'line',   Icon: Minus,     title: 'Line' },
+  { id: 'arrow',  Icon: MoveRight, title: 'Arrow' },
 ];
 
 /** Left toolbar — tool selector, shape tools, zoom, collapse toggle. */
@@ -47,7 +56,7 @@ export default function Toolbar({ open, onToggle }: Props) {
   const [showBg, setShowBg]             = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Zoom helpers (no canvas ref needed — we use direct store values) ─────────
+  // ── Zoom helpers ──────────────────────────────────────────────────────────────
   function zoomIn()  { setTransform(Math.min(zoom * 1.2, 4), panX, panY); }
   function zoomOut() { setTransform(Math.max(zoom / 1.2, 0.1), panX, panY); }
   function fitBoard() {
@@ -83,7 +92,6 @@ export default function Toolbar({ open, onToggle }: Props) {
     const el = document.querySelector('[data-board-canvas]') as HTMLElement | null;
     const cw = el?.clientWidth  ?? 900;
     const ch = el?.clientHeight ?? 600;
-    // centre of visible board area
     const cx = (cw / 2 - panX) / zoom;
     const cy = (ch / 2 - panY) / zoom;
 
@@ -133,21 +141,21 @@ export default function Toolbar({ open, onToggle }: Props) {
         onClick={onToggle}
         title={open ? 'Hide toolbar' : 'Show toolbar'}
       >
-        {open ? '‹' : '›'}
+        {open ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
       </button>
 
       {open && (
         <aside className={styles.toolbar}>
           {/* ── Main tools ── */}
           <div className={styles.group}>
-            {MAIN_TOOLS.map(({ id, icon, title }) => (
+            {MAIN_TOOLS.map(({ id, Icon, title }) => (
               <button
                 key={id}
                 className={`${styles.toolBtn} ${tool === id ? styles.active : ''}`}
                 title={title}
                 onClick={() => handleToolClick(id)}
               >
-                {icon}
+                <Icon size={ICON_SIZE} />
               </button>
             ))}
           </div>
@@ -156,14 +164,14 @@ export default function Toolbar({ open, onToggle }: Props) {
 
           {/* ── Shape tools ── */}
           <div className={styles.group}>
-            {SHAPE_TOOLS.map(({ id, icon, title }) => (
+            {SHAPE_TOOLS.map(({ id, Icon, title }) => (
               <button
                 key={id}
                 className={styles.toolBtn}
                 title={title}
                 onClick={() => addShape(id)}
               >
-                {icon}
+                <Icon size={ICON_SIZE} />
               </button>
             ))}
           </div>
@@ -172,7 +180,9 @@ export default function Toolbar({ open, onToggle }: Props) {
 
           {/* ── Background ── */}
           <div className={styles.group}>
-            <button className={styles.toolBtn} title="Background" onClick={() => setShowBg(true)}>◫</button>
+            <button className={styles.toolBtn} title="Background" onClick={() => setShowBg(true)}>
+              <Palette size={ICON_SIZE} />
+            </button>
           </div>
 
           <div className={styles.divider} />
@@ -181,11 +191,19 @@ export default function Toolbar({ open, onToggle }: Props) {
           {selId && (
             <>
               <div className={styles.group}>
-                <button className={styles.actionBtn} title="Duplicate (Ctrl+D)" onClick={() => duplicate(selId)}>⧉</button>
-                <button className={styles.actionBtn} title="Bring to front (Ctrl+])" onClick={() => bringFront(selId)}>↑</button>
-                <button className={styles.actionBtn} title="Send to back (Ctrl+[)" onClick={() => sendBack(selId)}>↓</button>
+                <button className={styles.actionBtn} title="Duplicate (Ctrl+D)" onClick={() => duplicate(selId)}>
+                  <Copy size={ICON_SIZE} />
+                </button>
+                <button className={styles.actionBtn} title="Bring to front (Ctrl+])" onClick={() => bringFront(selId)}>
+                  <BringToFront size={ICON_SIZE} />
+                </button>
+                <button className={styles.actionBtn} title="Send to back (Ctrl+[)" onClick={() => sendBack(selId)}>
+                  <SendToBack size={ICON_SIZE} />
+                </button>
                 <button className={`${styles.actionBtn} ${styles.danger}`} title="Delete"
-                  onClick={() => { useAppStore.getState().deselect(); removeEl(selId); }}>✕</button>
+                  onClick={() => { useAppStore.getState().deselect(); removeEl(selId); }}>
+                  <Trash2 size={ICON_SIZE} />
+                </button>
               </div>
               <div className={styles.divider} />
             </>
@@ -196,9 +214,15 @@ export default function Toolbar({ open, onToggle }: Props) {
 
           {/* ── Zoom ── */}
           <div className={styles.zoomGroup}>
-            <button className={styles.zoomBtn} title="Zoom in (+)" onClick={zoomIn}>+</button>
-            <button className={styles.zoomBtn} title="Fit to screen" onClick={fitBoard}>⊡</button>
-            <button className={styles.zoomBtn} title="Zoom out (-)" onClick={zoomOut}>−</button>
+            <button className={styles.zoomBtn} title="Zoom in (+)" onClick={zoomIn}>
+              <ZoomIn size={16} />
+            </button>
+            <button className={styles.zoomBtn} title="Fit to screen" onClick={fitBoard}>
+              <Maximize2 size={16} />
+            </button>
+            <button className={styles.zoomBtn} title="Zoom out (-)" onClick={zoomOut}>
+              <ZoomOut size={16} />
+            </button>
             <span className={styles.zoomPct}>{Math.round(zoom * 100)}%</span>
           </div>
 

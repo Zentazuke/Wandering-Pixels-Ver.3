@@ -17,6 +17,7 @@
     "@fontsource/dm-sans": "^5.2.8",
     "@fontsource/lora": "^5.2.8",
     "@fontsource/playfair-display": "^5.2.8",
+    "lucide-react": "^1.17.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "zundo": "^2.3.0",
