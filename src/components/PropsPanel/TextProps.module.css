@@ -64,3 +64,37 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 5px;
 }
+
+/* ── Colour tabs ── */
+.colorTabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 10px;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  border: 1px solid var(--topbar-border);
+}
+
+.colorTab {
+  flex: 1;
+  padding: 6px 4px;
+  border: none;
+  background: none;
+  color: var(--ink-faint);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--t-spring), color var(--t-spring);
+}
+
+.colorTab:hover {
+  background: var(--gold-08);
+  color: var(--ink);
+}
+
+.colorTabActive {
+  background: var(--gold-glow);
+  color: var(--gold);
+}

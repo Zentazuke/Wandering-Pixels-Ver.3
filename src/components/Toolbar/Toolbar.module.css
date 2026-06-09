@@ -63,9 +63,8 @@
 
 .spacer { flex: 1; }
 
-/* ── Tool & action buttons ─────────────────────────────────────────────────── */
-.toolBtn,
-.actionBtn {
+/* ── Tool buttons ───────────────────────────────────────────────────────────── */
+.toolBtn {
   width: 36px;
   height: 36px;
   border: none;
@@ -84,8 +83,7 @@
     box-shadow var(--t-spring);
 }
 
-.toolBtn:hover,
-.actionBtn:hover {
+.toolBtn:hover {
   background: var(--gold-08);
   color: var(--ink);
 }
@@ -96,48 +94,38 @@
   box-shadow: inset 0 0 0 1.5px var(--gold-30);
 }
 
-.actionBtn.danger:hover {
-  background: var(--danger-bg);
-  color: #b55a5a;
-}
-
-/* ── Zoom section ───────────────────────────────────────────────────────────── */
-.zoomGroup {
+/* ── Shapes flyout ──────────────────────────────────────────────────────────── */
+.flyout {
+  position: fixed;
+  background: var(--surface);
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-lg);
+  padding: 6px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  width: 100%;
-  padding: 6px 7px 4px;
-  border-top: 1px solid var(--topbar-border);
+  gap: 2px;
+  box-shadow: var(--shadow-md);
+  z-index: 200;
+  min-width: 90px;
 }
 
-.zoomBtn {
-  width: 36px;
-  height: 28px;
+.flyoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
   border: none;
   border-radius: var(--r-md);
   background: none;
   color: var(--ink-mid);
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 500;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: background var(--t-spring), color var(--t-spring);
+  white-space: nowrap;
 }
 
-.zoomBtn:hover {
+.flyoutBtn:hover {
   background: var(--gold-08);
   color: var(--ink);
-}
-
-.zoomPct {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--ink-faint);
-  letter-spacing: -0.01em;
-  padding-bottom: 2px;
 }

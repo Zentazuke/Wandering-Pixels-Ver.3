@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   BringToFront, ChevronsUp, ChevronsDown, SendToBack, Copy, Trash2,
   Bold, Italic, List, AlignLeft, AlignCenter, AlignRight,
@@ -84,6 +85,7 @@ export default function TextProps({ el }: { el: TextElement }) {
   const upd = (patch: Partial<TextElement>) => update(el.id, patch);
   const activeFrame = el.noteFrame || 'shadow';
   const isBulletList = el.content.trimStart().startsWith('<ul');
+  const [colorTab, setColorTab] = useState<'text' | 'bg'>('text');
 
   return (
     <div className={styles.root}>
@@ -127,40 +129,59 @@ export default function TextProps({ el }: { el: TextElement }) {
           <PropBtn active={(el.align || 'left') === 'right'}  onClick={() => upd({ align: 'right' })}  title="Align right"><AlignRight size={IC} /></PropBtn>
         </PropRow>
 
-        <div className={styles.swatchLabel}>Text Color</div>
-        <div className={styles.swatchRow}>
-          {TEXT_COLORS.map((c) => (
-            <div key={c}
-              className={`${styles.swatch} ${(el.color || '#3b3328') === c ? styles.swatchActive : ''}`}
-              style={{ background: c === 'transparent' ? 'none' : c, border: c === 'transparent' ? '1.5px dashed rgba(0,0,0,0.3)' : '1.5px solid rgba(0,0,0,0.12)' }}
-              onClick={() => upd({ color: c })}
-            />
-          ))}
+        {/* ── Colour tabs ── */}
+        <div className={styles.colorTabs}>
+          <button
+            className={`${styles.colorTab} ${colorTab === 'text' ? styles.colorTabActive : ''}`}
+            onClick={() => setColorTab('text')}
+          >
+            Text Color
+          </button>
+          <button
+            className={`${styles.colorTab} ${colorTab === 'bg' ? styles.colorTabActive : ''}`}
+            onClick={() => setColorTab('bg')}
+          >
+            Paper Color
+          </button>
         </div>
-        <div className={styles.customRow}>
-          <span className={styles.swatchLabel}>Custom</span>
-          <input type="color" className={styles.colorInput} title="Pick a custom text colour"
-            value={el.color?.startsWith('#') ? el.color : '#3b3328'}
-            onChange={(e) => upd({ color: e.target.value })} />
-        </div>
-      </PropSection>
 
-      <PropSection title="Background">
-        <div className={styles.swatchRow}>
-          {NOTE_BG_COLORS.map((c) => (
-            <div key={c}
-              className={`${styles.swatch} ${(el.bg || '#fff9e6') === c ? styles.swatchActive : ''}`}
-              style={{ background: c === 'transparent' ? 'none' : c, border: c === 'transparent' ? '1.5px dashed rgba(0,0,0,0.3)' : '1.5px solid rgba(0,0,0,0.12)' }}
-              onClick={() => upd({ bg: c })}
-            />
-          ))}
-        </div>
-        <div className={styles.customRow}>
-          <span className={styles.swatchLabel}>Custom</span>
-          <input type="color" className={styles.colorInput} title="Pick a custom background colour"
-            value={el.bg?.startsWith('#') ? el.bg : '#fff9e6'}
-            onChange={(e) => upd({ bg: e.target.value })} />
-        </div>
+        {colorTab === 'text' ? (
+          <>
+            <div className={styles.swatchRow}>
+              {TEXT_COLORS.map((c) => (
+                <div key={c}
+                  className={`${styles.swatch} ${(el.color || '#3b3328') === c ? styles.swatchActive : ''}`}
+                  style={{ background: c === 'transparent' ? 'none' : c, border: c === 'transparent' ? '1.5px dashed rgba(0,0,0,0.3)' : '1.5px solid rgba(0,0,0,0.12)' }}
+                  onClick={() => upd({ color: c })}
+                />
+              ))}
+            </div>
+            <div className={styles.customRow}>
+              <span className={styles.swatchLabel}>Custom</span>
+              <input type="color" className={styles.colorInput} title="Pick a custom text colour"
+                value={el.color?.startsWith('#') ? el.color : '#3b3328'}
+                onChange={(e) => upd({ color: e.target.value })} />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={styles.swatchRow}>
+              {NOTE_BG_COLORS.map((c) => (
+                <div key={c}
+                  className={`${styles.swatch} ${(el.bg || '#fff9e6') === c ? styles.swatchActive : ''}`}
+                  style={{ background: c === 'transparent' ? 'none' : c, border: c === 'transparent' ? '1.5px dashed rgba(0,0,0,0.3)' : '1.5px solid rgba(0,0,0,0.12)' }}
+                  onClick={() => upd({ bg: c })}
+                />
+              ))}
+            </div>
+            <div className={styles.customRow}>
+              <span className={styles.swatchLabel}>Custom</span>
+              <input type="color" className={styles.colorInput} title="Pick a custom background colour"
+                value={el.bg?.startsWith('#') ? el.bg : '#fff9e6'}
+                onChange={(e) => upd({ bg: e.target.value })} />
+            </div>
+          </>
+        )}
       </PropSection>
 
       <PropSection title="Frame Style" defaultOpen>

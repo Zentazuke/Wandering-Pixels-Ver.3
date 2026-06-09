@@ -38,6 +38,13 @@
   --topbar-bg:     #FDFBF7;
   --topbar-border: rgba(102,90,75,0.12);
 
+  /* Top bar — dark obsidian strip */
+  --bar-bg:           #1C1814;
+  --bar-border:       rgba(166,128,43,0.18);
+  --bar-text:         rgba(220,205,180,0.6);
+  --bar-text-active:  #F0E4C8;
+  --bar-btn-hover:    rgba(166,128,43,0.12);
+
   /* Board */
   --board-w:       1400px;
   --board-h:       900px;

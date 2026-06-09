@@ -1,15 +1,13 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import {
   MousePointer2, Image, Type, Sparkles,
   Square, Circle, Minus, MoveRight,
-  Palette, Copy, BringToFront, ChevronsUp, ChevronsDown, SendToBack, Trash2,
-  ZoomIn, ZoomOut, Maximize2,
+  Palette, LayoutGrid,
   ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import useAppStore from '../../store/appStore.js';
 import useBoardStore from '../../store/boardStore.js';
 import { makeShapeElement } from '../../store/boardStore.js';
-import { BOARD_W, BOARD_H } from '../../constants/board.js';
 import StickerPicker from '../ui/StickerPicker.jsx';
 import BgPicker from '../ui/BgPicker.jsx';
 import styles from './Toolbar.module.css';
@@ -29,48 +27,51 @@ const MAIN_TOOLS = [
   { id: 'sticker', Icon: Sparkles,      title: 'Sticker (S)' },
 ] as const;
 
-const SHAPE_TOOLS: { id: ShapeElement['shape']; Icon: React.FC<{ size?: number; style?: React.CSSProperties }>; title: string }[] = [
-  { id: 'rect',   Icon: Square,    title: 'Rectangle' },
-  { id: 'circle', Icon: Circle,    title: 'Circle / Ellipse' },
-  { id: 'line',   Icon: Minus,     title: 'Line' },
-  { id: 'arrow',  Icon: MoveRight, title: 'Arrow' },
+const SHAPE_TOOLS: { id: ShapeElement['shape']; Icon: React.FC<{ size?: number }>; title: string; short: string }[] = [
+  { id: 'rect',   Icon: Square,    title: 'Rectangle',       short: 'Rect'   },
+  { id: 'circle', Icon: Circle,    title: 'Circle / Ellipse', short: 'Circle' },
+  { id: 'line',   Icon: Minus,     title: 'Line',            short: 'Line'   },
+  { id: 'arrow',  Icon: MoveRight, title: 'Arrow',           short: 'Arrow'  },
 ];
 
-/** Left toolbar — tool selector, shape tools, zoom, collapse toggle. */
+/** Left toolbar — tool selector, shapes flyout, background, collapse toggle. */
 export default function Toolbar({ open, onToggle }: Props) {
   const tool    = useAppStore((s) => s.tool);
   const setTool = useAppStore((s) => s.setTool);
-  const selId   = useAppStore((s) => s.selId);
   const zoom    = useAppStore((s) => s.zoom);
   const panX    = useAppStore((s) => s.panX);
   const panY    = useAppStore((s) => s.panY);
-  const setTransform = useAppStore((s) => s.setTransform);
 
-  const addElement  = useBoardStore((s) => s.addElement);
-  const removeEl    = useBoardStore((s) => s.removeElement);
-  const duplicate      = useBoardStore((s) => s.duplicateElement);
-  const bringFront     = useBoardStore((s) => s.bringToFront);
-  const bringForward   = useBoardStore((s) => s.bringForward);
-  const sendBackward   = useBoardStore((s) => s.sendBackward);
-  const sendBack       = useBoardStore((s) => s.sendToBack);
+  const addElement = useBoardStore((s) => s.addElement);
 
-  const [showStickers, setShowStickers] = useState(false);
-  const [showBg, setShowBg]             = useState(false);
+  const [showStickers,     setShowStickers]     = useState(false);
+  const [showBg,           setShowBg]           = useState(false);
+  const [showShapesFlyout, setShowShapesFlyout] = useState(false);
+  const [flyoutPos,        setFlyoutPos]        = useState({ top: 0, left: 0 });
+
+  const shapeBtnRef   = useRef<HTMLButtonElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Zoom helpers ──────────────────────────────────────────────────────────────
-  function zoomIn()  { setTransform(Math.min(zoom * 1.2, 4), panX, panY); }
-  function zoomOut() { setTransform(Math.max(zoom / 1.2, 0.1), panX, panY); }
-  function fitBoard() {
-    const el = document.querySelector('[data-board-canvas]') as HTMLElement | null;
-    if (!el) return;
-    const ww = el.clientWidth  || 900;
-    const wh = el.clientHeight || 600;
-    const z  = Math.min(ww / BOARD_W, wh / BOARD_H) * 0.9;
-    setTransform(z, (ww - BOARD_W * z) / 2, (wh - BOARD_H * z) / 2);
+  // Close flyout when clicking outside
+  useEffect(() => {
+    if (!showShapesFlyout) return;
+    function handleOutside(e: MouseEvent) {
+      if (shapeBtnRef.current?.contains(e.target as Node)) return;
+      setShowShapesFlyout(false);
+    }
+    document.addEventListener('pointerdown', handleOutside);
+    return () => document.removeEventListener('pointerdown', handleOutside);
+  }, [showShapesFlyout]);
+
+  function openShapesFlyout() {
+    if (showShapesFlyout) { setShowShapesFlyout(false); return; }
+    if (shapeBtnRef.current) {
+      const rect = shapeBtnRef.current.getBoundingClientRect();
+      setFlyoutPos({ top: rect.top, left: rect.right + 6 });
+    }
+    setShowShapesFlyout(true);
   }
 
-  // ── Tool click ────────────────────────────────────────────────────────────────
   function handleToolClick(id: string) {
     if (id === 'photo')   { photoInputRef.current?.click(); return; }
     if (id === 'sticker') { setShowStickers(true); return; }
@@ -105,6 +106,7 @@ export default function Toolbar({ open, onToggle }: Props) {
     const id = addElement(makeShapeElement(shape, useBoardStore.getState().elements.length, extra));
     useAppStore.getState().setSelId(id);
     setTool('select');
+    setShowShapesFlyout(false);
   }
 
   function handlePhotoFiles(e: React.ChangeEvent<HTMLInputElement>) {
@@ -137,7 +139,7 @@ export default function Toolbar({ open, onToggle }: Props) {
 
   return (
     <>
-      {/* Collapse tab */}
+      {/* ── Collapse tab ── */}
       <button
         className={styles.collapseTab}
         onClick={onToggle}
@@ -164,18 +166,16 @@ export default function Toolbar({ open, onToggle }: Props) {
 
           <div className={styles.divider} />
 
-          {/* ── Shape tools ── */}
+          {/* ── Shapes flyout trigger ── */}
           <div className={styles.group}>
-            {SHAPE_TOOLS.map(({ id, Icon, title }) => (
-              <button
-                key={id}
-                className={styles.toolBtn}
-                title={title}
-                onClick={() => addShape(id)}
-              >
-                <Icon size={ICON_SIZE} />
-              </button>
-            ))}
+            <button
+              ref={shapeBtnRef}
+              className={`${styles.toolBtn} ${showShapesFlyout ? styles.active : ''}`}
+              title="Shapes"
+              onClick={openShapesFlyout}
+            >
+              <LayoutGrid size={ICON_SIZE} />
+            </button>
           </div>
 
           <div className={styles.divider} />
@@ -187,55 +187,38 @@ export default function Toolbar({ open, onToggle }: Props) {
             </button>
           </div>
 
-          <div className={styles.divider} />
-
-          {/* ── Element actions (when selected) ── */}
-          {selId && (
-            <>
-              <div className={styles.group}>
-                <button className={styles.actionBtn} title="Duplicate (Ctrl+D)" onClick={() => duplicate(selId)}>
-                  <Copy size={ICON_SIZE} />
-                </button>
-                <button className={styles.actionBtn} title="Bring to front" onClick={() => bringFront(selId)}>
-                  <BringToFront size={ICON_SIZE} />
-                </button>
-                <button className={styles.actionBtn} title="Move forward one layer" onClick={() => bringForward(selId)}>
-                  <ChevronsUp size={ICON_SIZE} />
-                </button>
-                <button className={styles.actionBtn} title="Move back one layer" onClick={() => sendBackward(selId)}>
-                  <ChevronsDown size={ICON_SIZE} />
-                </button>
-                <button className={styles.actionBtn} title="Send to back" onClick={() => sendBack(selId)}>
-                  <SendToBack size={ICON_SIZE} />
-                </button>
-                <button className={`${styles.actionBtn} ${styles.danger}`} title="Delete"
-                  onClick={() => { useAppStore.getState().deselect(); removeEl(selId); }}>
-                  <Trash2 size={ICON_SIZE} />
-                </button>
-              </div>
-              <div className={styles.divider} />
-            </>
-          )}
-
           {/* ── Spacer ── */}
           <div className={styles.spacer} />
 
-          {/* ── Zoom ── */}
-          <div className={styles.zoomGroup}>
-            <button className={styles.zoomBtn} title="Zoom in (+)" onClick={zoomIn}>
-              <ZoomIn size={16} />
-            </button>
-            <button className={styles.zoomBtn} title="Fit to screen" onClick={fitBoard}>
-              <Maximize2 size={16} />
-            </button>
-            <button className={styles.zoomBtn} title="Zoom out (-)" onClick={zoomOut}>
-              <ZoomOut size={16} />
-            </button>
-            <span className={styles.zoomPct}>{Math.round(zoom * 100)}%</span>
-          </div>
-
-          <input ref={photoInputRef} type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={handlePhotoFiles} />
+          <input
+            ref={photoInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            style={{ display: 'none' }}
+            onChange={handlePhotoFiles}
+          />
         </aside>
+      )}
+
+      {/* ── Shapes flyout — fixed position, not clipped by overflow:hidden ── */}
+      {showShapesFlyout && (
+        <div
+          className={styles.flyout}
+          style={{ top: flyoutPos.top, left: flyoutPos.left }}
+        >
+          {SHAPE_TOOLS.map(({ id, Icon, title, short }) => (
+            <button
+              key={id}
+              className={styles.flyoutBtn}
+              title={title}
+              onClick={() => addShape(id)}
+            >
+              <Icon size={16} />
+              <span>{short}</span>
+            </button>
+          ))}
+        </div>
       )}
 
       {showStickers && <StickerPicker onClose={() => setShowStickers(false)} />}
