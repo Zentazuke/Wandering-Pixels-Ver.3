@@ -1,0 +1,94 @@
+.bar {
+  height: var(--topbar-h);
+  background: var(--topbar-bg);
+  border-bottom: 1px solid var(--topbar-border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+  z-index: 100;
+  position: relative;
+}
+
+/* ── Logo / home button ── */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--r-sm);
+  transition: opacity var(--t-fast), background var(--t-fast);
+  white-space: nowrap;
+}
+
+.logo:hover { background: var(--gold-light); }
+
+.logoText {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px;
+  color: var(--ink);
+  letter-spacing: 0.03em;
+}
+
+/* ── View tabs ── */
+.tabs {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.tab {
+  padding: 5px 14px;
+  border: none;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--ink-mid);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+
+.tab:hover { background: var(--gold-light); color: var(--ink); }
+
+.tabActive {
+  background: var(--gold-light);
+  color: var(--gold-dark);
+  font-weight: 600;
+}
+
+/* ── Right actions ── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.actionBtn {
+  padding: 5px 10px;
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--ink-mid);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+}
+
+.actionBtn:hover {
+  background: var(--gold-light);
+  color: var(--ink);
+  border-color: var(--gold-border);
+}

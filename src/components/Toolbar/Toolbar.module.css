@@ -1,0 +1,61 @@
+.toolbar {
+  width: var(--toolbar-w);
+  background: var(--topbar-bg);
+  border-right: 1px solid var(--topbar-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  gap: 4px;
+  flex-shrink: 0;
+  z-index: 50;
+  box-shadow: var(--shadow-sm);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 0 6px;
+}
+
+.divider {
+  width: 28px;
+  height: 1px;
+  background: var(--topbar-border);
+  margin: 6px 0;
+}
+
+.toolBtn, .actionBtn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--ink-mid);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+
+.toolBtn:hover, .actionBtn:hover {
+  background: var(--gold-light);
+  color: var(--ink);
+}
+
+.toolBtn.active {
+  background: var(--gold-15);
+  color: var(--gold-dark);
+  box-shadow: inset 0 0 0 1.5px var(--gold-30);
+}
+
+.actionBtn.danger:hover {
+  background: var(--danger-bg);
+  color: #b55a5a;
+}

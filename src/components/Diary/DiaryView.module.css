@@ -1,0 +1,102 @@
+.wrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 24px;
+  overflow-y: auto;
+  background: var(--surface-alt);
+}
+
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+  padding: 40px 48px 36px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.date {
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 28px;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 28px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-mid);
+  margin-top: 10px;
+}
+
+.input {
+  padding: 8px 12px;
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-family: 'Lora', serif;
+  outline: none;
+  transition: border-color var(--t-fast);
+  user-select: text;
+}
+
+.input:focus { border-color: var(--gold); }
+
+.textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+  font-family: 'Lora', serif;
+  line-height: 1.6;
+  min-height: 160px;
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--t-fast);
+  user-select: text;
+}
+
+.textarea:focus { border-color: var(--gold); }
+
+.saveBtn {
+  width: 100%;
+  padding: 13px;
+  background: var(--gold-light);
+  border: 1.5px solid var(--gold-35);
+  border-radius: var(--r-md);
+  color: var(--gold-dark);
+  font-size: 13px;
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+
+.saveBtn:hover { background: var(--gold-18); border-color: var(--gold-50); }
+.saveBtnDone   { background: rgba(30,158,117,0.12); border-color: rgba(30,158,117,0.4); color: #1d9e75; }

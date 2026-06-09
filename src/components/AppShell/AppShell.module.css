@@ -1,0 +1,24 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;  /* toolbar + canvas side by side */
+  position: relative;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: var(--ink-mid);
+  letter-spacing: 0.05em;
+}

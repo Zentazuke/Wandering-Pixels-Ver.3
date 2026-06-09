@@ -1,0 +1,85 @@
+.fullPage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-alt);
+}
+
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+  padding: 40px 48px;
+  text-align: center;
+  max-width: 420px;
+}
+
+.icon {
+  font-size: 28px;
+  color: rgba(192,57,43,0.6);
+  margin-bottom: 16px;
+}
+
+.title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--ink-mid);
+  margin-bottom: 16px;
+}
+
+.message {
+  display: block;
+  font-size: 11px;
+  background: var(--surface-alt);
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+  color: var(--ink-faint);
+  margin-bottom: 24px;
+  word-break: break-word;
+  text-align: left;
+}
+
+.btn {
+  padding: 10px 24px;
+  background: var(--gold-light);
+  border: 1.5px solid var(--gold-35);
+  border-radius: var(--r-md);
+  color: var(--gold-dark);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+.btn:hover { background: var(--gold-border); }
+
+/* Inline variant */
+.inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(192,57,43,0.07);
+  border: 1px solid rgba(192,57,43,0.2);
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  color: rgba(192,57,43,0.8);
+}
+.inline button {
+  font-size: 11px;
+  padding: 2px 8px;
+  border: 1px solid rgba(192,57,43,0.3);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: rgba(192,57,43,0.8);
+  cursor: pointer;
+}

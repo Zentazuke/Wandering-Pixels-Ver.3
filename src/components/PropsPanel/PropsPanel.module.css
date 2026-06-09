@@ -1,0 +1,33 @@
+.panel {
+  width: var(--props-w);
+  min-width: var(--props-w);
+  background: var(--topbar-bg);
+  border-left: 1px solid var(--topbar-border);
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+/* Custom slim scrollbar */
+.panel::-webkit-scrollbar { width: 4px; }
+.panel::-webkit-scrollbar-track { background: transparent; }
+.panel::-webkit-scrollbar-thumb { background: var(--gold-mid); border-radius: 2px; }
+
+.empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--ink-faint);
+  text-align: center;
+  padding: 24px;
+  line-height: 1.6;
+}
+
+.emptyIcon {
+  font-size: 22px;
+  color: var(--gold-35);
+}

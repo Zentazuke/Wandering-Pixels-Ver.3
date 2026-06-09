@@ -1,0 +1,64 @@
+/* ── Design tokens — single source of truth for all colours, spacing, type ── */
+:root {
+  /* Gold palette — all alpha variants derived from rgb(181,148,58) */
+  --gold:          #b5943a;
+  --gold-dark:     #8a6820;
+  --gold-08:       rgba(181,148,58,0.08);
+  --gold-10:       rgba(181,148,58,0.1);
+  --gold-light:    rgba(181,148,58,0.12);
+  --gold-15:       rgba(181,148,58,0.15);
+  --gold-18:       rgba(181,148,58,0.18);
+  --gold-mid:      rgba(181,148,58,0.25);
+  --gold-border:   rgba(181,148,58,0.2);
+  --gold-30:       rgba(181,148,58,0.3);
+  --gold-35:       rgba(181,148,58,0.35);
+  --gold-50:       rgba(181,148,58,0.5);
+  --gold-55:       rgba(181,148,58,0.55);
+  --gold-60:       rgba(181,148,58,0.6);
+  --gold-70:       rgba(181,148,58,0.7);
+
+  /* Ink / text */
+  --ink:           #2e2416;
+  --ink-mid:       rgba(60,40,10,0.55);
+  --ink-faint:     rgba(60,40,10,0.35);
+
+  /* Surfaces */
+  --surface:       #fdfaf4;
+  --surface-alt:   #f2ece0;
+  --surface-card:  #fdfbf7;
+  --surface-dark:  #1a1712;
+
+  /* Semantic */
+  --danger:        rgba(181,90,90,0.7);
+  --danger-bg:     rgba(181,90,90,0.1);
+
+  /* Topbar */
+  --topbar-h:      48px;
+  --topbar-bg:     #fdfbf7;
+  --topbar-border: rgba(143,115,82,0.2);
+
+  /* Board */
+  --board-w:       1400px;
+  --board-h:       900px;
+  --board-bg:      #ddd5c5;
+
+  /* Toolbar */
+  --toolbar-w:     52px;
+
+  /* Props panel */
+  --props-w:       210px;
+
+  /* Radius */
+  --r-sm:  3px;
+  --r-md:  6px;
+  --r-lg:  12px;
+
+  /* Shadow */
+  --shadow-sm:  0 2px 8px rgba(92,75,54,0.08);
+  --shadow-md:  0 4px 20px rgba(92,75,54,0.12);
+  --shadow-lg:  0 8px 40px rgba(92,75,54,0.18);
+
+  /* Transition */
+  --t-fast: 0.15s ease;
+  --t-mid:  0.22s ease;
+}

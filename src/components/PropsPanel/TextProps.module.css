@@ -1,0 +1,46 @@
+.root { padding-bottom: 24px; }
+
+.fontBtns {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.swatchLabel {
+  font-size: 10px;
+  color: var(--ink-mid);
+  margin-top: 2px;
+}
+
+.swatchRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: transform var(--t-fast);
+}
+
+.swatch:hover     { transform: scale(1.2); }
+.swatchActive     { outline: 2px solid var(--gold); outline-offset: 1px; }
+
+.colorInput {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 3px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.frameGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
