@@ -1,5 +1,5 @@
 import {
-  BringToFront, SendToBack, Copy, Trash2,
+  BringToFront, ChevronsUp, ChevronsDown, SendToBack, Copy, Trash2,
   Bold, Italic, List, AlignLeft, AlignCenter, AlignRight,
 } from 'lucide-react';
 import useBoardStore from '../../store/boardStore.js';
@@ -75,9 +75,11 @@ export default function TextProps({ el }: { el: TextElement }) {
   const update     = useBoardStore((s) => s.updateElement);
   const deselect   = useAppStore((s) => s.deselect);
   const removeEl   = useBoardStore((s) => s.removeElement);
-  const duplicate  = useBoardStore((s) => s.duplicateElement);
-  const bringFront = useBoardStore((s) => s.bringToFront);
-  const sendBack   = useBoardStore((s) => s.sendToBack);
+  const duplicate    = useBoardStore((s) => s.duplicateElement);
+  const bringFront   = useBoardStore((s) => s.bringToFront);
+  const bringForward = useBoardStore((s) => s.bringForward);
+  const sendBackward = useBoardStore((s) => s.sendBackward);
+  const sendBack     = useBoardStore((s) => s.sendToBack);
 
   const upd = (patch: Partial<TextElement>) => update(el.id, patch);
   const activeFrame = el.noteFrame || 'shadow';
@@ -89,9 +91,11 @@ export default function TextProps({ el }: { el: TextElement }) {
         <PropSlider label="Rotate" min={-180} max={180} value={Math.round(el.rotation ?? 0)} unit="°"
           onChange={(v) => upd({ rotation: v })} />
         <PropRow>
-          <PropBtn onClick={() => bringFront(el.id)} title="Bring to front"><BringToFront size={IC} /></PropBtn>
-          <PropBtn onClick={() => sendBack(el.id)}   title="Send to back"><SendToBack size={IC} /></PropBtn>
-          <PropBtn onClick={() => duplicate(el.id)}  title="Duplicate"><Copy size={IC} /></PropBtn>
+          <PropBtn onClick={() => bringFront(el.id)}   title="Bring to front"><BringToFront size={IC} /></PropBtn>
+          <PropBtn onClick={() => bringForward(el.id)} title="Move forward one layer"><ChevronsUp size={IC} /></PropBtn>
+          <PropBtn onClick={() => sendBackward(el.id)} title="Move back one layer"><ChevronsDown size={IC} /></PropBtn>
+          <PropBtn onClick={() => sendBack(el.id)}     title="Send to back"><SendToBack size={IC} /></PropBtn>
+          <PropBtn onClick={() => duplicate(el.id)}    title="Duplicate"><Copy size={IC} /></PropBtn>
         </PropRow>
         <PropRow>
           <PropBtn danger onClick={() => { deselect(); removeEl(el.id); }} style={{ flex: 1 }} title="Delete"><Trash2 size={IC} /></PropBtn>

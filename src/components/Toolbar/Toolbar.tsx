@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import {
   MousePointer2, Image, Type, Sparkles,
   Square, Circle, Minus, MoveRight,
-  Palette, Copy, BringToFront, SendToBack, Trash2,
+  Palette, Copy, BringToFront, ChevronsUp, ChevronsDown, SendToBack, Trash2,
   ZoomIn, ZoomOut, Maximize2,
   ChevronLeft, ChevronRight,
 } from 'lucide-react';
@@ -48,9 +48,11 @@ export default function Toolbar({ open, onToggle }: Props) {
 
   const addElement  = useBoardStore((s) => s.addElement);
   const removeEl    = useBoardStore((s) => s.removeElement);
-  const duplicate   = useBoardStore((s) => s.duplicateElement);
-  const bringFront  = useBoardStore((s) => s.bringToFront);
-  const sendBack    = useBoardStore((s) => s.sendToBack);
+  const duplicate      = useBoardStore((s) => s.duplicateElement);
+  const bringFront     = useBoardStore((s) => s.bringToFront);
+  const bringForward   = useBoardStore((s) => s.bringForward);
+  const sendBackward   = useBoardStore((s) => s.sendBackward);
+  const sendBack       = useBoardStore((s) => s.sendToBack);
 
   const [showStickers, setShowStickers] = useState(false);
   const [showBg, setShowBg]             = useState(false);
@@ -194,10 +196,16 @@ export default function Toolbar({ open, onToggle }: Props) {
                 <button className={styles.actionBtn} title="Duplicate (Ctrl+D)" onClick={() => duplicate(selId)}>
                   <Copy size={ICON_SIZE} />
                 </button>
-                <button className={styles.actionBtn} title="Bring to front (Ctrl+])" onClick={() => bringFront(selId)}>
+                <button className={styles.actionBtn} title="Bring to front" onClick={() => bringFront(selId)}>
                   <BringToFront size={ICON_SIZE} />
                 </button>
-                <button className={styles.actionBtn} title="Send to back (Ctrl+[)" onClick={() => sendBack(selId)}>
+                <button className={styles.actionBtn} title="Move forward one layer" onClick={() => bringForward(selId)}>
+                  <ChevronsUp size={ICON_SIZE} />
+                </button>
+                <button className={styles.actionBtn} title="Move back one layer" onClick={() => sendBackward(selId)}>
+                  <ChevronsDown size={ICON_SIZE} />
+                </button>
+                <button className={styles.actionBtn} title="Send to back" onClick={() => sendBack(selId)}>
                   <SendToBack size={ICON_SIZE} />
                 </button>
                 <button className={`${styles.actionBtn} ${styles.danger}`} title="Delete"
