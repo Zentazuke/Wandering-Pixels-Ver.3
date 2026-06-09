@@ -48,6 +48,15 @@ export function buildFilter(el: Pick<PhotoElement, 'br'|'co'|'sa'|'bl'|'se'|'hr'
   ].join(' ');
 }
 
+// ─── Layer helpers ────────────────────────────────────────────────────────────
+/**
+ * Stamp each element's zIndex to match its position in the array.
+ * Must be called after every reorder so CSS z-index stays in sync.
+ */
+function stampZIndices(arr: BoardElement[]): BoardElement[] {
+  return arr.map((el, i) => ({ ...el, zIndex: i }));
+}
+
 // ─── Element factories ────────────────────────────────────────────────────────
 // All defaults live here — not scattered as `?? 100` across ten component files.
 
@@ -168,7 +177,7 @@ const useBoardStore = create<BoardState>()(
             const arr = [...s.elements];
             const i = arr.findIndex((e) => e.id === id);
             if (i < arr.length - 1) [arr[i], arr[i + 1]] = [arr[i + 1], arr[i]];
-            return { elements: arr };
+            return { elements: stampZIndices(arr) };
           }, false, 'bringForward'),
 
         sendBackward: (id) =>
@@ -176,21 +185,21 @@ const useBoardStore = create<BoardState>()(
             const arr = [...s.elements];
             const i = arr.findIndex((e) => e.id === id);
             if (i > 0) [arr[i], arr[i - 1]] = [arr[i - 1], arr[i]];
-            return { elements: arr };
+            return { elements: stampZIndices(arr) };
           }, false, 'sendBackward'),
 
         bringToFront: (id) =>
           set((s) => {
-            const arr = s.elements.filter((e) => e.id !== id);
-            const el  = s.elements.find((e) => e.id === id);
-            return { elements: el ? [...arr, el] : arr };
+            const rest = s.elements.filter((e) => e.id !== id);
+            const el   = s.elements.find((e) => e.id === id);
+            return { elements: stampZIndices(el ? [...rest, el] : rest) };
           }, false, 'bringToFront'),
 
         sendToBack: (id) =>
           set((s) => {
-            const arr = s.elements.filter((e) => e.id !== id);
-            const el  = s.elements.find((e) => e.id === id);
-            return { elements: el ? [el, ...arr] : arr };
+            const rest = s.elements.filter((e) => e.id !== id);
+            const el   = s.elements.find((e) => e.id === id);
+            return { elements: stampZIndices(el ? [el, ...rest] : rest) };
           }, false, 'sendToBack'),
 
         clearBoard: () => set({ elements: [] }, false, 'clearBoard'),
