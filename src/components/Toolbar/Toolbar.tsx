@@ -142,15 +142,6 @@ export default function Toolbar({ open, onToggle }: Props) {
 
   return (
     <>
-      {/* ── Collapse tab ── */}
-      <button
-        className={styles.collapseTab}
-        onClick={onToggle}
-        title={open ? 'Hide toolbar' : 'Show toolbar'}
-      >
-        {open ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
-      </button>
-
       {open && (
         <aside className={styles.toolbar}>
           {/* ── Main tools ── */}
@@ -203,6 +194,15 @@ export default function Toolbar({ open, onToggle }: Props) {
           />
         </aside>
       )}
+
+      {/* ── Collapse tab — sits on the toolbar's right edge, against the canvas ── */}
+      <button
+        className={styles.collapseTab}
+        onClick={onToggle}
+        title={open ? 'Hide toolbar' : 'Show toolbar'}
+      >
+        {open ? <ChevronLeft size={12} /> : <ChevronRight size={12} />}
+      </button>
 
       {/* ── Shapes flyout — fixed position, not clipped by overflow:hidden ── */}
       {showShapesFlyout && (
