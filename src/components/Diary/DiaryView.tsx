@@ -96,27 +96,7 @@ export default function DiaryView() {
         <h2 className={styles.heading}>Journal Entry</h2>
 
         <div className={styles.layout}>
-          {/* ── Left: info fields ── */}
-          <div className={styles.fields}>
-            <label className={styles.label}>{labels.label1}</label>
-            <input  className={styles.input}    placeholder={labels.ph1} value={field1} onChange={(e) => setField1(e.target.value)} />
-
-            <label className={styles.label}>{labels.label2}</label>
-            <input  className={styles.input}    placeholder={labels.ph2} value={field2} onChange={(e) => setField2(e.target.value)} />
-
-            <label className={styles.label}>{labels.label3}</label>
-            <input  className={styles.input}    placeholder={labels.ph3} value={field3} onChange={(e) => setField3(e.target.value)} />
-
-            <label className={styles.label}>Reflection</label>
-            <textarea
-              className={styles.textarea}
-              placeholder={labels.reflectionPh}
-              value={reflection}
-              onChange={(e) => setRef(e.target.value)}
-            />
-          </div>
-
-          {/* ── Right: photo ── */}
+          {/* ── Left: photo — the first thing you do ── */}
           <div className={styles.photoCol}>
             <label className={styles.label}>Photo</label>
 
@@ -151,6 +131,26 @@ export default function DiaryView() {
               accept="image/*"
               style={{ display: 'none' }}
               onChange={(e) => { handleFile(e.target.files?.[0]); e.target.value = ''; }}
+            />
+          </div>
+
+          {/* ── Right: info fields ── */}
+          <div className={styles.fields}>
+            <label className={styles.label}>{labels.label1}</label>
+            <input  className={styles.input}    placeholder={labels.ph1} value={field1} onChange={(e) => setField1(e.target.value)} />
+
+            <label className={styles.label}>{labels.label2}</label>
+            <input  className={styles.input}    placeholder={labels.ph2} value={field2} onChange={(e) => setField2(e.target.value)} />
+
+            <label className={styles.label}>{labels.label3}</label>
+            <input  className={styles.input}    placeholder={labels.ph3} value={field3} onChange={(e) => setField3(e.target.value)} />
+
+            <label className={styles.label}>Reflection</label>
+            <textarea
+              className={styles.textarea}
+              placeholder={labels.reflectionPh}
+              value={reflection}
+              onChange={(e) => setRef(e.target.value)}
             />
           </div>
         </div>

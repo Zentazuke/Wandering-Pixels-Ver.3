@@ -34,10 +34,10 @@
   margin-bottom: 28px;
 }
 
-/* ── Two-column layout: info left, photo right ── */
+/* ── Two-column layout: photo left, info right ── */
 .layout {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 340px 1fr;
   gap: 40px;
   margin-bottom: 28px;
   align-items: start;
@@ -148,7 +148,7 @@
   border-radius: var(--r-sm);
   box-shadow: var(--shadow-md);
   padding: 10px 10px 12px;
-  transform: rotate(-1deg);
+  transform: rotate(1deg);
 }
 
 .photoImg {
