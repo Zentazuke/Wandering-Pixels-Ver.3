@@ -24,7 +24,7 @@
   border-radius: var(--r-md);
   border: 2px solid transparent;
   overflow: hidden;
-  background: #222;
+  background: var(--surface-dark);
   flex-shrink: 0;
   width: 52px;
   transition: border-color var(--t-spring), transform var(--t-spring);
@@ -42,7 +42,7 @@
 
 .preset span {
   display: block;
-  font-size: 7px;
+  font-size: 10px;
   text-align: center;
   padding: 2px 0;
   color: var(--ink-faint);
@@ -113,7 +113,7 @@
   background: transparent;
   cursor: pointer;
   transition: all var(--t-spring);
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -145,7 +145,7 @@
   background: transparent;
   cursor: pointer;
   transition: all var(--t-spring);
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;

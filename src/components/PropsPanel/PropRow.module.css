@@ -141,6 +141,6 @@
 
 .btn.btnDanger:hover {
   background: var(--danger-bg);
-  color: #b55a5a;
+  color: var(--danger-text);
   box-shadow: 0 0 0 1px rgba(181,90,90,0.3), var(--shadow-btn-hover);
 }

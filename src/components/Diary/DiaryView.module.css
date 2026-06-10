@@ -190,7 +190,7 @@
 
 .photoBtnDanger:hover {
   background: var(--danger-bg);
-  color: #b55a5a;
+  color: var(--danger-text);
   border-color: rgba(181,90,90,0.4);
 }
 

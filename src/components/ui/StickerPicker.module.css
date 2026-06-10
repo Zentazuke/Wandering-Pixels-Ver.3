@@ -95,7 +95,7 @@
 }
 
 .item span {
-  font-size: 8px;
+  font-size: 10px;
   color: var(--ink-faint);
   letter-spacing: 0.03em;
 }
