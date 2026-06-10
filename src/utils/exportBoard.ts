@@ -1,11 +1,9 @@
 import { BG_OPTIONS } from '../constants/backgrounds.js';
-import { FRAMES } from '../constants/frames.js';
+import { FRAMES, resolveFrameKey } from '../constants/frames.js';
+import { NOTE_FRAME_BG_OVERRIDES } from '../constants/noteFrames.js';
 import { BOARD_W, BOARD_H } from '../constants/board.js';
-import type { BoardElement, PhotoElement } from '../types';
-
-function buildFilter(el: PhotoElement): string {
-  return `brightness(${el.br??100}%) contrast(${el.co??100}%) saturate(${el.sa??100}%) blur(${el.bl??0}px) sepia(${el.se??0}%) hue-rotate(${el.hr??0}deg) invert(${el.iv??0}%) opacity(${(el.op??100)/100})`;
-}
+import { buildFilter } from '../store/boardStore.js';
+import type { BoardElement } from '../types';
 
 function colorizeSvg(svg: string, color: string): string {
   return svg
@@ -115,8 +113,7 @@ export async function exportBoard(
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
-          const FRAME_REMAP: Record<string, string> = { dark:'polaroid', navy:'polaroid', sage:'polaroid', rose:'polaroid', kraft:'vintage', black:'thick', rounded:'none', round14:'none' };
-          const fk = FRAME_REMAP[el.frame ?? ''] || el.frame || 'polaroid';
+          const fk = resolveFrameKey(el.frame);
           const fr = FRAMES[fk] || FRAMES.polaroid;
           const isFL = fk === 'none';
           const pt = isFL ? {t:0,r:0,b:0,l:0} : parsePt(fr.pt);
@@ -157,8 +154,7 @@ export async function exportBoard(
         img.src = el.src;
       });
     } else if (el.type === 'text') {
-      const FRAME_BG: Record<string, string> = { polaroid:'#fff','dark-card':'#1a1712',crt:'#0a1a0a',blueprint:'#0d2a4a',kraft:'#c8913a' };
-      const bgFill = FRAME_BG[el.noteFrame ?? ''] || (el.bg === 'transparent' ? null : el.bg);
+      const bgFill = NOTE_FRAME_BG_OVERRIDES[el.noteFrame ?? ''] || (el.bg === 'transparent' ? null : el.bg);
       if (bgFill) {
         ctx.fillStyle = bgFill;
         ctx.shadowColor = 'rgba(0,0,0,0.14)'; ctx.shadowBlur = 7; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 3;

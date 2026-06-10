@@ -59,7 +59,7 @@ export default function ShapeProps({ el }: { el: ShapeElement }) {
   const sendBackward = useBoardStore((s) => s.sendBackward);
   const sendBack     = useBoardStore((s) => s.sendToBack);
 
-  const upd = (patch: Partial<ShapeElement>) => update(el.id, patch as Parameters<typeof update>[1]);
+  const upd = (patch: Partial<ShapeElement>) => update(el.id, patch);
   const isLine = el.shape === 'line' || el.shape === 'arrow';
   const activeFrame = el.shapeFrame || 'none';
 

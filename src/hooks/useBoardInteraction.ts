@@ -153,7 +153,7 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
             x: newX, y: newY,
             x2: r.dragX2 + dx,
             y2: r.dragY2 + dy,
-          } as Parameters<typeof updateEl>[1]);
+          });
         } else {
           updateEl(r.dragging, { x: newX, y: newY });
         }
@@ -175,11 +175,11 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
 
         // line / arrow endpoint drag
         if (r.resizeHandle === 'p1') {
-          updateEl(r.resizing, { x: bp.x, y: bp.y } as Parameters<typeof updateEl>[1]);
+          updateEl(r.resizing, { x: bp.x, y: bp.y });
           return;
         }
         if (r.resizeHandle === 'p2') {
-          updateEl(r.resizing, { x2: bp.x, y2: bp.y } as Parameters<typeof updateEl>[1]);
+          updateEl(r.resizing, { x2: bp.x, y2: bp.y });
           return;
         }
 

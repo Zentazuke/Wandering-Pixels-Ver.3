@@ -9,7 +9,8 @@ import {
 } from 'lucide-react';
 import useAppStore from '../../store/appStore.js';
 import useBoardStore from '../../store/boardStore.js';
-import { makeShapeElement } from '../../store/boardStore.js';
+import { makeShapeElement, makePhotoElement, makeTextElement } from '../../store/boardStore.js';
+import { makeThumb } from '../../utils/imageThumb.js';
 import StickerPicker from '../ui/StickerPicker.jsx';
 import BgPicker from '../ui/BgPicker.jsx';
 import styles from './Toolbar.module.css';
@@ -82,13 +83,10 @@ export default function Toolbar({ open, onToggle }: Props) {
   }
 
   function addTextNote() {
-    const id = addElement({
-      type: 'text', x: 100, y: 100, w: 220, h: 120,
-      rotation: 0, locked: false,
-      content: '', color: '#3b3328', bg: '#fff9e6',
-      fontSize: 15, fontFamily: 'Lora', align: 'left',
-      bold: false, italic: false, noteFrame: 'shadow',
-    });
+    const id = addElement(makeTextElement(
+      useBoardStore.getState().elements.length,
+      { x: 100, y: 100, w: 220, h: 120 },
+    ));
     useAppStore.getState().setSelId(id);
     setTool('select');
   }
@@ -117,21 +115,24 @@ export default function Toolbar({ open, onToggle }: Props) {
       const isPng = file.type === 'image/png' || file.name.toLowerCase().endsWith('.png');
       const reader = new FileReader();
       reader.onload = (ev) => {
+        const src = ev.target!.result as string;
         const img = new Image();
-        img.onload = () => {
+        img.onload = async () => {
           const ratio = img.naturalWidth / img.naturalHeight;
           const w = 200, h = Math.round(w / ratio);
-          const id = addElement({
-            type: 'photo', x: 100 + i * 30, y: 100 + i * 20, w, h,
-            rotation: (Math.random() - 0.5) * 6, locked: false,
-            src: ev.target!.result as string, caption: '', shadow: !isPng,
-            frame: isPng ? 'none' : 'polaroid', shape: 'square',
-            br: 100, co: 100, sa: 100, bl: 0, se: 0, hr: 0, iv: 0, op: 100,
-            flipH: false, flipV: false, imgZoom: 1, imgX: 50, imgY: 50,
-          });
+          // Small preview for the props panel — the panel renders a photo
+          // ~29 times (presets + frames); never feed it the full-res original.
+          const thumb = await makeThumb(src).catch(() => undefined);
+          const id = addElement(makePhotoElement(src, useBoardStore.getState().elements.length, {
+            x: 100 + i * 30, y: 100 + i * 20, w, h,
+            rotation: (Math.random() - 0.5) * 6,
+            caption: '', shadow: !isPng,
+            frame: isPng ? 'none' : 'polaroid',
+            thumb,
+          }));
           useAppStore.getState().setSelId(id);
         };
-        img.src = ev.target!.result as string;
+        img.src = src;
       };
       reader.readAsDataURL(file);
     });

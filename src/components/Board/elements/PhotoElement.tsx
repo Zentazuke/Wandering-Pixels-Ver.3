@@ -1,18 +1,12 @@
 import { useRef, memo } from 'react';
 import useAppStore from '../../../store/appStore.js';
 import { buildFilter } from '../../../store/boardStore.js';
-import { FRAMES } from '../../../constants/frames.js';
+import { FRAMES, resolveFrameKey } from '../../../constants/frames.js';
 import { SHAPES } from '../../../constants/shapes.js';
 import SelectionHandles from './SelectionHandles.jsx';
 import type { PhotoElement as PhotoEl } from '../../../types';
 import type { ResizeHandle } from '../../../hooks/useBoardInteraction.js';
 import styles from './PhotoElement.module.css';
-
-const FRAME_REMAP: Record<string, string> = {
-  dark: 'polaroid', navy: 'polaroid', sage: 'polaroid', rose: 'polaroid',
-  kraft: 'vintage', black: 'thick',
-  rounded: 'none', round14: 'none',
-};
 
 interface Props {
   el:            PhotoEl;
@@ -27,7 +21,7 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
   const selId      = useAppStore((s) => s.selId);
   const isSelected = selId === el.id;
 
-  const frameKey    = FRAME_REMAP[el.frame ?? ''] || el.frame || 'polaroid';
+  const frameKey    = resolveFrameKey(el.frame);
   const fr          = FRAMES[frameKey] || FRAMES.polaroid;
   const isFrameless = frameKey === 'none';
 

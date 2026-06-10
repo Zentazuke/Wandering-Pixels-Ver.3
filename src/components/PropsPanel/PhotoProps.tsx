@@ -4,8 +4,9 @@ import { BringToFront, ChevronsUp, ChevronsDown, SendToBack, Copy, Trash2, Folde
 const IC = 13;
 import useBoardStore from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
+import { makeThumb } from '../../utils/imageThumb.js';
 import { FILTER_PRESETS } from '../../constants/filterPresets.js';
-import { FRAMES } from '../../constants/frames.js';
+import { FRAMES, resolveFrameKey } from '../../constants/frames.js';
 import { SHAPES } from '../../constants/shapes.js';
 import PropSection from './PropSection.jsx';
 import { PropRow, PropSlider, PropBtn } from './PropRow.jsx';
@@ -13,11 +14,6 @@ import type { PhotoElement } from '../../types/index.js';
 import type { Shape } from '../../constants/shapes.js';
 import type { Frame } from '../../constants/frames.js';
 import styles from './PhotoProps.module.css';
-
-const FRAME_REMAP: Record<string, string> = {
-  dark:'polaroid', navy:'polaroid', sage:'polaroid', rose:'polaroid',
-  kraft:'vintage', black:'thick', rounded:'none', round14:'none',
-};
 const FRAME_COLOR_SWATCHES = ['#ffffff','#f0e6cc','#faf6ee','#1a1712','#0a0806','#0c1426','#e8ede4','#fce4ec','#c4973a','#111111'];
 const NO_COLOR_FRAMES = new Set(['none','shadow','burned']);
 
@@ -34,7 +30,7 @@ export default function PhotoProps({ el }: { el: PhotoElement }) {
   const replaceRef = useRef<HTMLInputElement>(null);
 
   const upd = (patch: Partial<PhotoElement>) => update(el.id, patch);
-  const frameKey    = FRAME_REMAP[el.frame ?? ''] || el.frame || 'polaroid';
+  const frameKey    = resolveFrameKey(el.frame);
   const activeShape = el.shape || 'square';
 
   const activePreset = FILTER_PRESETS.find(
@@ -53,7 +49,12 @@ export default function PhotoProps({ el }: { el: PhotoElement }) {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => upd({ src: ev.target!.result as string });
+    reader.onload = async (ev) => {
+      const src = ev.target!.result as string;
+      // Regenerate the panel thumb alongside the new source
+      const thumb = await makeThumb(src).catch(() => undefined);
+      upd({ src, thumb });
+    };
     reader.readAsDataURL(file);
     e.target.value = '';
   }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import useBoardStore from '../../store/boardStore.js';
+import useBoardStore, { makeStickerElement } from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import { STICKER_CATS } from '../../constants/stickers.js';
 import type { StickerCategoryName } from '../../constants/stickers.js';
@@ -14,12 +14,9 @@ export default function StickerPicker({ onClose }: { onClose: () => void }) {
   const setSelId   = useAppStore((s) => s.setSelId);
 
   function addSticker(svg: string) {
-    const id = addElement({
-      type: 'sticker', svg,
+    const id = addElement(makeStickerElement(svg, useBoardStore.getState().elements.length, {
       x: 120, y: 120, w: 60, h: 60,
-      rotation: 0, locked: false,
-      opacity: 100,
-    });
+    }));
     setSelId(id);
     onClose();
   }

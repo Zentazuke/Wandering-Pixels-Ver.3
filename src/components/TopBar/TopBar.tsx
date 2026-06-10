@@ -4,7 +4,6 @@ import useBoardStore from '../../store/boardStore.js';
 import { useFlash } from '../../hooks/useFlash.js';
 import { exportBoard } from '../../utils/exportBoard.js';
 import { exportBoardDom } from '../../utils/exportBoardDom.js';
-import { BOARD_W, BOARD_H } from '../../constants/board.js';
 import type { View } from '../../types';
 import styles from './TopBar.module.css';
 
@@ -16,13 +15,13 @@ const VIEW_TABS: { id: View; label: string }[] = [
 
 /** Top navigation bar — logo, view tabs, undo/redo, zoom, export. */
 export default function TopBar() {
-  const view         = useAppStore((s) => s.view);
-  const setView      = useAppStore((s) => s.setView);
-  const zoom         = useAppStore((s) => s.zoom);
-  const panX         = useAppStore((s) => s.panX);
-  const panY         = useAppStore((s) => s.panY);
-  const setTransform = useAppStore((s) => s.setTransform);
-  const flash        = useFlash();
+  const view     = useAppStore((s) => s.view);
+  const setView  = useAppStore((s) => s.setView);
+  const zoom     = useAppStore((s) => s.zoom);
+  const zoomIn   = useAppStore((s) => s.zoomIn);
+  const zoomOut  = useAppStore((s) => s.zoomOut);
+  const fitBoard = useAppStore((s) => s.fitBoard);
+  const flash    = useFlash();
 
   function switchView(nextView: View) {
     if (nextView === view) return;
@@ -31,17 +30,6 @@ export default function TopBar() {
 
   function goToMenu() {
     flash(() => setView('menu'));
-  }
-
-  function zoomIn()  { setTransform(Math.min(zoom * 1.2, 4), panX, panY); }
-  function zoomOut() { setTransform(Math.max(zoom / 1.2, 0.1), panX, panY); }
-  function fitBoard() {
-    const el = document.querySelector('[data-board-canvas]') as HTMLElement | null;
-    if (!el) return;
-    const ww = el.clientWidth  || 900;
-    const wh = el.clientHeight || 600;
-    const z  = Math.min(ww / BOARD_W, wh / BOARD_H) * 0.9;
-    setTransform(z, (ww - BOARD_W * z) / 2, (wh - BOARD_H * z) / 2);
   }
 
   return (

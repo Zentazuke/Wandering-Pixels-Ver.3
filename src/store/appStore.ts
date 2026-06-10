@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { BOARD_W, BOARD_H } from '../constants/board';
 import type { AppState, View, WorkspaceMode, Tool, Toast } from '../types';
+
+const ZOOM_MIN = 0.1;
+const ZOOM_MAX = 4;
+const ZOOM_STEP = 1.2;
 
 /**
  * appStore — UI / navigation state.
@@ -33,6 +38,21 @@ const useAppStore = create<AppState>()(
       panY: 0,
       setTransform: (zoom, panX, panY) =>
         set({ zoom, panX, panY }, false, 'setTransform'),
+
+      zoomIn: () =>
+        set((s) => ({ zoom: Math.min(s.zoom * ZOOM_STEP, ZOOM_MAX) }), false, 'zoomIn'),
+      zoomOut: () =>
+        set((s) => ({ zoom: Math.max(s.zoom / ZOOM_STEP, ZOOM_MIN) }), false, 'zoomOut'),
+
+      /** Fit the whole board in the visible canvas area, centered. */
+      fitBoard: () => {
+        const el = document.querySelector<HTMLElement>('[data-board-canvas]');
+        if (!el) return;
+        const ww = el.clientWidth  || 900;
+        const wh = el.clientHeight || 600;
+        const z  = Math.min(ww / BOARD_W, wh / BOARD_H) * 0.9;
+        set({ zoom: z, panX: (ww - BOARD_W * z) / 2, panY: (wh - BOARD_H * z) / 2 }, false, 'fitBoard');
+      },
 
       // ── Flash transition ──────────────────────────────
       flashing: false,

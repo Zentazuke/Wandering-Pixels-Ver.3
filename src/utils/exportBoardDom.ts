@@ -81,11 +81,3 @@ export async function exportBoardDom(): Promise<boolean> {
     }, 'image/png', 1.0);
   });
 }
-
-/** Spike/debug helper: capture the board and return a data URL instead of downloading. */
-export async function exportBoardDomDataUrl(): Promise<string | null> {
-  const canvas = await captureBoard();
-  if (!canvas) return null;
-  drawWatermark(canvas);
-  return canvas.toDataURL('image/png');
-}

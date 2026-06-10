@@ -1,4 +1,4 @@
-import type { BoardElement } from './elements';
+import type { BoardElement, PhotoElement, TextElement, StickerElement, ShapeElement } from './elements';
 
 /**
  * Omit that distributes over union members. A plain Omit<BoardElement, K>
@@ -9,6 +9,17 @@ export type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omi
 
 /** Payload for addElement — everything except id; zIndex optional (defaults to top). */
 export type NewElement = DistributiveOmit<BoardElement, 'id' | 'zIndex'> & { zIndex?: number };
+
+/**
+ * Patch for updateElement — a partial of one concrete element type, so
+ * type-specific fields (src, content, x2…) typecheck without casts.
+ * Callers are responsible for patching fields matching the element's type.
+ */
+export type ElementPatch =
+  | Partial<PhotoElement>
+  | Partial<TextElement>
+  | Partial<StickerElement>
+  | Partial<ShapeElement>;
 
 // ─── App store ────────────────────────────────────────────────────────────────
 export type View = 'menu' | 'board' | 'diary' | 'archive';
@@ -39,6 +50,9 @@ export interface AppState {
   panX:        number;
   panY:        number;
   setTransform:(zoom: number, panX: number, panY: number) => void;
+  zoomIn:      () => void;
+  zoomOut:     () => void;
+  fitBoard:    () => void;
 
   flashing:    boolean;
   setFlashing: (flashing: boolean) => void;
@@ -60,7 +74,7 @@ export interface BoardState {
   setCustomBgImage:  (dataUrl: string) => void;
 
   addElement:        (partial: NewElement) => string;
-  updateElement:     (id: string, patch: Partial<BoardElement>) => void;
+  updateElement:     (id: string, patch: ElementPatch) => void;
   removeElement:     (id: string) => void;
   duplicateElement:  (id: string) => string | undefined;
 

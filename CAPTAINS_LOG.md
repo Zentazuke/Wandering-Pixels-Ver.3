@@ -171,12 +171,20 @@ Established foundations:
 - React.memo on element components; IDB-only persistence
 - Undo history capped at 50 entries (zundo `limit`)
 
-Known debt (from the June 2026 audit — see session notes):
-- usePersistence has a save/load race when switching views fast (fix planned: Session 2)
-- Drag creates one undo entry per pointermove (fix planned: Session 2)
-- exportBoard doesn't render shape elements and supports only a subset of
-  note frames (export overhaul planned: Session 3 — DOM-snapshot spike)
-- Text content stored as raw HTML — must be sanitized before board sharing ships
+Known debt (from the June 2026 audit; Sessions 1–4 cleared the rest):
+- Text content stored as raw HTML — **must be sanitized before board
+  sharing ships** (planned: Session 5, before Archive becomes the hub)
+- Interaction-hook math (drag/resize/rotate) untested
+- `locked` element field exists but is never enforced — implement or drop
+
+Export architecture (decided Session 3): PNG downloads use the DOM
+snapshot in exportBoardDom.ts (faithful by construction). The canvas
+renderer in exportBoard.ts exists ONLY for Archive thumbnails — do not
+invest in its fidelity.
+
+Photo thumbnails (Session 4): photos carry a ~320px `thumb` generated at
+import (and backfilled on load for old boards). Panels must render
+`el.thumb` — never feed the full-res `src` to preview strips.
 
 ---
 

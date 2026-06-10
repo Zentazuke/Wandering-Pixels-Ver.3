@@ -59,24 +59,35 @@ function stampZIndices(arr: BoardElement[]): BoardElement[] {
 
 // ─── Element factories ────────────────────────────────────────────────────────
 // All defaults live here — not scattered as `?? 100` across ten component files.
+// Every creation path (Toolbar, pickers, tests) must go through these;
+// `overrides` covers caller-specific placement/styling.
 
-export function makePhotoElement(src: string, zIndex: number): Omit<PhotoElement, 'id'> {
+export function makePhotoElement(
+  src: string,
+  zIndex: number,
+  overrides: Partial<Omit<PhotoElement, 'id' | 'type'>> = {},
+): Omit<PhotoElement, 'id'> {
   return {
     type: 'photo', src,
     x: 120, y: 100, w: 220, h: 180, rotation: 0, zIndex, locked: false,
     frame: 'polaroid', shape: 'square', shadow: true,
     flipH: false, flipV: false, imgZoom: 1, imgX: 50, imgY: 50,
     br: 100, co: 100, sa: 100, bl: 0, se: 0, hr: 0, iv: 0, op: 100,
+    ...overrides,
   };
 }
 
-export function makeTextElement(zIndex: number): Omit<TextElement, 'id'> {
+export function makeTextElement(
+  zIndex: number,
+  overrides: Partial<Omit<TextElement, 'id' | 'type'>> = {},
+): Omit<TextElement, 'id'> {
   return {
     type: 'text', content: '',
     x: 140, y: 120, w: 200, h: 100, rotation: 0, zIndex, locked: false,
     fontFamily: 'Lora', fontSize: 15, bold: false, italic: false,
     align: 'left', color: '#3b3328',
     bg: '#fff9e6', noteFrame: 'shadow',
+    ...overrides,
   };
 }
 
@@ -100,11 +111,16 @@ export function makeShapeElement(
   };
 }
 
-export function makeStickerElement(svg: string, zIndex: number): Omit<StickerElement, 'id'> {
+export function makeStickerElement(
+  svg: string,
+  zIndex: number,
+  overrides: Partial<Omit<StickerElement, 'id' | 'type'>> = {},
+): Omit<StickerElement, 'id'> {
   return {
     type: 'sticker', svg,
     x: 160, y: 140, w: 80, h: 80, rotation: 0, zIndex, locked: false,
     opacity: 100,
+    ...overrides,
   };
 }
 

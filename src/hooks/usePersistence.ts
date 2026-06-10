@@ -23,6 +23,7 @@ import { useEffect, useRef } from 'react';
 import useBoardStore from '../store/boardStore';
 import useAppStore from '../store/appStore';
 import { dbSave, dbLoad } from '../db/boardDB';
+import { makeThumb } from '../utils/imageThumb';
 import type { BoardElement } from '../types';
 
 const SAVE_KEY    = 'board-state';
@@ -44,6 +45,33 @@ export function __resetPersistenceForTests(): void {
   sessionLoaded = false;
 }
 
+/**
+ * One-time migration for boards saved before the thumbnail pipeline:
+ * generate panel thumbs for photos that lack one. Runs outside undo
+ * history (paused temporal) so it never shows up as an undoable step.
+ */
+async function backfillThumbs(): Promise<void> {
+  const photos = useBoardStore.getState().elements
+    .filter((el) => el.type === 'photo' && !el.thumb);
+  if (photos.length === 0) return;
+
+  const thumbs = new Map<string, string>();
+  for (const p of photos) {
+    if (p.type !== 'photo') continue;
+    try { thumbs.set(p.id, await makeThumb(p.src)); } catch { /* skip broken images */ }
+  }
+  if (thumbs.size === 0) return;
+
+  const temporal = useBoardStore.temporal.getState();
+  temporal.pause();
+  useBoardStore.setState((s) => ({
+    elements: s.elements.map((el) =>
+      el.type === 'photo' && thumbs.has(el.id) ? { ...el, thumb: thumbs.get(el.id) } : el
+    ),
+  }));
+  temporal.resume();
+}
+
 export function usePersistence(): void {
   const timerRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingRef = useRef<SavedBoard | null>(null);
@@ -61,6 +89,8 @@ export function usePersistence(): void {
             useBoardStore.getState().loadBoard(saved.elements, saved.currentBg);
             if (saved.customBgColor) useBoardStore.setState({ customBgColor: saved.customBgColor });
             if (saved.customBgImage) useBoardStore.setState({ customBgImage: saved.customBgImage });
+            // Fire-and-forget: thumbs for photos saved before the pipeline existed
+            void backfillThumbs();
           }
         })
         .catch(() => {

@@ -1,13 +1,12 @@
-import { useEffect, useCallback, useRef } from 'react';
-import { BOARD_W, BOARD_H } from '../constants/board.js';
+import { useEffect, useRef } from 'react';
 import useAppStore from '../store/appStore.js';
 
-/** Attaches scroll-to-zoom and Space+drag / middle-mouse pan onto a canvas wrapper ref. */
-export function useZoom(canvasRef: React.RefObject<HTMLElement | null>): {
-  fitBoard: () => void;
-  zoomIn:   () => void;
-  zoomOut:  () => void;
-} {
+/**
+ * Attaches scroll-to-zoom and Space+drag / middle-mouse pan onto a canvas
+ * wrapper ref. Button-style zoom actions (zoomIn/zoomOut/fitBoard) live in
+ * appStore — this hook only owns the pointer/keyboard interactions.
+ */
+export function useZoom(canvasRef: React.RefObject<HTMLElement | null>): void {
   const zoom         = useAppStore((s) => s.zoom);
   const panX         = useAppStore((s) => s.panX);
   const panY         = useAppStore((s) => s.panY);
@@ -15,27 +14,6 @@ export function useZoom(canvasRef: React.RefObject<HTMLElement | null>): {
 
   const stateRef = useRef({ zoom, panX, panY });
   useEffect(() => { stateRef.current = { zoom, panX, panY }; }, [zoom, panX, panY]);
-
-  const fitBoard = useCallback(() => {
-    const el = canvasRef.current;
-    if (!el) return;
-    const ww = el.clientWidth  || 900;
-    const wh = el.clientHeight || 600;
-    const z  = Math.min(ww / BOARD_W, wh / BOARD_H) * 0.9;
-    const px = (ww - BOARD_W * z) / 2;
-    const py = (wh - BOARD_H * z) / 2;
-    setTransform(z, px, py);
-  }, [canvasRef, setTransform]);
-
-  const zoomIn = useCallback(() => {
-    const { zoom: z, panX: px, panY: py } = stateRef.current;
-    setTransform(Math.min(z * 1.2, 4), px, py);
-  }, [setTransform]);
-
-  const zoomOut = useCallback(() => {
-    const { zoom: z, panX: px, panY: py } = stateRef.current;
-    setTransform(Math.max(z / 1.2, 0.1), px, py);
-  }, [setTransform]);
 
   // ── Scroll-to-zoom ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -117,6 +95,4 @@ export function useZoom(canvasRef: React.RefObject<HTMLElement | null>): {
       document.removeEventListener('mouseup',   onMouseUp);
     };
   }, [canvasRef, setTransform]);
-
-  return { fitBoard, zoomIn, zoomOut };
 }

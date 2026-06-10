@@ -1,3 +1,18 @@
+/**
+ * Legacy frame ids → current frame keys. Boards saved by older versions
+ * may still carry these; remap on read everywhere frames are resolved.
+ */
+export const FRAME_REMAP: Record<string, string> = {
+  dark: 'polaroid', navy: 'polaroid', sage: 'polaroid', rose: 'polaroid',
+  kraft: 'vintage', black: 'thick',
+  rounded: 'none', round14: 'none',
+};
+
+/** Resolve an element's stored frame id to a current FRAMES key. */
+export function resolveFrameKey(frame: string | undefined): string {
+  return FRAME_REMAP[frame ?? ''] || frame || 'polaroid';
+}
+
 /** Decorative border frame applied around a photo element. */
 export interface Frame {
   pt:          string;

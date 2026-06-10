@@ -42,17 +42,18 @@ function bgToStyle(
 export default function Board() {
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  const zoom  = useAppStore((s) => s.zoom);
-  const panX  = useAppStore((s) => s.panX);
-  const panY  = useAppStore((s) => s.panY);
-  const selId = useAppStore((s) => s.selId);
+  const zoom     = useAppStore((s) => s.zoom);
+  const panX     = useAppStore((s) => s.panX);
+  const panY     = useAppStore((s) => s.panY);
+  const selId    = useAppStore((s) => s.selId);
+  const fitBoard = useAppStore((s) => s.fitBoard);
 
   const elements      = useBoardStore((s) => s.elements);
   const currentBg     = useBoardStore((s) => s.currentBg);
   const customBgColor = useBoardStore((s) => s.customBgColor);
   const customBgImage = useBoardStore((s) => s.customBgImage);
 
-  const { fitBoard } = useZoom(canvasRef);
+  useZoom(canvasRef);
   useKeyboardShortcuts();
   const { onElPointerDown, onRotatePointerDown, onResizePointerDown, onBoardPointerDown } =
     useBoardInteraction(canvasRef);
