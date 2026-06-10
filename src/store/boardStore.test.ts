@@ -5,6 +5,7 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import useBoardStore, { buildFilter, makePhotoElement, makeTextElement, makeStickerElement } from './boardStore';
+import type { PhotoElement } from '../types/elements';
 
 // Reset store state before each test
 beforeEach(() => {
@@ -14,11 +15,10 @@ beforeEach(() => {
 
 // ─── buildFilter ─────────────────────────────────────────────────────────────
 describe('buildFilter', () => {
-  it('returns default filter string when no properties set', () => {
-    const result = buildFilter({});
-    expect(result).toBe(
-      'brightness(100%) contrast(100%) saturate(100%) blur(0px) sepia(0%) hue-rotate(0deg) invert(0%) opacity(1)'
-    );
+  it('returns "none" when every property is at its default', () => {
+    // 'none' avoids a GPU compositing layer that breaks PNG transparency in Chrome.
+    expect(buildFilter({})).toBe('none');
+    expect(buildFilter({ br: 100, co: 100, sa: 100, bl: 0, se: 0, hr: 0, iv: 0, op: 100 })).toBe('none');
   });
 
   it('uses short property names correctly', () => {
@@ -35,8 +35,9 @@ describe('buildFilter', () => {
 
   it('converts opacity from percentage to fraction', () => {
     expect(buildFilter({ op: 50 })).toContain('opacity(0.5)');
-    expect(buildFilter({ op: 100 })).toContain('opacity(1)');
     expect(buildFilter({ op: 0 })).toContain('opacity(0)');
+    // op:100 alone is all-defaults → collapses to 'none'
+    expect(buildFilter({ op: 100 })).toBe('none');
   });
 });
 
@@ -97,7 +98,7 @@ describe('updateElement', () => {
     useBoardStore.getState().updateElement(id, { x: 999, br: 150 });
     const el = useBoardStore.getState().elements.find((e) => e.id === id)!;
     expect(el.x).toBe(999);
-    expect((el as any).br).toBe(150);
+    expect((el as PhotoElement).br).toBe(150);
     expect(el.y).toBe(100); // unchanged
   });
 

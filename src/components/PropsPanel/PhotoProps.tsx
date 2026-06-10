@@ -9,7 +9,8 @@ import { FRAMES } from '../../constants/frames.js';
 import { SHAPES } from '../../constants/shapes.js';
 import PropSection from './PropSection.jsx';
 import { PropRow, PropSlider, PropBtn } from './PropRow.jsx';
-import type { PhotoElement, Shape } from '../../types/index.js';
+import type { PhotoElement } from '../../types/index.js';
+import type { Shape } from '../../constants/shapes.js';
 import type { Frame } from '../../constants/frames.js';
 import styles from './PhotoProps.module.css';
 

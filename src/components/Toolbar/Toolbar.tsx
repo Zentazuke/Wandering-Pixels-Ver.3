@@ -1,6 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
+// `Image` is renamed to ImageIcon — the bare name would shadow the global
+// `new Image()` constructor used in handlePhotoFiles and break photo upload.
 import {
-  MousePointer2, Image, Type, Sparkles,
+  MousePointer2, Image as ImageIcon, Type, Sparkles,
   Square, Circle, Minus, MoveRight,
   Palette, LayoutGrid,
   ChevronLeft, ChevronRight,
@@ -22,7 +24,7 @@ const ICON_SIZE = 18;
 
 const MAIN_TOOLS = [
   { id: 'select',  Icon: MousePointer2, title: 'Select (V)' },
-  { id: 'photo',   Icon: Image,         title: 'Photo (P)'  },
+  { id: 'photo',   Icon: ImageIcon,     title: 'Photo (P)'  },
   { id: 'text',    Icon: Type,          title: 'Text note (T)' },
   { id: 'sticker', Icon: Sparkles,      title: 'Sticker (S)' },
 ] as const;

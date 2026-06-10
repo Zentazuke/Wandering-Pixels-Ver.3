@@ -1,16 +1,43 @@
-# React + Vite
+# Wandering Pixels ✦
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A visual journal / moodboard app. Arrange photos, text notes, stickers, and
+shapes on a freeform canvas; style them with frames, filters, and colour
+palettes; save board snapshots to the Archive; export the result as a PNG.
 
-Currently, two official plugins are available:
+Local-first: everything is stored in your browser's IndexedDB — no account,
+no server.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Live:** deployed on Vercel (auto-deploys from `main`).
 
-## React Compiler
+## Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + Vite 8 + TypeScript (strict)
+- Zustand 5 for state, [zundo](https://github.com/charkour/zundo) for undo/redo
+- CSS Modules + design tokens (`src/styles/tokens.css`)
+- IndexedDB persistence (`src/db/boardDB.ts`)
+- Vitest + Testing Library
 
-## Expanding the ESLint configuration
+## Getting started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev        # → http://localhost:5173
+```
+
+## Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Typecheck (`tsc --noEmit`) then production build |
+| `npm run lint` | ESLint over all TS/TSX source |
+| `npm test` | Run the test suite once |
+| `npm run test:watch` | Tests in watch mode |
+| `npm run test:coverage` | Tests with coverage report |
+
+All three gates (typecheck, lint, tests) also run in CI on every push.
+
+## Project structure
+
+See [CAPTAINS_LOG.md](./CAPTAINS_LOG.md) for the full architecture map,
+state design, element data model, and the prioritised backlog.

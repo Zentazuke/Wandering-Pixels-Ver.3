@@ -61,7 +61,7 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
     ref.current.elements = elements;
   });
 
-  function boardPt(clientX: number, clientY: number): { x: number; y: number } {
+  const boardPt = useCallback((clientX: number, clientY: number): { x: number; y: number } => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
@@ -70,7 +70,7 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
       x: (clientX - rect.left - panX) / zoom,
       y: (clientY - rect.top  - panY) / zoom,
     };
-  }
+  }, [canvasRef]);
 
   const onElPointerDown = useCallback((e: React.PointerEvent<HTMLElement>, id: string) => {
     if (e.button !== 0) return;
@@ -92,7 +92,7 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
       ref.current.dragX2 = null;
       ref.current.dragY2 = null;
     }
-  }, [setSelId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [setSelId, boardPt]);
 
   const onRotatePointerDown = useCallback((
     e: React.PointerEvent<HTMLElement>,
@@ -130,7 +130,7 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
     ref.current.resizeStartH   = el.h;
     ref.current.resizeElX      = el.x;
     ref.current.resizeElY      = el.y;
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [boardPt]);
 
   useEffect(() => {
     function onMouseMove(e: PointerEvent) {
@@ -206,7 +206,7 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
       document.removeEventListener('pointerup',     onMouseUp);
       document.removeEventListener('pointercancel', onMouseUp);
     };
-  }, [updateEl]);
+  }, [updateEl, boardPt]);
 
   const onBoardPointerDown = useCallback((e: React.PointerEvent<HTMLElement>) => {
     if (e.target === e.currentTarget) deselect();

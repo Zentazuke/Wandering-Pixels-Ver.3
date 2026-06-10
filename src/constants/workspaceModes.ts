@@ -1,3 +1,5 @@
+// NOTE: not consumed anywhere yet — reserved for the planned per-mode theming
+// feature (mode-specific board colours, fonts, and templates). Do not delete.
 import type { StickerCategoryName } from './stickers';
 
 export interface WorkspaceModeConfig {

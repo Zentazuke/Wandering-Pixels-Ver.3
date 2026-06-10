@@ -1,9 +1,19 @@
 import type { BoardElement } from './elements';
 
+/**
+ * Omit that distributes over union members. A plain Omit<BoardElement, K>
+ * collapses the union to its common fields, rejecting type-specific
+ * properties like `src` or `content`.
+ */
+export type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
+
+/** Payload for addElement — everything except id; zIndex optional (defaults to top). */
+export type NewElement = DistributiveOmit<BoardElement, 'id' | 'zIndex'> & { zIndex?: number };
+
 // ─── App store ────────────────────────────────────────────────────────────────
 export type View = 'menu' | 'board' | 'diary' | 'archive';
 export type WorkspaceMode = 'default' | 'travel' | 'love' | 'family' | 'game';
-export type Tool = 'select' | 'text' | 'photo' | 'sticker' | 'draw';
+export type Tool = 'select' | 'text' | 'photo' | 'sticker';
 
 export interface Toast {
   id:       string;
@@ -21,9 +31,6 @@ export interface AppState {
   selId:       string | null;
   setSelId:    (id: string) => void;
   deselect:    () => void;
-
-  propsOpen:   boolean;
-  setPropsOpen:(open: boolean) => void;
 
   tool:        Tool;
   setTool:     (tool: Tool) => void;
@@ -52,7 +59,7 @@ export interface BoardState {
   setCustomBgColor:  (color: string) => void;
   setCustomBgImage:  (dataUrl: string) => void;
 
-  addElement:        (partial: Omit<BoardElement, 'id' | 'zIndex'>) => string;
+  addElement:        (partial: NewElement) => string;
   updateElement:     (id: string, patch: Partial<BoardElement>) => void;
   removeElement:     (id: string) => void;
   duplicateElement:  (id: string) => string | undefined;

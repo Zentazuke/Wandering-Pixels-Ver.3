@@ -145,7 +145,10 @@ const useBoardStore = create<BoardState>()(
         updateElement: (id, patch) =>
           set(
             (s) => ({
-              elements: s.elements.map((el) => (el.id === id ? { ...el, ...patch } : el)),
+              // Cast needed: spreading Partial<BoardElement> over a union member
+              // can't be proven sound by TS. Callers are responsible for patching
+              // fields that match the element's type.
+              elements: s.elements.map((el) => (el.id === id ? { ...el, ...patch } as BoardElement : el)),
             }),
             false,
             'updateElement'
@@ -206,7 +209,13 @@ const useBoardStore = create<BoardState>()(
 
         loadBoard: (elements, bg) =>
           set({ elements, currentBg: bg ?? 'paper' }, false, 'loadBoard'),
-      })
+      }),
+      {
+        // Cap undo history — without a limit it grows unbounded for the whole
+        // session, and each entry references the elements array (incl. base64
+        // photo payloads on edited elements).
+        limit: 50,
+      }
     ),
     { name: 'WP:board' }
   )

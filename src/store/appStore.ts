@@ -23,10 +23,6 @@ const useAppStore = create<AppState>()(
       setSelId: (selId) => set({ selId }, false, 'setSelId'),
       deselect: () => set({ selId: null }, false, 'deselect'),
 
-      // ── Props panel ───────────────────────────────────
-      propsOpen: false,
-      setPropsOpen: (open) => set({ propsOpen: open }, false, 'setPropsOpen'),
-
       // ── Active tool ───────────────────────────────────
       tool: 'select' as Tool,
       setTool: (tool) => set({ tool }, false, 'setTool'),

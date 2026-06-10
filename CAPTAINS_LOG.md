@@ -10,8 +10,8 @@
 - **Repo:** https://github.com/Zentazuke/Wandering-Pixels-Ver.3
 - **Local path:** `C:\Users\Ricardo\Desktop\Work\PROJECTOS\WANDERING PIXELS\wandering-pixels-react`
 - **Dev server:** `npm run dev` → http://localhost:5173
-- **Tests:** `npm test` → 38 tests, all passing
-- **Build:** `npm run build` → 80 modules, 0 errors
+- **Tests:** `npm test` (CI runs typecheck + lint + tests on every push — trust CI, not this line)
+- **Build:** `npm run build` (runs `tsc --noEmit` first, then Vite)
 
 ---
 
@@ -158,20 +158,25 @@ Transition: --t-fast, --t-mid
 
 ---
 
-## Current Quality Score: 10/10
+## Quality Status
 
-What got it there:
-- TypeScript strict mode on **all** source files (hooks, utils, constants, components)
-- 38 passing tests (boardStore, appStore, exportBoard utilities)
-- Toast notifications system (showToast in appStore)
-- Error Boundary wrapping the app
-- Element factory functions (defaults in one place)
-- Full CSS token audit (zero hardcoded gold rgba values)
-- React.memo on all three element components
-- IDB-only persistence (no localStorage bomb)
-- JSDoc on every component, hook, and utility
+Don't write a score here — CI is the source of truth. Every push runs
+`tsc --noEmit`, `eslint .`, and `vitest run` via GitHub Actions, and the
+build script typechecks before bundling, so Vercel won't deploy red builds.
 
-Note: integration tests in a real browser remain a future nice-to-have.
+Established foundations:
+- TypeScript strict mode on all source files; lint covers all TS/TSX
+- Test suite: stores + export utilities (interaction hooks still untested)
+- Toast notifications, Error Boundary, element factories, design tokens
+- React.memo on element components; IDB-only persistence
+- Undo history capped at 50 entries (zundo `limit`)
+
+Known debt (from the June 2026 audit — see session notes):
+- usePersistence has a save/load race when switching views fast (fix planned: Session 2)
+- Drag creates one undo entry per pointermove (fix planned: Session 2)
+- exportBoard doesn't render shape elements and supports only a subset of
+  note frames (export overhaul planned: Session 3 — DOM-snapshot spike)
+- Text content stored as raw HTML — must be sanitized before board sharing ships
 
 ---
 
@@ -230,4 +235,4 @@ Paste this file, then add:
 
 ---
 
-*Last updated: June 2026 — full codebase migrated to TypeScript strict mode (all .jsx/.js → .tsx/.ts), JSDoc on every component/hook/util. 10/10.*
+*Last updated: 10 June 2026 — Session 1 (quality gates): CI added, ESLint now actually covers TS/TSX, `tsc --noEmit` fixed and wired into the build, all tests green, undo history capped, dead state removed, photo-upload `Image` shadowing bug fixed.*

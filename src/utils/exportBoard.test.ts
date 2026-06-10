@@ -10,13 +10,17 @@ import { buildFilter } from '../store/boardStore';
 // ── parsePt is internal to exportBoard — we test indirectly via edge cases
 
 describe('buildFilter (store version)', () => {
-  it('all defaults produce neutral filter', () => {
-    const f = buildFilter({});
+  it('all defaults produce "none" — avoids a GPU compositing layer that breaks PNG transparency', () => {
+    expect(buildFilter({})).toBe('none');
+  });
+
+  it('any non-default value produces the full filter chain', () => {
+    const f = buildFilter({ se: 30 });
     expect(f).toContain('brightness(100%)');
     expect(f).toContain('contrast(100%)');
     expect(f).toContain('saturate(100%)');
     expect(f).toContain('blur(0px)');
-    expect(f).toContain('sepia(0%)');
+    expect(f).toContain('sepia(30%)');
     expect(f).toContain('hue-rotate(0deg)');
     expect(f).toContain('invert(0%)');
     expect(f).toContain('opacity(1)');
@@ -45,8 +49,8 @@ describe('buildFilter (store version)', () => {
     expect(buildFilter({ bl: 5 })).toContain('blur(5px)');
   });
 
-  it('produces a single space-separated string', () => {
-    const f = buildFilter({});
+  it('produces a single space-separated string when non-default', () => {
+    const f = buildFilter({ br: 120 });
     expect(f.split(' ')).toHaveLength(8);
   });
 });

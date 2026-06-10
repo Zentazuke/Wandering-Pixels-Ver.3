@@ -8,7 +8,7 @@ import useAppStore from './appStore';
 beforeEach(() => {
   useAppStore.setState({
     view: 'menu', mode: 'default', selId: null,
-    propsOpen: false, tool: 'select',
+    tool: 'select',
     zoom: 1, panX: 0, panY: 0,
     flashing: false, toast: null,
   });
