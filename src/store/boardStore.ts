@@ -113,6 +113,41 @@ export function makeStickerElement(svg: string, zIndex: number): Omit<StickerEle
 // localStorage / zustand persist middleware deliberately omitted — it cannot
 // handle base64 image payloads without hitting the 5–10 MB storage limit.
 
+// ─── Gesture undo grouping ────────────────────────────────────────────────────
+// A drag/resize/rotate fires updateElement on every pointermove. Without
+// grouping, zundo records one history entry per pixel of movement, so Ctrl+Z
+// "undoes" a single mousemove. These helpers wrap a gesture so the whole
+// thing lands in history as exactly one entry.
+//
+// Usage: const pre = beginGesture();  …many updates…  commitGesture(pre);
+
+/** Pause history recording and snapshot the pre-gesture elements. */
+export function beginGesture(): BoardElement[] {
+  useBoardStore.temporal.getState().pause();
+  return useBoardStore.getState().elements;
+}
+
+/**
+ * End a gesture: record the whole thing as ONE undo entry.
+ * If nothing changed (a plain click), records nothing.
+ */
+export function commitGesture(preElements: BoardElement[]): void {
+  const temporal = useBoardStore.temporal.getState();
+  const finalElements = useBoardStore.getState().elements;
+
+  if (finalElements === preElements) {
+    // No updates happened during the gesture — nothing to record.
+    temporal.resume();
+    return;
+  }
+
+  // Rewind silently (still paused), resume recording, then re-apply the final
+  // state in a single set — zundo stores the pre-gesture state as one entry.
+  useBoardStore.setState({ elements: preElements });
+  temporal.resume();
+  useBoardStore.setState({ elements: finalElements });
+}
+
 const useBoardStore = create<BoardState>()(
   devtools(
     temporal(

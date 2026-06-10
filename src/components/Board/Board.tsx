@@ -4,7 +4,6 @@ import useBoardStore from '../../store/boardStore.js';
 import { useZoom } from '../../hooks/useZoom.js';
 import { useBoardInteraction } from '../../hooks/useBoardInteraction.js';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts.js';
-import { usePersistence } from '../../hooks/usePersistence.js';
 import { BG_OPTIONS } from '../../constants/backgrounds.js';
 import { BOARD_W, BOARD_H } from '../../constants/board.js';
 import PhotoElement   from './elements/PhotoElement.jsx';
@@ -55,7 +54,6 @@ export default function Board() {
 
   const { fitBoard } = useZoom(canvasRef);
   useKeyboardShortcuts();
-  usePersistence();
   const { onElPointerDown, onRotatePointerDown, onResizePointerDown, onBoardPointerDown } =
     useBoardInteraction(canvasRef);
 

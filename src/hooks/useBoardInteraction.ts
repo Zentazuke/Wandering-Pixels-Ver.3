@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import useAppStore from '../store/appStore.js';
-import useBoardStore from '../store/boardStore.js';
+import useBoardStore, { beginGesture, commitGesture } from '../store/boardStore.js';
 import type { BoardElement } from '../types';
 
 export type ResizeHandle = 'nw' | 'ne' | 'sw' | 'se' | 'p1' | 'p2';
@@ -17,6 +17,8 @@ type InteractionState = {
   rotating: string | null; rotCX: number; rotCY: number;
   rotStartAngle: number; rotStartRot: number;
   elements: BoardElement[];
+  /** Pre-gesture snapshot — non-null while a drag/resize/rotate is active. */
+  preElements: BoardElement[] | null;
 };
 
 /**
@@ -51,6 +53,7 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
     rotating: null, rotCX: 0, rotCY: 0,
     rotStartAngle: 0, rotStartRot: 0,
     elements: [],
+    preElements: null,
   });
 
   useEffect(() => {
@@ -79,6 +82,7 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
     const el = ref.current.elements.find((el) => el.id === id);
     if (!el) return;
     const bp = boardPt(e.clientX, e.clientY);
+    ref.current.preElements = beginGesture();
     ref.current.dragging  = id;
     ref.current.dragOX    = bp.x - el.x;
     ref.current.dragOY    = bp.y - el.y;
@@ -105,6 +109,7 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
     if (!node) return;
     const rect = node.getBoundingClientRect();
     const el   = ref.current.elements.find((el) => el.id === id);
+    ref.current.preElements    = beginGesture();
     ref.current.rotating       = id;
     ref.current.rotCX          = rect.left + rect.width  / 2;
     ref.current.rotCY          = rect.top  + rect.height / 2;
@@ -122,6 +127,7 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
     const el = ref.current.elements.find((el) => el.id === id);
     if (!el) return;
     const bp = boardPt(e.clientX, e.clientY);
+    ref.current.preElements    = beginGesture();
     ref.current.resizing       = id;
     ref.current.resizeHandle   = handle;
     ref.current.resizeStartX   = bp.x;
@@ -193,9 +199,16 @@ export function useBoardInteraction(canvasRef: React.RefObject<HTMLElement | nul
     }
 
     function onMouseUp() {
-      ref.current.dragging = null;
-      ref.current.rotating = null;
-      ref.current.resizing = null;
+      const r = ref.current;
+      // Close the gesture: the entire drag/resize/rotate becomes a single
+      // undo entry (or none, if it was just a click with no movement).
+      if (r.preElements) {
+        commitGesture(r.preElements);
+        r.preElements = null;
+      }
+      r.dragging = null;
+      r.rotating = null;
+      r.resizing = null;
     }
 
     document.addEventListener('pointermove',   onMouseMove);

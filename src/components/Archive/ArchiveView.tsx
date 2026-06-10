@@ -28,26 +28,36 @@ export default function ArchiveView() {
   useEffect(() => { loadSnapshots(); }, []);
 
   async function loadSnapshots() {
-    const { keys, vals } = await dbGetByPrefix('snap-');
-    const snaps = keys
-      .map((k, i) => ({ key: k, ...(vals[i] as Omit<Snapshot, 'key'>) }))
-      .sort((a, b) => b.ts - a.ts);
-    setSnapshots(snaps);
+    try {
+      const { keys, vals } = await dbGetByPrefix('snap-');
+      const snaps = keys
+        .map((k, i) => ({ key: k, ...(vals[i] as Omit<Snapshot, 'key'>) }))
+        .sort((a, b) => b.ts - a.ts);
+      setSnapshots(snaps);
+    } catch {
+      useAppStore.getState().showToast('Couldn\'t load archive', 'error');
+    }
   }
 
   async function saveSnapshot() {
     setSaving(true);
-    const { elements, currentBg, customBgColor, customBgImage } = useBoardStore.getState();
-    const thumb = await exportBoard(elements, currentBg, customBgColor, customBgImage, true) as string;
-    const snap: Snapshot = {
-      key:   `snap-${Date.now()}`,
-      ts:    Date.now(),
-      label: `Board — ${new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}`,
-      thumb, elements, currentBg, customBgColor, customBgImage,
-    };
-    await dbSave(snap.key, snap);
-    setSaving(false);
-    await loadSnapshots();
+    try {
+      const { elements, currentBg, customBgColor, customBgImage } = useBoardStore.getState();
+      const thumb = await exportBoard(elements, currentBg, customBgColor, customBgImage, true) as string;
+      const snap: Snapshot = {
+        key:   `snap-${Date.now()}`,
+        ts:    Date.now(),
+        label: `Board — ${new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })}`,
+        thumb, elements, currentBg, customBgColor, customBgImage,
+      };
+      await dbSave(snap.key, snap);
+      await loadSnapshots();
+      useAppStore.getState().showToast('Board saved to archive', 'success');
+    } catch {
+      useAppStore.getState().showToast('Couldn\'t save snapshot — storage may be full', 'error');
+    } finally {
+      setSaving(false);
+    }
   }
 
   function restoreSnapshot(snap: Snapshot) {
@@ -59,9 +69,15 @@ export default function ArchiveView() {
     });
   }
 
-  async function deleteSnapshot(key: string) {
-    await dbDelete(key);
-    await loadSnapshots();
+  async function deleteSnapshot(snap: Snapshot) {
+    // Permanent and unrecoverable — always confirm.
+    if (!window.confirm(`Delete "${snap.label}"? This can't be undone.`)) return;
+    try {
+      await dbDelete(snap.key);
+      await loadSnapshots();
+    } catch {
+      useAppStore.getState().showToast('Couldn\'t delete snapshot', 'error');
+    }
   }
 
   return (
@@ -91,7 +107,7 @@ export default function ArchiveView() {
                 <span className={styles.cardLabel}>{snap.label}</span>
                 <div className={styles.cardActions}>
                   <button className={styles.restoreBtn} onClick={() => restoreSnapshot(snap)}>Restore</button>
-                  <button className={styles.deleteBtn}  onClick={() => deleteSnapshot(snap.key)}>✕</button>
+                  <button className={styles.deleteBtn}  onClick={() => deleteSnapshot(snap)}>✕</button>
                 </div>
               </div>
             </div>

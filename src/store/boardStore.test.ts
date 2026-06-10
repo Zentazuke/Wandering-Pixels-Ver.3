@@ -4,7 +4,10 @@
  * and the buildFilter utility.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import useBoardStore, { buildFilter, makePhotoElement, makeTextElement, makeStickerElement } from './boardStore';
+import useBoardStore, {
+  buildFilter, makePhotoElement, makeTextElement, makeStickerElement,
+  beginGesture, commitGesture,
+} from './boardStore';
 import type { PhotoElement } from '../types/elements';
 
 // Reset store state before each test
@@ -183,6 +186,68 @@ describe('background', () => {
     const { currentBg, customBgColor } = useBoardStore.getState();
     expect(currentBg).toBe('custom');
     expect(customBgColor).toBe('#abc123');
+  });
+});
+
+// ─── gesture undo grouping ────────────────────────────────────────────────────
+describe('beginGesture / commitGesture', () => {
+  it('groups a whole drag (many updates) into a single undo entry', () => {
+    const id = useBoardStore.getState().addElement(makeTextElement(0));
+    const startX = useBoardStore.getState().elements[0].x;
+    useBoardStore.temporal.getState().clear();
+
+    const pre = beginGesture();
+    // Simulate a drag: one updateElement per pointermove
+    for (let i = 1; i <= 25; i++) {
+      useBoardStore.getState().updateElement(id, { x: startX + i * 4 });
+    }
+    commitGesture(pre);
+
+    // One entry, not 25
+    expect(useBoardStore.temporal.getState().pastStates).toHaveLength(1);
+    // Final position kept
+    expect(useBoardStore.getState().elements[0].x).toBe(startX + 100);
+    // One undo restores the pre-drag position
+    useBoardStore.temporal.getState().undo();
+    expect(useBoardStore.getState().elements[0].x).toBe(startX);
+  });
+
+  it('redo after undo restores the final gesture position', () => {
+    const id = useBoardStore.getState().addElement(makeTextElement(0));
+    const startX = useBoardStore.getState().elements[0].x;
+    useBoardStore.temporal.getState().clear();
+
+    const pre = beginGesture();
+    useBoardStore.getState().updateElement(id, { x: startX + 50 });
+    useBoardStore.getState().updateElement(id, { x: startX + 120 });
+    commitGesture(pre);
+
+    useBoardStore.temporal.getState().undo();
+    useBoardStore.temporal.getState().redo();
+    expect(useBoardStore.getState().elements[0].x).toBe(startX + 120);
+  });
+
+  it('a click with no movement records nothing', () => {
+    useBoardStore.getState().addElement(makeTextElement(0));
+    useBoardStore.temporal.getState().clear();
+
+    const pre = beginGesture();
+    commitGesture(pre); // pointerdown + pointerup, no moves
+
+    expect(useBoardStore.temporal.getState().pastStates).toHaveLength(0);
+  });
+
+  it('recording resumes normally after a gesture', () => {
+    const id = useBoardStore.getState().addElement(makeTextElement(0));
+    useBoardStore.temporal.getState().clear();
+
+    const pre = beginGesture();
+    useBoardStore.getState().updateElement(id, { x: 500 });
+    commitGesture(pre);
+
+    // A normal (non-gesture) change afterwards is recorded as its own entry
+    useBoardStore.getState().updateElement(id, { rotation: 45 });
+    expect(useBoardStore.temporal.getState().pastStates).toHaveLength(2);
   });
 });
 

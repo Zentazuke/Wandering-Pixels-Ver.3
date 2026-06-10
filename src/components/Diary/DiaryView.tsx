@@ -39,9 +39,13 @@ export default function DiaryView() {
       date: new Date().toISOString(),
       mode, field1, field2, field3, reflection,
     };
-    await dbSave(entry.id, entry);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await dbSave(entry.id, entry);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch {
+      useAppStore.getState().showToast('Couldn\'t save entry — storage may be full', 'error');
+    }
   }
 
   const labels = LABELS[mode] || LABELS.default;
