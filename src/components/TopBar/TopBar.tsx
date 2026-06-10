@@ -3,6 +3,7 @@ import useAppStore from '../../store/appStore.js';
 import useBoardStore from '../../store/boardStore.js';
 import { useFlash } from '../../hooks/useFlash.js';
 import { exportBoard } from '../../utils/exportBoard.js';
+import { exportBoardDom } from '../../utils/exportBoardDom.js';
 import { BOARD_W, BOARD_H } from '../../constants/board.js';
 import type { View } from '../../types';
 import styles from './TopBar.module.css';
@@ -100,9 +101,18 @@ export default function TopBar() {
           </div>
         )}
 
-        <button className={styles.exportBtn} title="Export PNG" onClick={() => {
-          const { elements, currentBg, customBgColor, customBgImage } = useBoardStore.getState();
+        <button className={styles.exportBtn} title="Export PNG" onClick={async () => {
           useAppStore.getState().deselect();
+          try {
+            // DOM-snapshot export: photographs the live board, so every
+            // frame/shape/filter exports exactly as rendered.
+            const ok = await exportBoardDom();
+            if (ok) return;
+          } catch {
+            // fall through to the canvas renderer
+          }
+          // Fallback (board not mounted, or snapshot failed): canvas renderer.
+          const { elements, currentBg, customBgColor, customBgImage } = useBoardStore.getState();
           exportBoard(elements, currentBg, customBgColor, customBgImage, false);
         }}>
           <Download size={12} />

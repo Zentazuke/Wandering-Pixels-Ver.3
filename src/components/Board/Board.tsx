@@ -82,6 +82,7 @@ export default function Board() {
     >
       <div
         className={styles.board}
+        data-board-root="1"
         style={{
           width:     BOARD_W,
           height:    BOARD_H,
