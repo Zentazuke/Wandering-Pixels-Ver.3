@@ -116,6 +116,12 @@
   box-shadow: var(--shadow-md);
   z-index: 200;
   min-width: 90px;
+  transform-origin: left center;
+  animation: flyIn 0.18s var(--ease-spring);
+}
+
+@keyframes flyIn {
+  from { opacity: 0; transform: scale(0.92) translateX(-4px); }
 }
 
 .flyoutBtn {

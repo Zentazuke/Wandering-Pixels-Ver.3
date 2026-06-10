@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { Undo2, Redo2, ZoomIn, ZoomOut, Maximize2, Download } from 'lucide-react';
 import useAppStore from '../../store/appStore.js';
 import useBoardStore from '../../store/boardStore.js';
@@ -22,6 +23,15 @@ export default function TopBar() {
   const zoomOut  = useAppStore((s) => s.zoomOut);
   const fitBoard = useAppStore((s) => s.fitBoard);
   const flash    = useFlash();
+
+  const [exportDone, setExportDone] = useState(false);
+  const exportPulseTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  function pulseExport() {
+    setExportDone(true);
+    clearTimeout(exportPulseTimer.current);
+    exportPulseTimer.current = setTimeout(() => setExportDone(false), 600);
+  }
 
   function switchView(nextView: View) {
     if (nextView === view) return;
@@ -89,19 +99,23 @@ export default function TopBar() {
           </div>
         )}
 
-        <button className={styles.exportBtn} title="Export PNG" onClick={async () => {
+        <button
+          className={`${styles.exportBtn} ${exportDone ? styles.exportDone : ''}`}
+          title="Export PNG"
+          onClick={async () => {
           useAppStore.getState().deselect();
           try {
             // DOM-snapshot export: photographs the live board, so every
             // frame/shape/filter exports exactly as rendered.
             const ok = await exportBoardDom();
-            if (ok) return;
+            if (ok) { pulseExport(); return; }
           } catch {
             // fall through to the canvas renderer
           }
           // Fallback (board not mounted, or snapshot failed): canvas renderer.
           const { elements, currentBg, customBgColor, customBgImage } = useBoardStore.getState();
           exportBoard(elements, currentBg, customBgColor, customBgImage, false);
+          pulseExport();
         }}>
           <Download size={12} />
           Export
