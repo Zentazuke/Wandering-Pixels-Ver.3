@@ -2,6 +2,7 @@ import { useRef, useCallback, memo } from 'react';
 import useAppStore from '../../../store/appStore.js';
 import useBoardStore from '../../../store/boardStore.js';
 import { NOTE_FRAME_STYLES, NOTE_FRAME_BG_OVERRIDES } from '../../../constants/noteFrames.js';
+import { sanitizeHtml } from '../../../utils/sanitizeHtml.js';
 import SelectionHandles from './SelectionHandles.jsx';
 import type { TextElement as TextEl } from '../../../types';
 import type { ResizeHandle } from '../../../hooks/useBoardInteraction.js';
@@ -66,7 +67,9 @@ const TextElement = memo(function TextElement({ el, onPointerDown, onRotate, onR
     txt.contentEditable = 'false';
     txt.style.pointerEvents = 'none';
     txt.style.cursor = 'default';
-    updateEl(el.id, { content: txt.innerHTML });
+    // Sanitize at the entry point — pasted rich content can carry
+    // scriptable markup that must never reach the store.
+    updateEl(el.id, { content: sanitizeHtml(txt.innerHTML) });
   }, [el.id, updateEl]);
 
   const onKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -101,7 +104,7 @@ const TextElement = memo(function TextElement({ el, onPointerDown, onRotate, onR
         const r = document.createRange();
         r.setStart(newLi, 0); r.collapse(true);
         sel.removeAllRanges(); sel.addRange(r);
-        updateEl(el.id, { content: textRef.current?.innerHTML });
+        updateEl(el.id, { content: sanitizeHtml(textRef.current?.innerHTML ?? '') });
       }
     }
   }, [el.id, el.bold, el.italic, updateEl]);
@@ -140,7 +143,9 @@ const TextElement = memo(function TextElement({ el, onPointerDown, onRotate, onR
             textAlign:    el.align     ?? 'left',
             pointerEvents: 'none',
           }}
-          dangerouslySetInnerHTML={{ __html: el.content || '' }}
+          // Defense in depth: content was sanitized on save, but boards
+          // loaded from storage / future imports go through here too.
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(el.content || '') }}
           onBlur={onBlur}
           onKeyDown={onKeyDown}
           onPointerDown={(e) => { if (e.currentTarget.contentEditable === 'true') e.stopPropagation(); }}

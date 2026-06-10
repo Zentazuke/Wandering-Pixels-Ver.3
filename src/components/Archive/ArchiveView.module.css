@@ -14,11 +14,50 @@
   margin-bottom: 32px;
 }
 
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
 .title {
   font-family: 'Playfair Display', serif;
   font-size: 26px;
   font-weight: 600;
   color: var(--ink);
+}
+
+/* ── Boards / Diary tabs ── */
+.tabs {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  background: var(--surface-card);
+}
+
+.tabBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border: none;
+  background: none;
+  color: var(--ink-faint);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--t-spring), color var(--t-spring);
+}
+
+.tabBtn:hover { background: var(--gold-08); color: var(--ink); }
+
+.tabActive {
+  background: var(--gold-glow);
+  color: var(--gold);
 }
 
 .saveBtn {
@@ -140,4 +179,56 @@
 .deleteBtn:hover {
   background: rgba(180,80,80,0.08);
   color: rgba(180,80,80,1);
+}
+
+/* ── Diary entry cards ── */
+.entryBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px 14px;
+}
+
+.entryMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.entryDate {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+}
+
+.entryMode {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--gold-glow);
+  border: 1px solid var(--gold-18);
+  border-radius: var(--r-pill);
+  padding: 2px 8px;
+}
+
+.entryTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.entryExcerpt {
+  font-family: 'Lora', serif;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-mid);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0 0 4px;
 }
