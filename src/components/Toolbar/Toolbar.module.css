@@ -80,7 +80,8 @@
   transition:
     background var(--t-spring),
     color var(--t-spring),
-    box-shadow var(--t-spring);
+    box-shadow var(--t-spring),
+    transform 0.12s var(--ease-out);
 }
 
 .toolBtn:hover {
@@ -88,10 +89,18 @@
   color: var(--ink);
 }
 
+.toolBtn:active {
+  transform: scale(var(--press));
+  transition-duration: 0.05s;
+}
+
+/* Engaged tool sits *into* the rail — sunken inset, not an outline */
 .toolBtn.active {
-  background: var(--gold-15);
+  background: var(--gold-10);
   color: var(--gold);
-  box-shadow: inset 0 0 0 1.5px var(--gold-30);
+  box-shadow:
+    inset 0 1.5px 3px rgba(41,31,18,0.12),
+    inset 0 0 0 1px var(--gold-border);
 }
 
 /* ── Shapes flyout ──────────────────────────────────────────────────────────── */

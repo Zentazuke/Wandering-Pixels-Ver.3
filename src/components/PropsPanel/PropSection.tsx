@@ -17,9 +17,14 @@ export default function PropSection({
         onClick={() => setOpen((v) => !v)}
       >
         <span>{title}</span>
-        <span className={styles.chevron}>{open ? '▾' : '▸'}</span>
+        <span className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`}>▸</span>
       </button>
-      {open && <div className={styles.body}>{children}</div>}
+      {/* Body stays mounted — height animates via grid-template-rows */}
+      <div className={`${styles.body} ${open ? styles.bodyOpen : ''}`}>
+        <div className={styles.bodyClip}>
+          <div className={styles.bodyContent}>{children}</div>
+        </div>
+      </div>
     </div>
   );
 }

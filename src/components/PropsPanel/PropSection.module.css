@@ -31,12 +31,31 @@
 .chevron {
   font-size: 9px;
   color: var(--ink-faint);
-  transition: color var(--t-fast);
+  transition: transform 0.22s var(--ease-out), color var(--t-fast);
 }
 
-.header.open .chevron { color: var(--gold); }
+.chevronOpen {
+  transform: rotate(90deg);
+  color: var(--gold);
+}
 
+/* Animated disclosure: grid row 0fr→1fr animates height without JS
+   measuring. Padding lives on the innermost layer so the closed state
+   collapses to exactly zero. */
 .body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s var(--ease-out);
+}
+
+.bodyOpen { grid-template-rows: 1fr; }
+
+.bodyClip {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.bodyContent {
   padding: 10px 12px 14px;
   display: flex;
   flex-direction: column;
