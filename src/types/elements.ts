@@ -25,6 +25,11 @@ export interface PhotoElement extends BaseElement {
   shape?:       string;
   frameColor?:  string;
   shadow?:      boolean;
+  // Frame geometry overrides — absent = archetype/legacy defaults apply
+  frameW?:      number;   // mat width px
+  frameTail?:   number;   // extra bottom depth px (polaroid tail)
+  frameRadius?: number;   // corner rounding px
+  frameDouble?: boolean;  // second outline ring
 
   // Crop & orientation
   flipH?:       boolean;

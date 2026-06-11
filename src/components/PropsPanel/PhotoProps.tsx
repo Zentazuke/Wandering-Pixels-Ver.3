@@ -6,7 +6,7 @@ import useBoardStore from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import { makeThumb } from '../../utils/imageThumb.js';
 import { FILTER_PRESETS } from '../../constants/filterPresets.js';
-import { FRAMES, resolveFrameKey } from '../../constants/frames.js';
+import { FRAMES, resolveFrame } from '../../constants/frames.js';
 import { SHAPES } from '../../constants/shapes.js';
 import PropSection from './PropSection.jsx';
 import { PropRow, PropSlider, PropBtn } from './PropRow.jsx';
@@ -15,7 +15,7 @@ import type { Shape } from '../../constants/shapes.js';
 import type { Frame } from '../../constants/frames.js';
 import styles from './PhotoProps.module.css';
 const FRAME_COLOR_SWATCHES = ['#ffffff','#f0e6cc','#faf6ee','#1a1712','#0a0806','#0c1426','#e8ede4','#fce4ec','#c4973a','#111111'];
-const NO_COLOR_FRAMES = new Set(['none','shadow','burned']);
+const NO_COLOR_FRAMES = new Set(['none','burned']);
 
 /** Props panel for a selected photo element. */
 export default function PhotoProps({ el }: { el: PhotoElement }) {
@@ -30,7 +30,7 @@ export default function PhotoProps({ el }: { el: PhotoElement }) {
   const replaceRef = useRef<HTMLInputElement>(null);
 
   const upd = (patch: Partial<PhotoElement>) => update(el.id, patch);
-  const frameKey    = resolveFrameKey(el.frame);
+  const rf          = resolveFrame(el);
   const activeShape = el.shape || 'square';
 
   const activePreset = FILTER_PRESETS.find(
@@ -139,18 +139,32 @@ export default function PhotoProps({ el }: { el: PhotoElement }) {
       <PropSection title="Frame" defaultOpen>
         <div className={styles.frameGrid}>
           {Object.entries(FRAMES).map(([fid, fr]) => (
-            <FrameBtn key={fid} fid={fid} fr={fr} el={el} active={frameKey === fid} onClick={() => upd({ frame: fid })} />
+            <FrameBtn key={fid} fid={fid} fr={fr} el={el} active={rf.key === fid} onClick={() => upd({ frame: fid })} />
           ))}
         </div>
 
-        {!NO_COLOR_FRAMES.has(frameKey) && (
+        {rf.key !== 'none' && (
+          <>
+            <PropSlider label="Width"   min={0} max={40} value={rf.w}      unit="px"
+              onChange={(v) => upd({ frameW: v })} />
+            <PropSlider label="Tail"    min={0} max={48} value={rf.tail}   unit="px"
+              onChange={(v) => upd({ frameTail: v })} />
+            <PropSlider label="Corners" min={0} max={24} value={rf.radius} unit="px"
+              onChange={(v) => upd({ frameRadius: v })} />
+            <PropRow>
+              <PropBtn active={rf.double} onClick={() => upd({ frameDouble: !rf.double })}>Double ring</PropBtn>
+            </PropRow>
+          </>
+        )}
+
+        {!NO_COLOR_FRAMES.has(rf.key) && (
           <>
             <div className={styles.swatchLabel}>Border Color</div>
             <div className={styles.swatchRow}>
               {FRAME_COLOR_SWATCHES.map((c) => (
                 <div
                   key={c}
-                  className={`${styles.swatch} ${(el.frameColor || FRAMES[frameKey]?.bg) === c ? styles.swatchActive : ''}`}
+                  className={`${styles.swatch} ${(el.frameColor || rf.bg) === c ? styles.swatchActive : ''}`}
                   style={{ background: c }}
                   onClick={() => upd({ frameColor: c })}
                 />
@@ -215,35 +229,30 @@ function ShapeBtn({ sid, sh, active, onClick }: { sid: string; sh: Shape; active
   );
 }
 
-const LABEL_MAP: Record<string, string> = {
-  none:'None', polaroid:'Polaroid', vintage:'Vintage', thick:'Thick', thin:'Thin',
-  double:'Double', shadow:'Shadow', painting:'Painting', burned:'Burned',
-  comic:'Comic', torn:'Torn', filmstrip:'Film', stamp:'Stamp',
-};
-
 function FrameBtn({ fid, fr, el, active, onClick }: { fid: string; fr: Frame; el: PhotoElement; active: boolean; onClick: () => void }) {
   const THUMB = 46;
   const isFrameless = fid === 'none';
-  const padNum  = Math.min(parseInt(fr.pt) || 0, 8);
+  const padNum  = Math.min(fr.defaultW, 8);
+  const padBtm  = Math.min(fr.defaultW + fr.defaultTail, 14);
   const frameBg = (active && el.frameColor) ? el.frameColor : fr.bg;
-  const shadow  = fr.shadowOnly ? '0 4px 16px rgba(0,0,0,0.4)' : isFrameless ? 'none' : '2px 3px 8px rgba(0,0,0,0.22)';
-  const label   = LABEL_MAP[fid] || fid;
+  const shadow  = isFrameless ? 'none' : '2px 3px 8px rgba(0,0,0,0.22)';
 
   return (
-    <button className={`${styles.frameBtn} ${active ? styles.btnActive : ''}`} onClick={onClick} title={label}>
+    <button className={`${styles.frameBtn} ${active ? styles.btnActive : ''}`} onClick={onClick} title={fr.label}>
       <div className={styles.framePrev} style={{
-        background: frameBg, padding: isFrameless ? 0 : padNum,
-        borderRadius: fr.br, boxShadow: shadow,
+        background: frameBg,
+        padding: isFrameless ? 0 : `${padNum}px ${padNum}px ${padBtm}px ${padNum}px`,
+        borderRadius: fr.defaultRadius ?? 0, boxShadow: shadow,
       }}>
         <img src={el.thumb || el.src} decoding="async" draggable={false}
-          style={{ width: THUMB, height: THUMB, objectFit: 'cover', display: 'block', borderRadius: fr.br === '0px' ? 0 : fr.br }} />
+          style={{ width: THUMB, height: THUMB, objectFit: 'cover', display: 'block' }} />
         {fr.capColor && (
           <div style={{ fontSize: 7, textAlign: 'center', fontFamily: fr.capFont, color: fr.capColor, padding: '2px 0' }}>
-            {label}
+            {fr.label}
           </div>
         )}
       </div>
-      <span>{label}</span>
+      <span>{fr.label}</span>
     </button>
   );
 }

@@ -1,5 +1,5 @@
 import { BG_OPTIONS } from '../constants/backgrounds.js';
-import { FRAMES, resolveFrameKey } from '../constants/frames.js';
+import { resolveFrame } from '../constants/frames.js';
 import { NOTE_FRAME_BG_OVERRIDES } from '../constants/noteFrames.js';
 import { BOARD_W, BOARD_H } from '../constants/board.js';
 import { buildFilter } from '../store/boardStore.js';
@@ -9,15 +9,6 @@ function colorizeSvg(svg: string, color: string): string {
   return svg
     .replace(/fill="(?!none)[^"]*"/g,   `fill="${color}"`)
     .replace(/stroke="(?!none)[^"]*"/g, `stroke="${color}"`);
-}
-
-function parsePt(pt: string): { t: number; r: number; b: number; l: number } {
-  if (!pt || pt === '0px') return { t:0, r:0, b:0, l:0 };
-  const vals = pt.trim().split(/\s+/).map((v) => parseInt(v) || 0);
-  if (vals.length === 1) return { t:vals[0], r:vals[0], b:vals[0], l:vals[0] };
-  if (vals.length === 2) return { t:vals[0], r:vals[1], b:vals[0], l:vals[1] };
-  if (vals.length === 3) return { t:vals[0], r:vals[1], b:vals[2], l:vals[1] };
-  return { t:vals[0], r:vals[1], b:vals[2], l:vals[3] };
 }
 
 /** Renders the board to a PNG download or a JPEG thumbnail data URL. */
@@ -113,15 +104,14 @@ export async function exportBoard(
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => {
-          const fk = resolveFrameKey(el.frame);
-          const fr = FRAMES[fk] || FRAMES.polaroid;
-          const isFL = fk === 'none';
-          const pt = isFL ? {t:0,r:0,b:0,l:0} : parsePt(fr.pt);
-          const shadow = el.shadow !== false && fk !== 'none';
+          const rf = resolveFrame(el);
+          const isFL = rf.key === 'none';
+          const pt = rf.pad;
+          const shadow = el.shadow !== false && (!isFL || rf.shadowOnly);
 
           if (!isFL) {
             if (shadow) { ctx.shadowColor='rgba(0,0,0,0.25)'; ctx.shadowBlur=18; ctx.shadowOffsetX=3; ctx.shadowOffsetY=5; }
-            ctx.fillStyle = el.frameColor || fr.bg || '#fff';
+            ctx.fillStyle = el.frameColor || rf.bg || '#fff';
             ctx.fillRect(el.x, el.y, el.w + pt.l + pt.r, el.h + pt.t + pt.b);
             ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
           }
@@ -142,9 +132,9 @@ export async function exportBoard(
           ctx.drawImage(img, sx, sy, sw, sh, ix, iy, el.w, el.h);
           ctx.restore(); ctx.filter = 'none';
 
-          if (el.caption && fr.capColor) {
-            ctx.fillStyle = el.captionColor || fr.capColor;
-            ctx.font = `${el.captionItalic !== false ? 'italic ' : ''}${el.captionBold ? '600 ' : ''}${el.captionSize || 11}px ${fr.capFont || 'Georgia,serif'}`;
+          if (el.caption && rf.capColor) {
+            ctx.fillStyle = el.captionColor || rf.capColor;
+            ctx.font = `${el.captionItalic !== false ? 'italic ' : ''}${el.captionBold ? '600 ' : ''}${el.captionSize || 11}px ${rf.capFont || 'Georgia,serif'}`;
             ctx.textAlign = 'center';
             ctx.fillText(el.caption, el.x + (el.w + pt.l + pt.r) / 2, el.y + el.h + pt.t + pt.b - 8, el.w + pt.l + pt.r - 10);
           }

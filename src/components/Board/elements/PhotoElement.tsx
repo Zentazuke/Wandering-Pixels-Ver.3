@@ -1,7 +1,7 @@
 import { useRef, memo } from 'react';
 import useAppStore from '../../../store/appStore.js';
 import { buildFilter } from '../../../store/boardStore.js';
-import { FRAMES, resolveFrameKey } from '../../../constants/frames.js';
+import { resolveFrame } from '../../../constants/frames.js';
 import { SHAPES } from '../../../constants/shapes.js';
 import SelectionHandles from './SelectionHandles.jsx';
 import type { PhotoElement as PhotoEl } from '../../../types';
@@ -21,9 +21,8 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
   const selId      = useAppStore((s) => s.selId);
   const isSelected = selId === el.id;
 
-  const frameKey    = resolveFrameKey(el.frame);
-  const fr          = FRAMES[frameKey] || FRAMES.polaroid;
-  const isFrameless = frameKey === 'none';
+  const rf          = resolveFrame(el);
+  const isFrameless = rf.key === 'none';
 
   const shapeKey  = el.shape || 'square';
   const shape     = SHAPES[shapeKey] || SHAPES.square;
@@ -37,9 +36,10 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
 
   const clipOverflow = (shape.clipPath || shape.svgPath) ? 'visible' : 'hidden';
 
-  const shadow = (el.shadow !== false && frameKey !== 'none')
-    ? (fr.shadowOnly ? '0 8px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.25)' : '4px 5px 18px rgba(0,0,0,0.28)')
-    : 'none';
+  const shadow = el.shadow === false ? 'none'
+    : rf.shadowOnly ? '0 8px 40px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.25)'
+    : isFrameless   ? 'none'
+    : '4px 5px 18px rgba(0,0,0,0.28)';
 
   const zoom      = el.imgZoom ?? 1;
   const flipH     = el.flipH ? -1 : 1;
@@ -52,10 +52,10 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
   // Omit default filter for the same reason
   const imgFilter = buildFilter(el) === 'none' ? undefined : buildFilter(el);
 
-  const frameBg    = el.frameColor || fr.bg;
-  const extraStyle = fr.wrapStyle
+  const frameBg    = el.frameColor || rf.bg;
+  const extraStyle = rf.fr.wrapStyle
     ? Object.fromEntries(
-        fr.wrapStyle.split(';').filter(Boolean).map((p) => {
+        rf.fr.wrapStyle.split(';').filter(Boolean).map((p) => {
           const i = p.indexOf(':');
           const k = p.slice(0, i).trim().replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
           return [k, p.slice(i + 1).trim()];
@@ -63,9 +63,10 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
       )
     : {};
 
-  const isDouble = frameKey === 'double';
-  const hasCap   = !isFrameless && fr.capColor && el.caption;
-  const totalW   = el.w + (isFrameless ? 0 : (parseInt(fr.pt) || 8) * 2);
+  const hasCap   = !isFrameless && rf.capColor && el.caption;
+  const totalW   = el.w + rf.pad.l + rf.pad.r;
+  // Inner corner follows the outer one through the mat (classic frame math)
+  const innerR   = rf.radius > 0 ? Math.max(0, rf.radius - rf.w) : 0;
 
   return (
     <div
@@ -84,11 +85,11 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
         className={styles.frameWrap}
         style={{
           background:    isFrameless ? 'transparent' : frameBg,
-          padding:       fr.pt,
+          padding:       `${rf.pad.t}px ${rf.pad.r}px ${rf.pad.b}px ${rf.pad.l}px`,
           boxShadow:     shadow,
-          borderRadius:  fr.br,
-          outline:       isDouble ? '3px solid #f0e8d8' : undefined,
-          outlineOffset: isDouble ? '3px' : undefined,
+          borderRadius:  rf.radius ? `${rf.radius}px` : '0px',
+          outline:       rf.double ? '3px solid #f0e8d8' : undefined,
+          outlineOffset: rf.double ? '3px' : undefined,
           ...extraStyle,
         }}
       >
@@ -107,7 +108,7 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
           style={{
             width:        el.w,
             height:       el.h,
-            borderRadius: isFrameless ? undefined : shape.br,
+            borderRadius: isFrameless ? undefined : (shape.br !== '0px' ? shape.br : (innerR ? `${innerR}px` : undefined)),
             overflow:     isFrameless ? 'visible' : clipOverflow as React.CSSProperties['overflow'],
             ...(isFrameless ? {} : clipStyle),
           }}
@@ -128,14 +129,14 @@ const PhotoElement = memo(function PhotoElement({ el, onPointerDown, onRotate, o
               transformOrigin: imgTx ? imgOrigin : undefined,
             }}
           />
-          {fr.overlay && <div dangerouslySetInnerHTML={{ __html: fr.overlay }} />}
+          {rf.fr.overlay && <div dangerouslySetInnerHTML={{ __html: rf.fr.overlay }} />}
         </div>
 
         {hasCap && (
           <div className={styles.caption} style={{
-            fontFamily: fr.capFont,
+            fontFamily: rf.capFont,
             fontSize:   el.captionSize  ?? 11,
-            color:      el.captionColor ?? fr.capColor,
+            color:      el.captionColor ?? rf.capColor,
             fontStyle:  el.captionItalic !== false ? 'italic' : 'normal',
             fontWeight: el.captionBold   ? '600' : '400',
           }}>
