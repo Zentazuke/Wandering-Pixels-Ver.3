@@ -181,29 +181,33 @@ export default function PhotoProps({ el }: { el: PhotoElement }) {
           </>
         )}
 
-        <PropRow label="Shadow">
-          <input type="checkbox" checked={el.shadow !== false}
-            onChange={(e) => upd({ shadow: e.target.checked })} />
+        <PropRow>
+          <PropBtn active={el.shadow !== false} onClick={() => upd({ shadow: el.shadow === false })}>
+            Shadow
+          </PropBtn>
         </PropRow>
       </PropSection>
 
-      <PropSection title="Caption">
-        <PropRow label="Text">
-          <input className={styles.textInput} type="text" maxLength={60}
-            placeholder="Add caption…" value={el.caption || ''}
-            onChange={(e) => upd({ caption: e.target.value })} />
-        </PropRow>
-        <PropSlider label="Size" min={7} max={24} value={el.captionSize ?? 11} unit="px"
-          onChange={(v) => upd({ captionSize: v })} />
-        <PropRow label="Color">
-          <input type="color" className={styles.colorInput} value={el.captionColor ?? '#3b3328'}
-            onChange={(e) => upd({ captionColor: e.target.value })} />
-        </PropRow>
-        <PropRow>
-          <PropBtn active={el.captionBold}              onClick={() => upd({ captionBold:   !el.captionBold })}><b>B</b></PropBtn>
-          <PropBtn active={el.captionItalic !== false}  onClick={() => upd({ captionItalic: !el.captionItalic })}><i>I</i></PropBtn>
-        </PropRow>
-      </PropSection>
+      {/* Hidden for archetypes with no caption area (None, Torn, Burned) */}
+      {rf.capColor !== '' && (
+        <PropSection title="Caption">
+          <PropRow label="Text">
+            <input className={styles.textInput} type="text" maxLength={60}
+              placeholder="Add caption…" value={el.caption || ''}
+              onChange={(e) => upd({ caption: e.target.value })} />
+          </PropRow>
+          <PropSlider label="Size" min={7} max={24} value={el.captionSize ?? 11} unit="px"
+            onChange={(v) => upd({ captionSize: v })} />
+          <PropRow label="Color">
+            <input type="color" className={styles.colorInput} value={el.captionColor ?? '#3b3328'}
+              onChange={(e) => upd({ captionColor: e.target.value })} />
+          </PropRow>
+          <PropRow>
+            <PropBtn active={el.captionBold}              onClick={() => upd({ captionBold:   !el.captionBold })}><b>B</b></PropBtn>
+            <PropBtn active={el.captionItalic !== false}  onClick={() => upd({ captionItalic: !el.captionItalic })}><i>I</i></PropBtn>
+          </PropRow>
+        </PropSection>
+      )}
     </div>
   );
 }
