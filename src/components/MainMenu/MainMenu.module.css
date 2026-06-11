@@ -111,15 +111,24 @@
 
 .title {
   font-family: 'Playfair Display', serif;
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 36px;
+  font-weight: 700;
   color: var(--ink);
-  letter-spacing: 0.07em;
+  letter-spacing: 0.02em;
   line-height: 1.2;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   /* Letterpress: light catches the deboss under the ink */
   text-shadow: 0 1px 0 rgba(255,255,255,0.55);
   animation: wpRise 0.5s var(--ease-out) 0.8s backwards;
+}
+
+/* "pixels" wears the same metal as the mark */
+.titleGold {
+  background: linear-gradient(180deg, #d2a13a, #8f6316);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none; /* shadow bleeds through transparent fill */
 }
 
 .subtitle {

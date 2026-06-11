@@ -70,7 +70,7 @@ export default function MainMenu() {
               d="M88,9 L89.2,12.8 L93,14 L89.2,15.2 L88,19 L86.8,15.2 L83,14 L86.8,12.8 Z"
               fill="url(#wp-gild)" opacity="0.6" />
           </svg>
-          <h1 className={styles.title}>wandering pixels</h1>
+          <h1 className={styles.title}>wandering <span className={styles.titleGold}>pixels</span></h1>
           <p className={styles.subtitle}>Your visual journal</p>
         </div>
 
