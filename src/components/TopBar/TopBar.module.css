@@ -45,11 +45,11 @@
 }
 
 .logoText {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Lora', serif;
   font-size: 13.5px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--bar-text-active);
-  letter-spacing: 0.09em;
+  letter-spacing: 0.06em;
 }
 
 /* ── Center group: tabs + history ── */
