@@ -1,14 +1,15 @@
+import { Fragment } from 'react';
 import useAppStore from '../../store/appStore.js';
 import { useFlash } from '../../hooks/useFlash.js';
 import type { WorkspaceMode } from '../../types';
 import styles from './MainMenu.module.css';
 
-const MODES: { id: WorkspaceMode; label: string; sub: string }[] = [
-  { id: 'default', label: '✦ Default',  sub: 'Open canvas'          },
-  { id: 'travel',  label: '🧭 Travel',  sub: 'Wander & document'    },
-  { id: 'love',    label: '❤️ Love',    sub: 'Moments & memories'   },
-  { id: 'family',  label: '🏡 Family',  sub: 'Keep it together'     },
-  { id: 'game',    label: '🎮 Game',    sub: 'Log your session'     },
+/* Themed spreads — the default canvas gets the clasp button instead */
+const THEMES: { id: WorkspaceMode; label: string; sub: string }[] = [
+  { id: 'travel', label: 'Travel', sub: 'Wander & document'  },
+  { id: 'love',   label: 'Love',   sub: 'Moments & memories' },
+  { id: 'family', label: 'Family', sub: 'Keep it together'   },
+  { id: 'game',   label: 'Game',   sub: 'Log your session'   },
 ];
 
 /** Full-screen landing screen for selecting a workspace mode. */
@@ -70,25 +71,37 @@ export default function MainMenu() {
               d="M88,9 L89.2,12.8 L93,14 L89.2,15.2 L88,19 L86.8,15.2 L83,14 L86.8,12.8 Z"
               fill="url(#wp-gild)" opacity="0.6" />
           </svg>
-          <h1 className={styles.title}>wandering <span className={styles.titleGold}>pixels</span></h1>
+          <h1 className={styles.title}>
+            <span className={styles.initial}>W</span>andering{' '}
+            <span className={styles.initial}>P</span>ixels
+          </h1>
           <p className={styles.subtitle}>Your visual journal</p>
         </div>
 
         <div className={styles.divider} />
 
-        <div className={styles.cards}>
-          {MODES.map((m) => (
-            <button key={m.id} className={styles.card} onClick={() => enterApp(m.id)}>
-              <span className={styles.cardLabel}>{m.label}</span>
-              <span className={styles.cardSub}>{m.sub}</span>
-            </button>
+        {/* The clasp — one primary action, stamped like a bookplate */}
+        <button className={styles.clasp} onClick={() => enterApp('default')}>
+          Open Your Journal
+        </button>
+
+        {/* Themed spreads, set like a table of contents */}
+        <p className={styles.chaptersLabel}>or begin a themed spread</p>
+        <nav className={styles.chapters} aria-label="Themed spreads">
+          {THEMES.map((m, i) => (
+            <Fragment key={m.id}>
+              {i > 0 && <span className={styles.dot} aria-hidden="true">·</span>}
+              <button className={styles.chapter} title={m.sub} onClick={() => enterApp(m.id)}>
+                {m.label}
+              </button>
+            </Fragment>
           ))}
-        </div>
+        </nav>
 
         <div className={styles.divider} />
 
         <button className={styles.archiveBtn} onClick={openArchive}>
-          📚 Open Archive
+          Open Archive
         </button>
       </div>
     </div>

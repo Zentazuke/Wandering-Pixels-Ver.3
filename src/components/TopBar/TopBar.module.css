@@ -45,11 +45,12 @@
 }
 
 .logoText {
-  font-family: 'Lora', serif;
-  font-size: 13.5px;
-  font-weight: 600;
+  font-family: 'Cormorant Garamond', serif;
+  /* Cormorant runs small — 16px here matches Lora's former 13.5px presence */
+  font-size: 16px;
+  font-weight: 700;
   color: var(--bar-text-active);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
 }
 
 /* ── Center group: tabs + history ── */

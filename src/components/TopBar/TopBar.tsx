@@ -58,7 +58,7 @@ export default function TopBar() {
           <path d="M81,20 L82.2,23.8 L86,25 L82.2,26.2 L81,30 L79.8,26.2 L76,25 L79.8,23.8 Z"
             fill="currentColor" opacity="0.65" />
         </svg>
-        <span className={styles.logoText}>wandering pixels</span>
+        <span className={styles.logoText}>Wandering Pixels</span>
       </button>
 
       {/* ── Center: view tabs + divider + undo/redo ── */}
