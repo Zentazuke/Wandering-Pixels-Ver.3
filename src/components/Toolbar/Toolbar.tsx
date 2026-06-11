@@ -66,6 +66,33 @@ export default function Toolbar({ open, onToggle }: Props) {
     return () => document.removeEventListener('pointerdown', handleOutside);
   }, [showShapesFlyout]);
 
+  // V/P/T/S tool shortcuts — the tooltips advertise them; the actions live
+  // here (file input ref, picker state), not in useKeyboardShortcuts.
+  useEffect(() => {
+    function onToolKey(e: KeyboardEvent) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.tagName === 'SELECT' ||
+        target?.isContentEditable
+      ) return;
+
+      switch (e.key.toLowerCase()) {
+        case 'v': setTool('select');                break;
+        case 'p': photoInputRef.current?.click();   break;
+        case 't': addTextNote();                    break;
+        case 's': setShowStickers(true);            break;
+        default: break;
+      }
+    }
+    window.addEventListener('keydown', onToolKey);
+    return () => window.removeEventListener('keydown', onToolKey);
+    // setTool is a stable zustand action; addTextNote only touches stable refs/actions
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function openShapesFlyout() {
     if (showShapesFlyout) { setShowShapesFlyout(false); return; }
     if (shapeBtnRef.current) {
