@@ -39,6 +39,9 @@ input, button, select, textarea {
   font-size: inherit;
 }
 
+/* Native checkboxes/radios follow the palette, not the OS blue */
+input[type="checkbox"], input[type="radio"] { accent-color: var(--gold); }
+
 button { cursor: pointer; }
 
 /* Allow text selection inside contenteditable only */

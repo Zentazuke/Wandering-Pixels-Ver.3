@@ -14,7 +14,12 @@ import type { PhotoElement } from '../../types/index.js';
 import type { Shape } from '../../constants/shapes.js';
 import type { Frame } from '../../constants/frames.js';
 import styles from './PhotoProps.module.css';
-const FRAME_COLOR_SWATCHES = ['#ffffff','#f0e6cc','#faf6ee','#1a1712','#0a0806','#0c1426','#e8ede4','#fce4ec','#c4973a','#111111'];
+/* Atelier mats — papers, deep inks, and muted pigments. One of each,
+   no near-duplicates. 11 swatches + the custom well = two clean rows of 6. */
+const FRAME_COLOR_SWATCHES = [
+  '#ffffff', '#f3ead3', '#c9b795', '#211a11', '#0e1320', '#31594f',
+  '#9caf97', '#5e6e8c', '#d9a0a8', '#c77e5e', '#c9952e',
+];
 const NO_COLOR_FRAMES = new Set(['none','burned']);
 
 /** Props panel for a selected photo element. */
@@ -176,22 +181,22 @@ export default function PhotoProps({ el }: { el: PhotoElement }) {
           </>
         )}
 
-        <PropRow label="Caption">
-          <input className={styles.textInput} type="text" maxLength={60}
-            placeholder="Add caption…" value={el.caption || ''}
-            onChange={(e) => upd({ caption: e.target.value })} />
-        </PropRow>
         <PropRow label="Shadow">
           <input type="checkbox" checked={el.shadow !== false}
             onChange={(e) => upd({ shadow: e.target.checked })} />
         </PropRow>
       </PropSection>
 
-      <PropSection title="Caption Style">
+      <PropSection title="Caption">
+        <PropRow label="Text">
+          <input className={styles.textInput} type="text" maxLength={60}
+            placeholder="Add caption…" value={el.caption || ''}
+            onChange={(e) => upd({ caption: e.target.value })} />
+        </PropRow>
         <PropSlider label="Size" min={7} max={24} value={el.captionSize ?? 11} unit="px"
           onChange={(v) => upd({ captionSize: v })} />
         <PropRow label="Color">
-          <input type="color" value={el.captionColor ?? '#3b3328'}
+          <input type="color" className={styles.colorInput} value={el.captionColor ?? '#3b3328'}
             onChange={(e) => upd({ captionColor: e.target.value })} />
         </PropRow>
         <PropRow>
