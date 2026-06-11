@@ -29,8 +29,17 @@ export default function MainMenu() {
     <div className={styles.backdrop}>
       <div className={styles.panel}>
         <div className={styles.header}>
-          <div className={styles.logo}>✦</div>
-          <h1 className={styles.title}>Wandering Pixels</h1>
+          <svg className={styles.logoMark} viewBox="0 0 100 80" aria-hidden="true">
+            <path d="M50,70 C35,65 20,68 10,72 L10,22 C20,18 35,15 50,20 Z"
+              fill="none" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
+            <path d="M50,70 C65,65 80,68 90,72 L90,22 C80,18 65,15 50,20 Z"
+              fill="none" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
+            <path d="M70,28 L72.8,37.2 L82,40 L72.8,42.8 L70,52 L67.2,42.8 L58,40 L67.2,37.2 Z"
+              fill="currentColor" />
+            <path d="M81,20 L82.2,23.8 L86,25 L82.2,26.2 L81,30 L79.8,26.2 L76,25 L79.8,23.8 Z"
+              fill="currentColor" opacity="0.65" />
+          </svg>
+          <h1 className={styles.title}>wandering pixels</h1>
           <p className={styles.subtitle}>Your visual journal</p>
         </div>
 

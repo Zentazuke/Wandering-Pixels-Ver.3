@@ -75,11 +75,12 @@
   margin-bottom: 0;
 }
 
-.logo {
-  font-size: 28px;
+.logoMark {
+  width: 64px;
+  height: 52px;
+  display: block;
+  margin: 0 auto 10px;
   color: var(--gold);
-  margin-bottom: 8px;
-  letter-spacing: 2px;
 }
 
 .title {
@@ -87,7 +88,7 @@
   font-size: 28px;
   font-weight: 600;
   color: var(--ink);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.07em;
   line-height: 1.2;
   margin-bottom: 6px;
 }
