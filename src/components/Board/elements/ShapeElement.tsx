@@ -32,13 +32,13 @@ function buildSvgProps(el: ShapeEl): SvgShapeProps {
     const b = parseInt(hex.slice(5, 7), 16);
     return `rgba(${r},${g},${b},${alpha})`;
   }
-  const s = el.stroke && el.stroke.startsWith('#') ? el.stroke : '#b5943a';
+  const s = el.stroke && el.stroke.startsWith('#') ? el.stroke : '#a8741a';
 
   switch (el.shapeFrame) {
     case 'rounded':  return { ...base, rx: 12 };
     case 'dashed':   return { ...base, strokeDasharray: '8 6' };
     case 'dotted':   return { ...base, strokeDasharray: '2 5', strokeLinecap: 'round' };
-    case 'gold':     return { ...base, stroke: '#b5943a', strokeWidth: Math.max(el.strokeWidth, 2) };
+    case 'gold':     return { ...base, stroke: '#a8741a', strokeWidth: Math.max(el.strokeWidth, 2) };
     case 'neon':     return { ...base, filter: `drop-shadow(0 0 5px ${hexToRgba(s, 0.9)}) drop-shadow(0 0 14px ${hexToRgba(s, 0.5)})` };
     case 'shadow':   return { ...base, filter: 'drop-shadow(2px 4px 8px rgba(0,0,0,0.22))' };
     case 'thick':    return { ...base, strokeWidth: el.strokeWidth * 2.5 };

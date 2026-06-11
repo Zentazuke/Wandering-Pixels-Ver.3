@@ -14,17 +14,17 @@ const IC = 13; // icon size for prop panel buttons
 
 const FONTS = ['Lora', 'Playfair', 'DM Sans'];
 
+/* Atelier papers — washes, pigments, deep inks. Three rows of six. */
 const NOTE_BG_COLORS = [
-  '#fff9e6','#fdf6ee','#fffef0','#fce8e8','#fce4ec','#fde8f5',
-  '#e8f5e9','#e8f5f0','#e3f2fd','#e8eaf6','#ede7f6','#f3e5f5',
-  '#fff3e0','#fff8e1','#e0f7fa','#f5f5f5','#eceff1','#fafafa',
-  '#2a2520','#1a1a2e','#0d1f10','transparent',
+  '#fff9e6','#faf6ee','#f3ead3','#c9b795','#f6e3dd','#e4eadf',
+  '#dfe7ec','#e7e2ec','#d9a0a8','#9caf97','#5e6e8c','#c77e5e',
+  '#c9952e','#211a11','#0e1320','#31594f','#4a3527','transparent',
 ];
 
+/* Writing inks first, light inks for dark papers after. Two rows of six. */
 const TEXT_COLORS = [
-  '#3b3328','#5a3e1a','#2d4a2d','#6b2737','#1a3080','#0d1f10',
-  '#ffffff','#f0e6cc','#e8f5e9','#e3f2fd','#39ff9f','#ffd700',
-  '#000000','transparent',
+  '#3b3328','#211a11','#5a3e1a','#31594f','#2c3a58','#6b2737',
+  '#2d4a2d','#ffffff','#f3ead3','#d9a0a8','#c9952e','transparent',
 ];
 
 const NOTE_FRAMES = [

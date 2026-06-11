@@ -50,12 +50,12 @@ export const STICKER_CATS: Record<StickerCategoryName, Sticker[]> = {
     { id: 'sparkle',   label: 'Sparkle',  svg: '<path d="M12 2v4M12 18v4M2 12h4M18 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8" stroke="#EF9F27" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="2.5" fill="#EF9F27"/>' },
   ],
   Shapes: [
-    { id: 'tri',       label: 'Triangle', svg: '<polygon points="12,3 22,20 2,20" fill="none" stroke="#b5943a" stroke-width="2"/>' },
-    { id: 'hex',       label: 'Hexagon',  svg: '<polygon points="12,2 20,7 20,17 12,22 4,17 4,7" fill="none" stroke="#b5943a" stroke-width="2"/>' },
-    { id: 'diamond-s', label: 'Diamond',  svg: '<polygon points="12,2 22,12 12,22 2,12" fill="none" stroke="#b5943a" stroke-width="2"/>' },
-    { id: 'circle-s',  label: 'Circle',   svg: '<circle cx="12" cy="12" r="9" fill="none" stroke="#b5943a" stroke-width="2"/>' },
-    { id: 'plus-s',    label: 'Plus',     svg: '<path d="M12 3v18M3 12h18" stroke="#b5943a" stroke-width="2.5" stroke-linecap="round"/>' },
-    { id: 'squiggle',  label: 'Squiggle', svg: '<path d="M3 12c2-4 4 4 6 0s4-4 6 0 4 4 6 0" fill="none" stroke="#b5943a" stroke-width="2.5" stroke-linecap="round"/>' },
+    { id: 'tri',       label: 'Triangle', svg: '<polygon points="12,3 22,20 2,20" fill="none" stroke="#a8741a" stroke-width="2"/>' },
+    { id: 'hex',       label: 'Hexagon',  svg: '<polygon points="12,2 20,7 20,17 12,22 4,17 4,7" fill="none" stroke="#a8741a" stroke-width="2"/>' },
+    { id: 'diamond-s', label: 'Diamond',  svg: '<polygon points="12,2 22,12 12,22 2,12" fill="none" stroke="#a8741a" stroke-width="2"/>' },
+    { id: 'circle-s',  label: 'Circle',   svg: '<circle cx="12" cy="12" r="9" fill="none" stroke="#a8741a" stroke-width="2"/>' },
+    { id: 'plus-s',    label: 'Plus',     svg: '<path d="M12 3v18M3 12h18" stroke="#a8741a" stroke-width="2.5" stroke-linecap="round"/>' },
+    { id: 'squiggle',  label: 'Squiggle', svg: '<path d="M3 12c2-4 4 4 6 0s4-4 6 0 4 4 6 0" fill="none" stroke="#a8741a" stroke-width="2.5" stroke-linecap="round"/>' },
   ],
 };
 

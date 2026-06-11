@@ -7,10 +7,11 @@ import type { StickerElement } from '../../types';
 
 const IC = 13;
 
+/* null = original sticker colors; tints follow the atelier palette. */
 const STICKER_COLORS: (string | null)[] = [
   null,
-  '#EF9F27','#E24B4A','#D85A30','#1D9E75','#7F77DD','#378ADD',
-  '#2e2416','#ffffff','#b5943a','#39ff9f',
+  '#c9952e','#c77e5e','#6b2737','#31594f','#9caf97','#5e6e8c',
+  '#2c3a58','#211a11','#d9a0a8','#f3ead3','#ffffff',
 ];
 
 /** Props panel for a selected sticker element. */

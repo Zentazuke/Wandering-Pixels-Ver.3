@@ -10,19 +10,18 @@ const IC = 13;
 
 // ── Palettes ───────────────────────────────────────────────────────────────────
 
+/* Atelier palette — papers, pigments, deep inks. Three rows of six. */
 const FILL_COLORS = [
   'transparent',
-  '#ffffff','#fdfaf4','#fff9e6','#fce8e8','#fce4ec',
-  '#e8f5e9','#e3f2fd','#ede7f6','#fff3e0','#e0f7fa',
-  '#2a2520','#1a1a2e','#0d1f10','#b5943a','#5a3e1a',
-  '#000000',
+  '#ffffff','#fff9e6','#f3ead3','#c9b795','#f6e3dd',
+  '#e4eadf','#dfe7ec','#d9a0a8','#9caf97','#5e6e8c',
+  '#c77e5e','#c9952e','#211a11','#0e1320','#31594f',
+  '#4a3527','#6b2737',
 ];
 
 const STROKE_COLORS = [
-  '#b5943a','#3b3328','#ffffff','#000000',
-  '#6b2737','#1a3080','#2d4a2d','#5a3e1a',
-  '#ff6b6b','#4ecdc4','#45b7d1','#96e6a1',
-  'transparent',
+  '#a8741a','#3b3328','#211a11','#6b2737','#31594f','#2c3a58',
+  '#2d4a2d','#c77e5e','#d9a0a8','#9caf97','#ffffff','transparent',
 ];
 
 // ── Frame presets ──────────────────────────────────────────────────────────────
@@ -125,7 +124,7 @@ export default function ShapeProps({ el }: { el: ShapeElement }) {
           <span className={styles.customLabel}>Custom</span>
           <input type="color" className={styles.colorInput}
             title="Pick a custom stroke colour"
-            value={el.stroke?.startsWith('#') ? el.stroke : '#b5943a'}
+            value={el.stroke?.startsWith('#') ? el.stroke : '#a8741a'}
             onChange={(e) => upd({ stroke: e.target.value })} />
         </div>
         <PropSlider label="Width" min={1} max={16} value={el.strokeWidth ?? 2} unit="px"

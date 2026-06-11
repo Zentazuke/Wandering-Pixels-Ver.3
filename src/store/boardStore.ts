@@ -105,7 +105,7 @@ export function makeShapeElement(
     x2: isLine ? (extra?.x2 ?? (extra?.x ?? 200) + 180) : undefined,
     y2: isLine ? (extra?.y2 ?? (extra?.y ?? 200))        : undefined,
     rotation: 0, zIndex, locked: false,
-    fill: 'transparent', stroke: '#b5943a',
+    fill: 'transparent', stroke: '#a8741a',
     strokeWidth: 2, fillOpacity: 100,
     shapeFrame: 'none',
   };
