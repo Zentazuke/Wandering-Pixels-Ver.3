@@ -30,14 +30,45 @@ export default function MainMenu() {
       <div className={styles.panel}>
         <div className={styles.header}>
           <svg className={styles.logoMark} viewBox="0 0 100 80" aria-hidden="true">
-            <path d="M50,70 C35,65 20,68 10,72 L10,22 C20,18 35,15 50,20 Z"
-              fill="none" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
-            <path d="M50,70 C65,65 80,68 90,72 L90,22 C80,18 65,15 50,20 Z"
-              fill="none" stroke="currentColor" strokeWidth="4" strokeLinejoin="round" />
-            <path d="M70,28 L72.8,37.2 L82,40 L72.8,42.8 L70,52 L67.2,42.8 L58,40 L67.2,37.2 Z"
-              fill="currentColor" />
-            <path d="M81,20 L82.2,23.8 L86,25 L82.2,26.2 L81,30 L79.8,26.2 L76,25 L79.8,23.8 Z"
-              fill="currentColor" opacity="0.65" />
+            <defs>
+              {/* Top-lit metal: amber catches the light, bronze in the shadow */}
+              <linearGradient id="wp-gild" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#d2a13a" />
+                <stop offset="100%" stopColor="#8f6316" />
+              </linearGradient>
+              <radialGradient id="wp-halo">
+                <stop offset="0%" stopColor="#d9a441" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#d9a441" stopOpacity="0" />
+              </radialGradient>
+            </defs>
+
+            {/* Late-arriving craft details: foil under-edge, star halo, page lines */}
+            <g className={styles.detail}>
+              <path d="M50,70 C35,65 20,68 10,72 L10,22 C20,18 35,15 50,20 Z" transform="translate(0,1.2)"
+                fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="4" strokeLinejoin="round" />
+              <path d="M50,70 C65,65 80,68 90,72 L90,22 C80,18 65,15 50,20 Z" transform="translate(0,1.2)"
+                fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="4" strokeLinejoin="round" />
+              <circle cx="70" cy="40" r="17" fill="url(#wp-halo)" />
+              <path d="M18,33 C27,30 36,29 44,31" fill="none" stroke="#8f6316" strokeWidth="1.5" opacity="0.25" strokeLinecap="round" />
+              <path d="M18,43 C27,40 36,39 44,41" fill="none" stroke="#8f6316" strokeWidth="1.5" opacity="0.25" strokeLinecap="round" />
+              <path d="M18,53 C27,50 36,49 44,51" fill="none" stroke="#8f6316" strokeWidth="1.5" opacity="0.25" strokeLinecap="round" />
+            </g>
+
+            {/* Book covers draw themselves in */}
+            <path className={styles.bookStroke} pathLength={100}
+              d="M50,70 C35,65 20,68 10,72 L10,22 C20,18 35,15 50,20 Z"
+              fill="none" stroke="url(#wp-gild)" strokeWidth="4" strokeLinejoin="round" />
+            <path className={styles.bookStroke} pathLength={100}
+              d="M50,70 C65,65 80,68 90,72 L90,22 C80,18 65,15 50,20 Z"
+              fill="none" stroke="url(#wp-gild)" strokeWidth="4" strokeLinejoin="round" />
+
+            {/* The wandering star pops in, its echo already leaving the page */}
+            <path className={styles.sparkle}
+              d="M70,26 L73.2,36.8 L84,40 L73.2,43.2 L70,54 L66.8,43.2 L56,40 L66.8,36.8 Z"
+              fill="url(#wp-gild)" />
+            <path className={styles.sparkleEcho}
+              d="M88,9 L89.2,12.8 L93,14 L89.2,15.2 L88,19 L86.8,15.2 L83,14 L86.8,12.8 Z"
+              fill="url(#wp-gild)" opacity="0.6" />
           </svg>
           <h1 className={styles.title}>wandering pixels</h1>
           <p className={styles.subtitle}>Your visual journal</p>
