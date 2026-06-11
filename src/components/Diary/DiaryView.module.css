@@ -77,7 +77,7 @@
   user-select: text;
 }
 
-.input:focus { border-color: var(--gold); }
+.input:focus { border-color: var(--viridian); }
 
 .textarea {
   padding: 10px 12px;
@@ -95,7 +95,7 @@
   user-select: text;
 }
 
-.textarea:focus { border-color: var(--gold); }
+.textarea:focus { border-color: var(--viridian); }
 
 /* ── Photo column ── */
 .photoCol {

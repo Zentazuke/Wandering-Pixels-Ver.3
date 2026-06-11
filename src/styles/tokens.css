@@ -1,55 +1,61 @@
 /* ── Design tokens — single source of truth for all colours, spacing, type ── */
 :root {
-  /* Gold palette — refined muted gold rgb(166,128,43) */
-  --gold:          #A6802B;
-  --gold-dark:     #7a5c1e;
-  --gold-08:       rgba(166,128,43,0.08);
-  --gold-10:       rgba(166,128,43,0.1);
+  /* Gold palette — two-tone gilded amber rgb(168,116,26).
+     --gold/--gold-dark for light surfaces, --gold-bright for dark ones. */
+  --gold:          #A8741A;
+  --gold-dark:     #7C5512;
+  --gold-bright:   #D9A441;
+  --gold-08:       rgba(168,116,26,0.08);
+  --gold-10:       rgba(168,116,26,0.1);
   --gold-light:    var(--gold-10);
-  --gold-15:       rgba(166,128,43,0.15);
-  --gold-18:       rgba(166,128,43,0.18);
-  --gold-mid:      rgba(166,128,43,0.25);
-  --gold-border:   rgba(166,128,43,0.22);
-  --gold-30:       rgba(166,128,43,0.3);
-  --gold-35:       rgba(166,128,43,0.35);
-  --gold-50:       rgba(166,128,43,0.5);
-  --gold-55:       rgba(166,128,43,0.55);
-  --gold-60:       rgba(166,128,43,0.6);
-  --gold-70:       rgba(166,128,43,0.7);
+  --gold-15:       rgba(168,116,26,0.15);
+  --gold-18:       rgba(168,116,26,0.18);
+  --gold-mid:      rgba(168,116,26,0.25);
+  --gold-border:   rgba(168,116,26,0.22);
+  --gold-30:       rgba(168,116,26,0.3);
+  --gold-35:       rgba(168,116,26,0.35);
+  --gold-50:       rgba(168,116,26,0.5);
+  --gold-55:       rgba(168,116,26,0.55);
+  --gold-60:       rgba(168,116,26,0.6);
+  --gold-70:       rgba(168,116,26,0.7);
   --gold-glow:     var(--gold-08);
 
-  /* Ink / text — deeper, near-black warm tone */
-  --ink:           #1A150E;
-  --ink-mid:       #665A4B;
-  --ink-faint:     #8D8170; /* deepened from #A69C8E — small labels now pass contrast */
+  /* Ink / text — espresso ramp, three clearly separated levels */
+  --ink:           #211A11;
+  --ink-mid:       #5D5140;
+  --ink-faint:     #857862;
 
   /* Surfaces */
-  --surface:       #FDFBF7;
-  --surface-alt:   #F4EFE6;
-  --surface-card:  #FDFBF7;
-  --surface-dark:  #1a1712;
+  --surface:       #FBF8F1;
+  --surface-alt:   #F0E9DA;
+  --surface-card:  #FBF8F1;
+  --surface-dark:  #181310;
 
   /* Semantic */
-  --danger:        rgba(181,90,90,0.7);
-  --danger-bg:     rgba(181,90,90,0.1);
-  --danger-text:   #b55a5a;
+  --danger:        rgba(176,88,74,0.75);
+  --danger-bg:     rgba(176,88,74,0.1);
+  --danger-text:   #B0584A;
+
+  /* Counterpoint — deep viridian, used sparingly against the gold */
+  --viridian:      #31594F;
+  --viridian-soft: rgba(49,89,79,0.12);
 
   /* Topbar */
   --topbar-h:      48px;
-  --topbar-bg:     #FDFBF7;
-  --topbar-border: rgba(102,90,75,0.12);
+  --topbar-bg:     #FBF8F1;
+  --topbar-border: rgba(93,81,64,0.12);
 
-  /* Top bar — dark obsidian strip */
-  --bar-bg:           #1C1814;
-  --bar-border:       rgba(166,128,43,0.18);
-  --bar-text:         rgba(220,205,180,0.6);
-  --bar-text-active:  #F0E4C8;
-  --bar-btn-hover:    rgba(166,128,43,0.12);
+  /* Top bar — dark obsidian strip (bright gold accents) */
+  --bar-bg:           #16120E;
+  --bar-border:       rgba(217,164,65,0.18);
+  --bar-text:         rgba(228,214,188,0.62);
+  --bar-text-active:  #F2E7CD;
+  --bar-btn-hover:    rgba(217,164,65,0.12);
 
   /* Board */
   --board-w:       1400px;
   --board-h:       900px;
-  --board-bg:      #ddd5c5;
+  --board-bg:      #D9CFBA;
 
   /* Toolbar */
   --toolbar-w:     52px;
@@ -86,7 +92,7 @@
   --shadow-btn-press: inset 0 1px 2px rgba(41,31,18,0.08);
 
   /* Status — warm sage, sits in the palette unlike pure green */
-  --save-ok: #7d9a6f;
+  --save-ok: #6F8F63;
 
   /* Typography */
   --font-sans: 'DM Sans', sans-serif;

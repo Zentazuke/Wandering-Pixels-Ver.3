@@ -19,7 +19,7 @@
   gap: 7px;
   background: none;
   border: none;
-  color: var(--gold);
+  color: var(--gold-bright);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -77,8 +77,8 @@
 }
 
 .tabActive {
-  background: rgba(166,128,43,0.16);
-  color: var(--gold);
+  background: rgba(217,164,65,0.16);
+  color: var(--gold-bright);
   font-weight: 600;
 }
 
@@ -185,10 +185,10 @@
   align-items: center;
   gap: 5px;
   padding: 6px 14px;
-  border: 1px solid rgba(166,128,43,0.5);
+  border: none;
   border-radius: var(--r-pill);
-  background: rgba(166,128,43,0.1);
-  color: var(--gold);
+  background: var(--gold-bright);
+  color: var(--bar-bg);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -198,9 +198,8 @@
 }
 
 .exportBtn:hover {
-  background: rgba(166,128,43,0.2);
-  box-shadow: 0 0 12px rgba(166,128,43,0.2);
-  border-color: rgba(166,128,43,0.7);
+  background: #E2B156; /* gold-bright lifted one step */
+  box-shadow: 0 0 14px rgba(217,164,65,0.35);
 }
 
 .exportBtn:active {
@@ -214,6 +213,6 @@
 }
 
 @keyframes glowPulse {
-  0%   { box-shadow: 0 0 0 0 rgba(166,128,43,0.45); }
-  100% { box-shadow: 0 0 0 14px rgba(166,128,43,0); }
+  0%   { box-shadow: 0 0 0 0 rgba(217,164,65,0.5); }
+  100% { box-shadow: 0 0 0 14px rgba(217,164,65,0); }
 }

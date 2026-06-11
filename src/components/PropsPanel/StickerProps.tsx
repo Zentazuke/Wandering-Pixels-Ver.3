@@ -77,7 +77,7 @@ export default function StickerProps({ el }: { el: StickerElement }) {
               cursor: 'pointer',
               background: 'none',
             }}
-            value={el.customColor?.startsWith('#') ? el.customColor : '#A6802B'}
+            value={el.customColor?.startsWith('#') ? el.customColor : '#A8741A'}
             onChange={(e) => upd({ customColor: e.target.value })}
           />
         </PropRow>
