@@ -39,6 +39,8 @@
   /* Counterpoint — deep viridian, used sparingly against the gold */
   --viridian:      #31594F;
   --viridian-soft: rgba(49,89,79,0.12);
+  --viridian-60:   rgba(49,89,79,0.6);
+  --viridian-70:   rgba(49,89,79,0.7);
 
   /* Topbar */
   --topbar-h:      48px;

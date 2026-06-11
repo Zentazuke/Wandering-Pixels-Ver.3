@@ -56,8 +56,8 @@
 .tabBtn:hover { background: var(--gold-08); color: var(--ink); }
 
 .tabActive {
-  background: var(--gold-glow);
-  color: var(--gold);
+  background: var(--viridian-soft);
+  color: var(--viridian);
 }
 
 .saveBtn {

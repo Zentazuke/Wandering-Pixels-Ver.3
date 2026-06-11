@@ -6,7 +6,7 @@
 }
 
 .el.selected .frameWrap {
-  outline: 2px solid var(--gold-70);
+  outline: 2px solid var(--viridian-70);
   outline-offset: 2px;
 }
 

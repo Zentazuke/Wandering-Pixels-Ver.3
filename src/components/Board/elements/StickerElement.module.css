@@ -9,7 +9,7 @@
 }
 
 .el.selected {
-  outline: 2px solid var(--gold-60);
+  outline: 2px solid var(--viridian-60);
   outline-offset: 3px;
   border-radius: 2px;
 }

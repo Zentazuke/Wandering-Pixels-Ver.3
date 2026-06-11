@@ -17,7 +17,7 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: var(--gold);
+  background: var(--viridian);
   border: 2px solid #fff;
   box-shadow: 0 1px 4px rgba(0,0,0,0.25);
   cursor: crosshair;

@@ -6,7 +6,7 @@
   transform: translateX(-50%);
   width: 1px;
   height: 24px;
-  background: var(--gold-70);
+  background: var(--viridian-70);
   pointer-events: none;
 }
 
@@ -18,7 +18,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--gold);
+  background: var(--viridian);
   border: 2px solid #fff;
   display: flex;
   align-items: center;
@@ -36,7 +36,7 @@
   width: 10px;
   height: 10px;
   background: #fff;
-  border: 2px solid var(--gold);
+  border: 2px solid var(--viridian);
   border-radius: 2px;
   z-index: 10;
   transform: translate(-50%, -50%);
