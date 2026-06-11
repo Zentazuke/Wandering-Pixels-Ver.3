@@ -1,3 +1,4 @@
+import { Copy, Trash2 } from 'lucide-react';
 import styles from './PropRow.module.css';
 
 /** Label + control row used throughout the props panel. */
@@ -38,6 +39,24 @@ export function PropSlider({
         onChange={(e) => onChange(Number(e.target.value))}
       />
       <span className={styles.val}>{value}{unit}</span>
+    </div>
+  );
+}
+
+/** Pinned action row at the top of a props panel — duplicate / extras / delete.
+    Lives outside the accordions so destructive actions are always visible. */
+export function ElementActions({
+  onDuplicate, onDelete, children,
+}: {
+  onDuplicate: () => void;
+  onDelete:    () => void;
+  children?:   React.ReactNode;
+}) {
+  return (
+    <div className={styles.actions}>
+      <PropBtn onClick={onDuplicate} title="Duplicate"><Copy size={13} /></PropBtn>
+      {children}
+      <PropBtn danger onClick={onDelete} title="Delete"><Trash2 size={13} /></PropBtn>
     </div>
   );
 }

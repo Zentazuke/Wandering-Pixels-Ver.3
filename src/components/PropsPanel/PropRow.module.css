@@ -5,6 +5,13 @@
   padding: 2px 0;
 }
 
+/* ── Pinned panel action row — sits above the accordions ── */
+.actions {
+  display: flex;
+  gap: 6px;
+  padding: 12px 12px 6px;
+}
+
 .row.wrap { flex-wrap: wrap; }
 
 .label {

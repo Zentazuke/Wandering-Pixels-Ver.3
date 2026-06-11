@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { BringToFront, ChevronsUp, ChevronsDown, SendToBack, Copy, Trash2, FolderOpen } from 'lucide-react';
+import { BringToFront, ChevronsUp, ChevronsDown, SendToBack, FolderOpen } from 'lucide-react';
 
 const IC = 13;
 import useBoardStore from '../../store/boardStore.js';
@@ -9,7 +9,7 @@ import { FILTER_PRESETS } from '../../constants/filterPresets.js';
 import { FRAMES, resolveFrame } from '../../constants/frames.js';
 import { SHAPES } from '../../constants/shapes.js';
 import PropSection from './PropSection.jsx';
-import { PropRow, PropSlider, PropBtn } from './PropRow.jsx';
+import { PropRow, PropSlider, PropBtn, ElementActions } from './PropRow.jsx';
 import type { PhotoElement } from '../../types/index.js';
 import type { Shape } from '../../constants/shapes.js';
 import type { Frame } from '../../constants/frames.js';
@@ -66,18 +66,26 @@ export default function PhotoProps({ el }: { el: PhotoElement }) {
 
   return (
     <div className={styles.root}>
-      <PropSection title="Transform" defaultOpen>
+      <ElementActions
+        onDuplicate={() => duplicate(el.id)}
+        onDelete={() => { deselect(); removeEl(el.id); }}
+      >
+        <PropBtn onClick={() => replaceRef.current?.click()} title="Replace photo"><FolderOpen size={IC} /></PropBtn>
+        <input ref={replaceRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleReplace} />
+      </ElementActions>
+
+      <PropSection title="Arrange" defaultOpen>
         <PropSlider label="Rotate" min={-180} max={180} value={Math.round(el.rotation ?? 0)} unit="°"
           onChange={(v) => upd({ rotation: v })} />
+        <PropRow label="Width">
+          <input className={styles.numInput} type="number" min={60} max={700}
+            value={el.w} onChange={(e) => upd({ w: Number(e.target.value) })} />
+        </PropRow>
         <PropRow>
           <PropBtn onClick={() => bringFront(el.id)}   title="Bring to front"><BringToFront size={IC} /></PropBtn>
           <PropBtn onClick={() => bringForward(el.id)} title="Move forward one layer"><ChevronsUp size={IC} /></PropBtn>
           <PropBtn onClick={() => sendBackward(el.id)} title="Move back one layer"><ChevronsDown size={IC} /></PropBtn>
           <PropBtn onClick={() => sendBack(el.id)}     title="Send to back"><SendToBack size={IC} /></PropBtn>
-          <PropBtn onClick={() => duplicate(el.id)}    title="Duplicate"><Copy size={IC} /></PropBtn>
-        </PropRow>
-        <PropRow>
-          <PropBtn danger onClick={() => { deselect(); removeEl(el.id); }} style={{ flex: 1 }} title="Delete"><Trash2 size={IC} /></PropBtn>
         </PropRow>
       </PropSection>
 
@@ -86,20 +94,12 @@ export default function PhotoProps({ el }: { el: PhotoElement }) {
           <PropBtn active={el.flipH} onClick={() => upd({ flipH: !el.flipH })}>⇔ Flip H</PropBtn>
           <PropBtn active={el.flipV} onClick={() => upd({ flipV: !el.flipV })}>⇕ Flip V</PropBtn>
         </PropRow>
-        <PropRow>
-          <PropBtn style={{ flex: 1 }} onClick={() => replaceRef.current?.click()}><FolderOpen size={IC} />&nbsp;Replace</PropBtn>
-          <input ref={replaceRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleReplace} />
-        </PropRow>
         <PropSlider label="Zoom"   min={100} max={300} value={Math.round((el.imgZoom ?? 1) * 100)} unit="%"
           onChange={(v) => upd({ imgZoom: v / 100 })} />
         <PropSlider label="Crop X" min={0}   max={100} value={el.imgX ?? 50} unit="%"
           onChange={(v) => upd({ imgX: v })} />
         <PropSlider label="Crop Y" min={0}   max={100} value={el.imgY ?? 50} unit="%"
           onChange={(v) => upd({ imgY: v })} />
-        <PropRow label="Width">
-          <input className={styles.numInput} type="number" min={60} max={700}
-            value={el.w} onChange={(e) => upd({ w: Number(e.target.value) })} />
-        </PropRow>
       </PropSection>
 
       <PropSection title="Filter Presets">

@@ -1,8 +1,8 @@
-import { BringToFront, ChevronsUp, ChevronsDown, SendToBack, Copy, Trash2 } from 'lucide-react';
+import { BringToFront, ChevronsUp, ChevronsDown, SendToBack } from 'lucide-react';
 import useBoardStore from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import PropSection from './PropSection.jsx';
-import { PropRow, PropSlider, PropBtn } from './PropRow.jsx';
+import { PropRow, PropSlider, PropBtn, ElementActions } from './PropRow.jsx';
 import type { StickerElement } from '../../types';
 
 const IC = 13;
@@ -29,7 +29,12 @@ export default function StickerProps({ el }: { el: StickerElement }) {
 
   return (
     <div style={{ paddingBottom: 24 }}>
-      <PropSection title="Transform" defaultOpen>
+      <ElementActions
+        onDuplicate={() => duplicate(el.id)}
+        onDelete={() => { deselect(); removeEl(el.id); }}
+      />
+
+      <PropSection title="Arrange" defaultOpen>
         <PropSlider label="Rotate"  min={-180} max={180} value={Math.round(el.rotation ?? 0)} unit="°"
           onChange={(v) => upd({ rotation: v })} />
         <PropSlider label="Size"    min={24}   max={240} value={el.w} unit="px"
@@ -41,10 +46,6 @@ export default function StickerProps({ el }: { el: StickerElement }) {
           <PropBtn onClick={() => bringForward(el.id)} title="Move forward one layer"><ChevronsUp size={IC} /></PropBtn>
           <PropBtn onClick={() => sendBackward(el.id)} title="Move back one layer"><ChevronsDown size={IC} /></PropBtn>
           <PropBtn onClick={() => sendBack(el.id)}     title="Send to back"><SendToBack size={IC} /></PropBtn>
-          <PropBtn onClick={() => duplicate(el.id)}    title="Duplicate"><Copy size={IC} /></PropBtn>
-        </PropRow>
-        <PropRow>
-          <PropBtn danger onClick={() => { deselect(); removeEl(el.id); }} style={{ flex: 1 }} title="Delete"><Trash2 size={IC} /></PropBtn>
         </PropRow>
       </PropSection>
 

@@ -1,8 +1,8 @@
-import { BringToFront, ChevronsUp, ChevronsDown, SendToBack, Copy, Trash2 } from 'lucide-react';
+import { BringToFront, ChevronsUp, ChevronsDown, SendToBack } from 'lucide-react';
 import useBoardStore from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import PropSection from './PropSection.jsx';
-import { PropRow, PropSlider, PropBtn } from './PropRow.jsx';
+import { PropRow, PropSlider, PropBtn, ElementActions } from './PropRow.jsx';
 import type { ShapeElement } from '../../types';
 import styles from './ShapeProps.module.css';
 
@@ -64,7 +64,12 @@ export default function ShapeProps({ el }: { el: ShapeElement }) {
 
   return (
     <div className={styles.root}>
-      <PropSection title="Transform" defaultOpen>
+      <ElementActions
+        onDuplicate={() => duplicate(el.id)}
+        onDelete={() => { deselect(); removeEl(el.id); }}
+      />
+
+      <PropSection title="Arrange" defaultOpen>
         {!isLine && (
           <PropSlider label="Rotate" min={-180} max={180} value={Math.round(el.rotation ?? 0)} unit="°"
             onChange={(v) => upd({ rotation: v })} />
@@ -74,10 +79,6 @@ export default function ShapeProps({ el }: { el: ShapeElement }) {
           <PropBtn onClick={() => bringForward(el.id)} title="Move forward one layer"><ChevronsUp size={IC} /></PropBtn>
           <PropBtn onClick={() => sendBackward(el.id)} title="Move back one layer"><ChevronsDown size={IC} /></PropBtn>
           <PropBtn onClick={() => sendBack(el.id)}     title="Send to back"><SendToBack size={IC} /></PropBtn>
-          <PropBtn onClick={() => duplicate(el.id)}    title="Duplicate"><Copy size={IC} /></PropBtn>
-        </PropRow>
-        <PropRow>
-          <PropBtn danger onClick={() => { deselect(); removeEl(el.id); }} style={{ flex: 1 }} title="Delete"><Trash2 size={IC} /></PropBtn>
         </PropRow>
       </PropSection>
 
