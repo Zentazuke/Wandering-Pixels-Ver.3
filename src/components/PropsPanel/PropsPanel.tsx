@@ -29,8 +29,8 @@ export default function PropsPanel({ open, onToggle }: Props) {
         {open ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
       </button>
 
-      {open && (
-        <aside className={styles.panel}>
+      {/* Always mounted — collapse animates via margin slide */}
+      <aside className={`${styles.panel} ${open ? '' : styles.panelClosed}`}>
           {!el && (
             <div className={styles.empty}>
               <div className={styles.emptyIcon}>✦</div>
@@ -41,8 +41,7 @@ export default function PropsPanel({ open, onToggle }: Props) {
           {el?.type === 'text'    && <TextProps    el={el} />}
           {el?.type === 'sticker' && <StickerProps el={el} />}
           {el?.type === 'shape'   && <ShapeProps   el={el} />}
-        </aside>
-      )}
+      </aside>
     </>
   );
 }

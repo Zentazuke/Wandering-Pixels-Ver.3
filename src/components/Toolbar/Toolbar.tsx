@@ -142,8 +142,8 @@ export default function Toolbar({ open, onToggle }: Props) {
 
   return (
     <>
-      {open && (
-        <aside className={styles.toolbar}>
+      {/* Always mounted — collapse animates via margin slide */}
+      <aside className={`${styles.toolbar} ${open ? '' : styles.toolbarClosed}`}>
           {/* ── Main tools ── */}
           <div className={styles.group}>
             {MAIN_TOOLS.map(({ id, Icon, title }) => (
@@ -192,8 +192,7 @@ export default function Toolbar({ open, onToggle }: Props) {
             style={{ display: 'none' }}
             onChange={handlePhotoFiles}
           />
-        </aside>
-      )}
+      </aside>
 
       {/* ── Collapse tab — sits on the toolbar's right edge, against the canvas ── */}
       <button

@@ -33,6 +33,23 @@
   overflow-x: hidden;
   flex-shrink: 0;
   font-size: 12px;
+  transition:
+    margin-right var(--t-spring),
+    opacity 0.2s var(--ease-out),
+    visibility 0s;
+}
+
+/* Slides out right (clipped by .body's overflow:hidden); inner content keeps
+   its width so nothing reflows. visibility flips at transition end so the
+   closed panel isn't keyboard-focusable. */
+.panelClosed {
+  margin-right: calc(-1 * var(--props-w));
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    margin-right var(--t-spring),
+    opacity 0.2s var(--ease-out),
+    visibility 0s linear 0.28s;
 }
 
 /* Slim scrollbar */
