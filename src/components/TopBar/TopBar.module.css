@@ -32,11 +32,24 @@
 
 .logo:hover { background: var(--bar-btn-hover); }
 
+.logoMark {
+  width: 26px;
+  height: 21px;
+  display: block;
+  flex-shrink: 0;
+  transition: filter var(--t-mid);
+}
+
+.logo:hover .logoMark {
+  filter: drop-shadow(0 0 6px rgba(217,164,65,0.45));
+}
+
 .logoText {
   font-family: 'Playfair Display', serif;
-  font-size: 13px;
+  font-size: 13.5px;
+  font-weight: 500;
   color: var(--bar-text-active);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.09em;
 }
 
 /* ── Center group: tabs + history ── */

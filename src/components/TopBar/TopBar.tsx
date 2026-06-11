@@ -46,7 +46,19 @@ export default function TopBar() {
     <header className={styles.bar}>
       {/* ── Logo ── */}
       <button className={styles.logo} onClick={goToMenu} title="Main Menu">
-        ✦ <span className={styles.logoText}>Wandering Pixels</span>
+        <svg className={styles.logoMark} viewBox="0 0 100 80" aria-hidden="true">
+          {/* Open book — strokes follow the bar's bright gold via currentColor */}
+          <path d="M50,70 C35,65 20,68 10,72 L10,22 C20,18 35,15 50,20 Z"
+            fill="none" stroke="currentColor" strokeWidth="5" strokeLinejoin="round" />
+          <path d="M50,70 C65,65 80,68 90,72 L90,22 C80,18 65,15 50,20 Z"
+            fill="none" stroke="currentColor" strokeWidth="5" strokeLinejoin="round" />
+          {/* Wandering star on the right page, echo sparkle above */}
+          <path d="M70,28 L72.8,37.2 L82,40 L72.8,42.8 L70,52 L67.2,42.8 L58,40 L67.2,37.2 Z"
+            fill="currentColor" />
+          <path d="M81,20 L82.2,23.8 L86,25 L82.2,26.2 L81,30 L79.8,26.2 L76,25 L79.8,23.8 Z"
+            fill="currentColor" opacity="0.65" />
+        </svg>
+        <span className={styles.logoText}>wandering pixels</span>
       </button>
 
       {/* ── Center: view tabs + divider + undo/redo ── */}
