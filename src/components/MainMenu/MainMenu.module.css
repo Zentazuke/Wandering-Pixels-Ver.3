@@ -9,21 +9,51 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(4px);
-  background: rgba(30, 20, 10, 0.22);
+  overflow: hidden;
+  background: #2a1c10; /* shows while the photo decodes */
+}
+
+/* Desk photo, defocused — camera is on the menu, table sits behind.
+   scale(1.05) hides the soft edge fringe the blur creates. */
+.backdrop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: url('../../assets/menu-desk.webp') center / cover no-repeat;
+  filter: blur(7px) brightness(0.93);
+  transform: scale(1.05);
+}
+
+/* Cinematic grade: corner vignette + a whisper of warm tint to seat the panel */
+.backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(120% 90% at 50% 45%, transparent 38%, rgba(20, 12, 5, 0.5) 100%),
+    rgba(30, 20, 10, 0.12);
 }
 
 /* ── Paper panel ── */
 .panel {
+  position: relative;
+  z-index: 1; /* above the photo + vignette layers */
   width: 580px;
   padding: 56px 56px 52px;
   border-radius: 4px;
 
-  /* Warm paper base + grain + light shimmer */
+  /* Warm paper base + lit two-frequency texture + light shimmer.
+     Layer 1: shimmer gradient (top). Layer 2: paper SVG — high-freq tooth
+     run through feDiffuseLighting (noise as bump map, light from upper-left
+     to match the app's downward shadows) over a low-freq sheet-formation
+     mottle; soft-light blend modulates the warm base without graying it. */
   background-color: #f2ece0;
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E"),
-    linear-gradient(160deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 45%);
+    linear-gradient(160deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 45%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='t' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='5' stitchTiles='stitch' result='n'/%3E%3CfeDiffuseLighting in='n' lighting-color='%23fff' surfaceScale='1.4'%3E%3CfeDistantLight azimuth='235' elevation='65'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Cfilter id='f' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23t)' opacity='0.45'/%3E%3Crect width='400' height='400' filter='url(%23f)' opacity='0.05'/%3E%3C/svg%3E");
+  background-blend-mode: normal, soft-light;
 
   /* 3D lifted edges */
   border-top:    1.5px solid rgba(255, 255, 255, 0.85);
