@@ -42,7 +42,7 @@ interface DiaryLabels {
   reflectionPh: string;
 }
 
-const LABELS: Record<WorkspaceMode, DiaryLabels> = {
+export const LABELS: Record<WorkspaceMode, DiaryLabels> = {
   default: { label1:'Title',    ph1:'e.g. Something on my mind…',   label2:'Place',    ph2:'e.g. The study, the garden…', label3:'With',      ph3:'e.g. Alone, with friends…',      reflectionPh:'What did you feel in this moment?' },
   travel:  { label1:'Location', ph1:'e.g. Kyoto, Japan…',           label2:'Area',     ph2:'e.g. Gion Quarter…',          label3:'With',      ph3:'e.g. Solo, with Maria…',          reflectionPh:'Describe the atmosphere — the light, the sounds…' },
   love:    { label1:'Occasion', ph1:'e.g. Our Anniversary…',        label2:'Place',    ph2:'e.g. The little café…',       label3:'With',      ph3:'e.g. Maya, my mum…',              reflectionPh:'Write something beautiful…' },

@@ -7,6 +7,7 @@ import { exportBoard } from '../../utils/exportBoard.js';
 import { makeThumb } from '../../utils/imageThumb.js';
 import { escapeHtml } from '../../utils/sanitizeHtml.js';
 import { useFlash } from '../../hooks/useFlash.js';
+import MemoryViewer from './MemoryViewer.jsx';
 import type { BoardElement, WorkspaceMode } from '../../types';
 import styles from './ArchiveView.module.css';
 
@@ -21,7 +22,7 @@ interface Snapshot {
   customBgImage: string | null;
 }
 
-interface DiaryEntry {
+export interface DiaryEntry {
   id:         string;
   date:       string;       // ISO
   mode:       WorkspaceMode;
@@ -44,6 +45,7 @@ export default function ArchiveView() {
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [entries, setEntries]     = useState<DiaryEntry[]>([]);
   const [saving, setSaving]       = useState(false);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const loadBoard = useBoardStore((s) => s.loadBoard);
   const flash     = useFlash();
 
@@ -228,8 +230,11 @@ export default function ArchiveView() {
           </div>
         ) : (
           <div className={styles.grid}>
-            {entries.map((entry) => (
-              <div key={entry.id} className={styles.card}>
+            {entries.map((entry, i) => (
+              <div key={entry.id} className={styles.card}
+                style={{ cursor: 'pointer' }}
+                onClick={() => setViewerIndex(i)}
+                title="Open entry">
                 {entry.photo ? (
                   <img src={entry.photo} className={styles.thumb} alt={entry.field1 || 'Diary photo'} />
                 ) : (
@@ -243,14 +248,25 @@ export default function ArchiveView() {
                   {entry.field1 && <div className={styles.entryTitle}>{entry.field1}</div>}
                   {entry.reflection && <p className={styles.entryExcerpt}>{entry.reflection}</p>}
                   <div className={styles.cardActions}>
-                    <button className={styles.restoreBtn} onClick={() => addEntryToBoard(entry)}>Add to board</button>
-                    <button className={styles.deleteBtn}  onClick={() => deleteEntry(entry)}>✕</button>
+                    <button className={styles.restoreBtn} onClick={(e) => { e.stopPropagation(); addEntryToBoard(entry); }}>Add to board</button>
+                    <button className={styles.deleteBtn}  onClick={(e) => { e.stopPropagation(); deleteEntry(entry); }}>✕</button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )
+      )}
+
+      {viewerIndex !== null && viewerIndex < entries.length && (
+        <MemoryViewer
+          entries={entries}
+          index={viewerIndex}
+          onClose={() => setViewerIndex(null)}
+          onNavigate={setViewerIndex}
+          onAddToBoard={addEntryToBoard}
+          onDelete={deleteEntry}
+        />
       )}
     </div>
   );
