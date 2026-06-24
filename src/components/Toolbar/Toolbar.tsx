@@ -66,6 +66,15 @@ export default function Toolbar({ open, onToggle }: Props) {
     return () => document.removeEventListener('pointerdown', handleOutside);
   }, [showShapesFlyout]);
 
+  function addTextNote() {
+    const id = addElement(makeTextElement(
+      useBoardStore.getState().elements.length,
+      { x: 100, y: 100, w: 220, h: 120 },
+    ));
+    useAppStore.getState().setSelId(id);
+    setTool('select');
+  }
+
   // V/P/T/S tool shortcuts — the tooltips advertise them; the actions live
   // here (file input ref, picker state), not in useKeyboardShortcuts.
   useEffect(() => {
@@ -106,15 +115,6 @@ export default function Toolbar({ open, onToggle }: Props) {
     if (id === 'photo')   { photoInputRef.current?.click(); return; }
     if (id === 'sticker') { setShowStickers(true); return; }
     if (id === 'text')    { addTextNote(); return; }
-    setTool('select');
-  }
-
-  function addTextNote() {
-    const id = addElement(makeTextElement(
-      useBoardStore.getState().elements.length,
-      { x: 100, y: 100, w: 220, h: 120 },
-    ));
-    useAppStore.getState().setSelId(id);
     setTool('select');
   }
 
