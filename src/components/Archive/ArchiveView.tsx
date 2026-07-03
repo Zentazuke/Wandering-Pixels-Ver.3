@@ -31,6 +31,8 @@ export interface DiaryEntry {
   field3:     string;
   reflection: string;
   photo?:     string | null;
+  /** How the photo was framed in its diary crop (object-position %). */
+  photoPos?:  { x: number; y: number };
 }
 
 type Tab = 'boards' | 'diary';
@@ -237,7 +239,12 @@ export default function ArchiveView() {
                 title="Open entry">
                 {/* text-only entries skip the image slot — the words are the card */}
                 {entry.photo && (
-                  <img src={entry.photo} className={styles.thumb} alt={entry.field1 || 'Diary photo'} />
+                  <img
+                    src={entry.photo}
+                    className={styles.thumb}
+                    alt={entry.field1 || 'Diary photo'}
+                    style={entry.photoPos ? { objectPosition: `${entry.photoPos.x}% ${entry.photoPos.y}%` } : undefined}
+                  />
                 )}
                 <div className={styles.entryBody}>
                   <div className={styles.entryMeta}>
