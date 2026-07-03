@@ -18,8 +18,10 @@ export default function MainMenu() {
   const setMode = useAppStore((s) => s.setMode);
   const flash   = useFlash();
 
+  // The diary is the heart of the app — opening the journal (or a themed
+  // spread) lands on writing; the board is a tab away.
   function enterApp(modeId: WorkspaceMode) {
-    flash(() => { setMode(modeId); setView('board'); });
+    flash(() => { setMode(modeId); setView('diary'); });
   }
 
   function openArchive() {
