@@ -100,15 +100,6 @@
   object-fit: contain;
 }
 
-.noPhoto {
-  width: 320px;
-  height: 240px;
-  display: grid;
-  place-items: center;
-  background: var(--surface-alt);
-  color: var(--ink-faint);
-}
-
 .polaroidCaption {
   margin-top: 12px;
   text-align: center;

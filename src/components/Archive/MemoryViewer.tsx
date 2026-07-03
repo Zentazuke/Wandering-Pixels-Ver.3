@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ChevronLeft, ChevronRight, X, ImagePlus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { LABELS } from '../Diary/diaryLabels.js';
 import type { DiaryEntry } from './ArchiveView.jsx';
 import styles from './MemoryViewer.module.css';
@@ -56,18 +56,16 @@ export default function MemoryViewer({ entries, index, onClose, onNavigate, onAd
       )}
 
       <div className={styles.stage} onClick={(e) => e.stopPropagation()}>
-        {/* ── The memory — a taped photo print ── */}
-        <figure className={styles.polaroid} key={`photo-${entry.id}`}>
-          <span className={styles.tape} aria-hidden="true" />
-          {entry.photo ? (
+        {/* ── The memory — a taped photo print (text-only entries are just the page) ── */}
+        {entry.photo && (
+          <figure className={styles.polaroid} key={`photo-${entry.id}`}>
+            <span className={styles.tape} aria-hidden="true" />
             <img className={styles.photo} src={entry.photo} alt={entry.field1 || 'Memory'} draggable={false} />
-          ) : (
-            <div className={styles.noPhoto}><ImagePlus size={26} /></div>
-          )}
-          <figcaption className={styles.polaroidCaption}>
-            memory · {index + 1} of {entries.length}
-          </figcaption>
-        </figure>
+            <figcaption className={styles.polaroidCaption}>
+              memory · {index + 1} of {entries.length}
+            </figcaption>
+          </figure>
+        )}
 
         {/* ── The journal page ── */}
         <article className={styles.page} key={`page-${entry.id}`}>
@@ -75,10 +73,11 @@ export default function MemoryViewer({ entries, index, onClose, onNavigate, onAd
 
           <header className={styles.pageHead}>
             <span className={styles.pageLabel}>Logged entry</span>
-            <time className={styles.pageDate}>{longDate(entry.date)}</time>
+            {/* when there's no title the date becomes the heading — don't show it twice */}
+            {entry.field1 && <time className={styles.pageDate}>{longDate(entry.date)}</time>}
           </header>
 
-          <h2 className={styles.pageTitle}>{entry.field1 || 'Untitled memory'}</h2>
+          <h2 className={styles.pageTitle}>{entry.field1 || longDate(entry.date)}</h2>
 
           <dl className={styles.fields}>
             {entry.field2 && (
