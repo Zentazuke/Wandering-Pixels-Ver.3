@@ -1,9 +1,21 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ImagePlus, RefreshCw, X } from 'lucide-react';
 import useAppStore from '../../store/appStore.js';
-import { dbSave } from '../../db/boardDB.js';
+import { dbSave, dbLoad, dbDelete } from '../../db/boardDB.js';
 import { LABELS } from './diaryLabels.js';
 import styles from './DiaryView.module.css';
+
+// Draft key must NOT start with 'diary-' — ArchiveView lists entries via
+// dbGetByPrefix('diary-') and a draft must never show up as a real entry.
+const DRAFT_KEY = 'draft-diary';
+
+interface DiaryDraft {
+  field1:     string;
+  field2:     string;
+  field3:     string;
+  reflection: string;
+  photo:      string | null;
+}
 
 function todayStr(): string {
   return new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
@@ -45,7 +57,38 @@ export default function DiaryView() {
   const [reflection, setRef] = useState('');
   const [photo, setPhoto]    = useState<string | null>(null);
   const [saved, setSaved]    = useState(false);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const fileRef     = useRef<HTMLInputElement>(null);
+  const draftLoaded = useRef(false);
+
+  // Restore an unsaved draft on mount — a diary must never eat someone's writing.
+  useEffect(() => {
+    dbLoad<DiaryDraft>(DRAFT_KEY)
+      .then((d) => {
+        if (!d) return;
+        setField1(d.field1 ?? '');
+        setField2(d.field2 ?? '');
+        setField3(d.field3 ?? '');
+        setRef(d.reflection ?? '');
+        setPhoto(d.photo ?? null);
+      })
+      .catch(() => {}) // a failed read just means no restore
+      .finally(() => { draftLoaded.current = true; });
+  }, []);
+
+  // Debounced draft autosave (800ms, same rhythm as board persistence).
+  // Guarded until the restore resolves so the empty mount state can't
+  // overwrite an existing draft (see loadedRef bug in the captain's log).
+  useEffect(() => {
+    if (!draftLoaded.current) return;
+    const t = setTimeout(() => {
+      if (!field1 && !field2 && !field3 && !reflection && !photo) {
+        dbDelete(DRAFT_KEY).catch(() => {});
+        return;
+      }
+      dbSave(DRAFT_KEY, { field1, field2, field3, reflection, photo }).catch(() => {});
+    }, 800);
+    return () => clearTimeout(t);
+  }, [field1, field2, field3, reflection, photo]);
 
   async function handleFile(file: File | undefined) {
     if (!file || !file.type.startsWith('image/')) return;
@@ -65,6 +108,9 @@ export default function DiaryView() {
     };
     try {
       await dbSave(entry.id, entry);
+      // The entry is safe in the archive — the draft has done its job.
+      // (Fields stay on screen; editing again simply starts a new draft.)
+      dbDelete(DRAFT_KEY).catch(() => {});
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {
