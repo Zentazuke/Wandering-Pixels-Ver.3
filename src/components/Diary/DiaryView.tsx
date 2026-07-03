@@ -129,15 +129,19 @@ export default function DiaryView() {
 
             <label className={styles.label}>{labels.label3}</label>
             <input  className={styles.input}    placeholder={labels.ph3} value={field3} onChange={(e) => setField3(e.target.value)} />
-
-            <label className={styles.label}>Reflection</label>
-            <textarea
-              className={styles.textarea}
-              placeholder={labels.reflectionPh}
-              value={reflection}
-              onChange={(e) => setRef(e.target.value)}
-            />
           </div>
+        </div>
+
+        {/* ── The entry itself — full-width ruled writing surface ── */}
+        <div className={styles.entrySection}>
+          <label className={styles.label} htmlFor="diary-entry">Entry</label>
+          <textarea
+            id="diary-entry"
+            className={styles.entryArea}
+            placeholder={labels.reflectionPh}
+            value={reflection}
+            onChange={(e) => setRef(e.target.value)}
+          />
         </div>
 
         <button className={`${styles.saveBtn} ${saved ? styles.saveBtnDone : ''}`} onClick={save}>

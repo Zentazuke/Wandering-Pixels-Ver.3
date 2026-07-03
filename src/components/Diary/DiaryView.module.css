@@ -79,23 +79,39 @@
 
 .input:focus { border-color: var(--viridian); }
 
-.textarea {
-  padding: 10px 12px;
+/* ── Long-form entry — a full-width ruled writing surface ── */
+.entrySection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 28px;
+}
+
+.entryArea {
+  /* 28px top padding = one blank ruled line before the writing starts */
+  padding: 28px 18px 10px;
   border: 1px solid var(--topbar-border);
   border-radius: var(--r-md);
-  background: var(--surface);
+  background-color: var(--surface);
+  /* faint ruled lines on the journal page's 28px rhythm —
+     background-attachment: local makes them scroll with the text */
+  background-image: repeating-linear-gradient(
+    transparent, transparent 27px,
+    rgba(93, 81, 64, 0.1) 27px, rgba(93, 81, 64, 0.1) 28px
+  );
+  background-attachment: local;
   color: var(--ink);
-  font-size: 14px;
+  font-size: 15px;
   font-family: 'Lora', serif;
-  line-height: 1.6;
-  min-height: 160px;
+  line-height: 28px; /* sits on the ruled lines */
+  min-height: 344px; /* ~11 ruled lines of writing room */
   resize: vertical;
   outline: none;
   transition: border-color var(--t-fast);
   user-select: text;
 }
 
-.textarea:focus { border-color: var(--viridian); }
+.entryArea:focus { border-color: var(--viridian); }
 
 /* ── Photo column ── */
 .photoCol {

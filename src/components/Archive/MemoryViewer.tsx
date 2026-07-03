@@ -103,7 +103,7 @@ export default function MemoryViewer({ entries, index, onClose, onNavigate, onAd
 
           {reflection && (
             <>
-              <span className={styles.pageLabel}>Reflection</span>
+              <span className={styles.pageLabel}>Entry</span>
               <p className={styles.reflection}>
                 <span className={styles.dropCap}>{reflection.charAt(0)}</span>
                 {reflection.slice(1)}
