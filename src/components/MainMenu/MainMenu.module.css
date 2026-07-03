@@ -212,9 +212,10 @@
 
 .chapters {
   display: flex;
+  flex-wrap: wrap; /* nine spreads read as two lines of contents */
   align-items: baseline;
   justify-content: center;
-  gap: 10px;
+  gap: 4px 10px;
   animation: wpRise 0.5s var(--ease-out) 1.15s backwards;
 }
 

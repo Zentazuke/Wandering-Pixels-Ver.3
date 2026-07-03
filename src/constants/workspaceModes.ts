@@ -69,6 +69,37 @@ export const WORKSPACE_MODES: Record<string, WorkspaceModeConfig> = {
     placeholder: 'Log your session…',
     stickerHighlight: ['Gaming', 'Shapes'],
   },
+  /* The personal spreads — July 2026 */
+  pets: {
+    label: '🐾 Pets', bg: 'linen',
+    font: 'Lora', textColor: '#5a4632', noteBg: '#fdf6e3', fontSize: 15,
+    placeholder: 'What did they get up to?',
+    stickerHighlight: ['Nature', 'Decorative'],
+  },
+  children: {
+    label: '🧸 Children', bg: 'paper',
+    font: 'DM Sans', textColor: '#2d4a2d', noteBg: '#f0f7f0', fontSize: 16,
+    placeholder: 'A moment to keep for them…',
+    stickerHighlight: ['Nature', 'Shapes', 'Decorative'],
+  },
+  sports: {
+    label: '🏃 Sports', bg: 'grid',
+    font: 'DM Sans', textColor: '#1e3a5f', noteBg: '#eef4fb', fontSize: 15,
+    placeholder: 'How did it go?',
+    stickerHighlight: ['Shapes', 'Nature'],
+  },
+  dreams: {
+    label: '🌙 Dreams', bg: 'slate',
+    font: 'Playfair', textColor: '#cfc8f2', noteBg: '#141225', fontSize: 15,
+    placeholder: 'Before it fades…',
+    stickerHighlight: ['Decorative', 'Nature'],
+  },
+  gratitude: {
+    label: '✨ Gratitude', bg: 'paper',
+    font: 'Lora', textColor: '#7a6217', noteBg: '#fff9e6', fontSize: 15,
+    placeholder: 'Count the good…',
+    stickerHighlight: ['Decorative', 'Nature'],
+  },
 };
 
 export const WORKSPACE_TEMPLATES: Record<string, WorkspaceTemplate> = {

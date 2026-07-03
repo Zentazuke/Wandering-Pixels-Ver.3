@@ -23,7 +23,9 @@ export type ElementPatch =
 
 // ─── App store ────────────────────────────────────────────────────────────────
 export type View = 'menu' | 'board' | 'diary' | 'archive';
-export type WorkspaceMode = 'default' | 'travel' | 'love' | 'family' | 'game';
+export type WorkspaceMode =
+  | 'default' | 'travel' | 'love' | 'family' | 'game'
+  | 'pets' | 'children' | 'sports' | 'dreams' | 'gratitude';
 export type Tool = 'select' | 'text' | 'photo' | 'sticker';
 
 export interface Toast {

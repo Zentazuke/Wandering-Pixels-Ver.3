@@ -6,10 +6,15 @@ import styles from './MainMenu.module.css';
 
 /* Themed spreads — the default canvas gets the clasp button instead */
 const THEMES: { id: WorkspaceMode; label: string; sub: string }[] = [
-  { id: 'travel', label: 'Travel', sub: 'Wander & document'  },
-  { id: 'love',   label: 'Love',   sub: 'Moments & memories' },
-  { id: 'family', label: 'Family', sub: 'Keep it together'   },
-  { id: 'game',   label: 'Game',   sub: 'Log your session'   },
+  { id: 'travel',    label: 'Travel',    sub: 'Wander & document'  },
+  { id: 'love',      label: 'Love',      sub: 'Moments & memories' },
+  { id: 'family',    label: 'Family',    sub: 'Keep it together'   },
+  { id: 'game',      label: 'Game',      sub: 'Log your session'   },
+  { id: 'pets',      label: 'Pets',      sub: 'Companions & antics' },
+  { id: 'children',  label: 'Children',  sub: 'Watch them grow'    },
+  { id: 'sports',    label: 'Sports',    sub: 'Sweat & triumphs'   },
+  { id: 'dreams',    label: 'Dreams',    sub: 'Before they fade'   },
+  { id: 'gratitude', label: 'Gratitude', sub: 'Count the good'     },
 ];
 
 /** Full-screen landing screen for selecting a workspace mode. */
