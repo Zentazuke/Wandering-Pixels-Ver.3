@@ -100,6 +100,31 @@ export const WORKSPACE_MODES: Record<string, WorkspaceModeConfig> = {
     placeholder: 'Count the good…',
     stickerHighlight: ['Decorative', 'Nature'],
   },
+  /* Day-to-day life — July 2026 */
+  work: {
+    label: '💼 Work', bg: 'grid',
+    font: 'DM Sans', textColor: '#33404d', noteBg: '#f2f5f8', fontSize: 15,
+    placeholder: 'How was the workday?',
+    stickerHighlight: ['Shapes', 'Decorative'],
+  },
+  wellbeing: {
+    label: '🧘 Wellbeing', bg: 'linen',
+    font: 'Lora', textColor: '#41543f', noteBg: '#f3f7f0', fontSize: 15,
+    placeholder: 'Check in with yourself…',
+    stickerHighlight: ['Nature', 'Decorative'],
+  },
+  food: {
+    label: '🍳 Food', bg: 'cork',
+    font: 'Lora', textColor: '#6b4423', noteBg: '#fdf3e3', fontSize: 15,
+    placeholder: 'What was on the table?',
+    stickerHighlight: ['Nature', 'Decorative'],
+  },
+  friends: {
+    label: '☕ Friends', bg: 'paper',
+    font: 'DM Sans', textColor: '#4a3b55', noteBg: '#f7f2fa', fontSize: 15,
+    placeholder: 'Who did you see today?',
+    stickerHighlight: ['Decorative', 'Shapes'],
+  },
 };
 
 export const WORKSPACE_TEMPLATES: Record<string, WorkspaceTemplate> = {

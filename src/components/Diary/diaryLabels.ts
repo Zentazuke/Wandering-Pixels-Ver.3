@@ -23,4 +23,10 @@ export const LABELS: Record<WorkspaceMode, DiaryLabels> = {
   sports:    { label1:'Activity',     ph1:'e.g. Morning run, five-a-side…',    label2:'Where',          ph2:'e.g. Riverside trail, the gym…',    label3:'Result',     ph3:'e.g. 10k in 52:10, won 3–2…',          reflectionPh:'How did it feel — what did you push through?' },
   dreams:    { label1:'Dream',        ph1:'e.g. The house by the sea…',        label2:'Mood on waking', ph2:'e.g. Calm, unsettled, wistful…',    label3:'Recurring?', ph3:'e.g. First time, third this month…',   reflectionPh:'Write it down before it fades — every detail you can still hold…' },
   gratitude: { label1:'Grateful for', ph1:'e.g. A quiet morning…',             label2:'Because',        ph2:'e.g. It let me breathe…',           label3:'Who',        ph3:'e.g. Maria, an old friend, myself…',   reflectionPh:'Why did this matter today?' },
+
+  /* Day-to-day life — July 2026 */
+  work:      { label1:'Project / Task', ph1:'e.g. The big presentation…',      label2:'Where',          ph2:'e.g. Office, home desk…',           label3:'Wins / Blockers', ph3:'e.g. Shipped it, stuck on a bug…', reflectionPh:'How was the workday, really?' },
+  wellbeing: { label1:'Mood',           ph1:'e.g. Steady, foggy, bright…',     label2:'Energy',         ph2:'e.g. Slept 7h, low battery…',       label3:'One good thing',  ph3:'e.g. A walk in the sun…',          reflectionPh:'Check in with yourself — what’s on your mind?' },
+  food:      { label1:'Dish',           ph1:'e.g. Grandma’s caldo verde…', label2:'Where',         ph2:'e.g. Home kitchen, the tasca…',     label3:'Shared with',     ph3:'e.g. Solo, the whole table…',      reflectionPh:'What did it taste like? What memory does the flavour carry?' },
+  friends:   { label1:'Who',            ph1:'e.g. Miguel, the old crew…',      label2:'Where',          ph2:'e.g. The café, a late call…',       label3:'Occasion',        ph3:'e.g. Catch-up, birthday…',         reflectionPh:'What did the conversation leave you with?' },
 };

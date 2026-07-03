@@ -15,6 +15,10 @@ const THEMES: { id: WorkspaceMode; label: string; sub: string }[] = [
   { id: 'sports',    label: 'Sports',    sub: 'Sweat & triumphs'   },
   { id: 'dreams',    label: 'Dreams',    sub: 'Before they fade'   },
   { id: 'gratitude', label: 'Gratitude', sub: 'Count the good'     },
+  { id: 'work',      label: 'Work',      sub: 'The daily grind'    },
+  { id: 'wellbeing', label: 'Wellbeing', sub: 'Check in with yourself' },
+  { id: 'food',      label: 'Food',      sub: 'Meals & flavours'   },
+  { id: 'friends',   label: 'Friends',   sub: 'People & conversations' },
 ];
 
 /** Full-screen landing screen for selecting a workspace mode. */

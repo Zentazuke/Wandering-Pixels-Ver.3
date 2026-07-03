@@ -25,7 +25,8 @@ export type ElementPatch =
 export type View = 'menu' | 'board' | 'diary' | 'archive';
 export type WorkspaceMode =
   | 'default' | 'travel' | 'love' | 'family' | 'game'
-  | 'pets' | 'children' | 'sports' | 'dreams' | 'gratitude';
+  | 'pets' | 'children' | 'sports' | 'dreams' | 'gratitude'
+  | 'work' | 'wellbeing' | 'food' | 'friends';
 export type Tool = 'select' | 'text' | 'photo' | 'sticker';
 
 export interface Toast {
