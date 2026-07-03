@@ -5,7 +5,10 @@
 
 ## Project Identity
 
-- **App:** Wandering Pixels — a visual journal / mood board app
+- **App:** Wandering Pixels — a **digital diary first** (July 2026 pivot); mood
+  boards are the creative layer you build *from* diary entries and other things
+- **Direction:** menu lands on the diary; text-only entries are first-class
+  (no photo → no polaroid/placeholder anywhere; no title → date is the heading)
 - **Owner:** Ricardo (Zentazuke)
 - **Repo:** https://github.com/Zentazuke/Wandering-Pixels-Ver.3
 - **Local path:** `C:\Users\Ricardo\Desktop\Work\PROJECTOS\WANDERING PIXELS\wandering-pixels-react`
@@ -188,23 +191,29 @@ import (and backfilled on load for old boards). Panels must render
 
 ---
 
-## Backlog — Prioritised
+## Backlog — Prioritised (diary-first as of July 2026)
 
-### Round 1 — UI Polish (do these first)
+### Round 1 — Diary core
+- [ ] More themed spreads (pets, children, sports + others under discussion).
+      A theme touches: `WorkspaceMode` union (types/store.ts), `LABELS`
+      (diaryLabels.ts), `THEMES` (MainMenu.tsx), `WORKSPACE_MODES/TEMPLATES`
+      (workspaceModes.ts — reserved, not consumed yet)
+- [ ] Edit past entries (MemoryViewer → load back into DiaryView)
+- [ ] Mood boards built FROM diary entries ("Add to board" exists; grow it)
+- [ ] Browse/search entries (list is newest-first only; no calendar or search)
+
+### Round 2 — UI Polish
 - [ ] **TopBar** — too many buttons, needs reorganising
 - [ ] **PropsPanel** — feels disorganised, needs visual hierarchy
 - [ ] **Frames** — not premium enough, needs refinement
-- [ ] **Archive** — layout needs improvement
 
-### Round 2 — Features
-- [ ] View past diary entries (saves to IDB but no read UI)
+### Round 3 — Board features
 - [ ] Workspace mode changes board defaults (colours, fonts per mode)
 - [ ] Drag & drop images onto board
-- [ ] Arrow / shape elements
 - [ ] Multi-select (shift+click)
 - [ ] Snap to grid
 
-### Round 3 — Platform
+### Round 4 — Platform
 - [ ] Decide: PWA (responsive web) vs React Native (true mobile app)
 - [ ] Touch-aware interactions (pointer events already used — good start)
 - [ ] Mobile layout strategy for the board canvas
@@ -243,4 +252,14 @@ Paste this file, then add:
 
 ---
 
-*Last updated: 10 June 2026 — Session 1 (quality gates): CI added, ESLint now actually covers TS/TSX, `tsc --noEmit` fixed and wired into the build, all tests green, undo history capped, dead state removed, photo-upload `Image` shadowing bug fixed.*
+*Last updated: 3 July 2026 — diary-first pivot: menu (clasp + themed spreads)
+lands on the diary; full-width ruled writing surface (long-form text lives in
+the existing `reflection` field — plain text, deliberately NOT HTML); draft
+autosave to IDB key `draft-diary` (never prefix drafts with `diary-`, the
+archive lists that prefix); text-only entries render as a bare journal page
+(no polaroid, date as heading) in both MemoryViewer and archive cards.*
+
+*Previously: 10 June 2026 — Session 1 (quality gates): CI added, ESLint now
+actually covers TS/TSX, `tsc --noEmit` fixed and wired into the build, all
+tests green, undo history capped, dead state removed, photo-upload `Image`
+shadowing bug fixed. Arrow/shape elements shipped since.*
