@@ -232,3 +232,15 @@
   overflow: hidden;
   margin: 0 0 4px;
 }
+
+/* Text-only entries — the words get the photo's room, on faint ruled lines */
+.entryExcerptFull {
+  font-size: 13px;
+  line-height: 22px;
+  -webkit-line-clamp: 8;
+  color: var(--ink);
+  background-image: repeating-linear-gradient(
+    transparent, transparent 21px,
+    rgba(93, 81, 64, 0.09) 21px, rgba(93, 81, 64, 0.09) 22px
+  );
+}

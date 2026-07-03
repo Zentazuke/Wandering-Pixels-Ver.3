@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ImagePlus, BookOpenText, LayoutGrid } from 'lucide-react';
+import { BookOpenText, LayoutGrid } from 'lucide-react';
 import useBoardStore, { makePhotoElement, makeTextElement } from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import { dbGetByPrefix, dbSave, dbDelete } from '../../db/boardDB.js';
@@ -235,10 +235,9 @@ export default function ArchiveView() {
                 style={{ cursor: 'pointer' }}
                 onClick={() => setViewerIndex(i)}
                 title="Open entry">
-                {entry.photo ? (
+                {/* text-only entries skip the image slot — the words are the card */}
+                {entry.photo && (
                   <img src={entry.photo} className={styles.thumb} alt={entry.field1 || 'Diary photo'} />
-                ) : (
-                  <div className={styles.thumbPlaceholder}><ImagePlus size={18} /></div>
                 )}
                 <div className={styles.entryBody}>
                   <div className={styles.entryMeta}>
@@ -246,7 +245,11 @@ export default function ArchiveView() {
                     <span className={styles.entryMode}>{entry.mode}</span>
                   </div>
                   {entry.field1 && <div className={styles.entryTitle}>{entry.field1}</div>}
-                  {entry.reflection && <p className={styles.entryExcerpt}>{entry.reflection}</p>}
+                  {entry.reflection && (
+                    <p className={`${styles.entryExcerpt} ${entry.photo ? '' : styles.entryExcerptFull}`}>
+                      {entry.reflection}
+                    </p>
+                  )}
                   <div className={styles.cardActions}>
                     <button className={styles.restoreBtn} onClick={(e) => { e.stopPropagation(); addEntryToBoard(entry); }}>Add to board</button>
                     <button className={styles.deleteBtn}  onClick={(e) => { e.stopPropagation(); deleteEntry(entry); }}>✕</button>
