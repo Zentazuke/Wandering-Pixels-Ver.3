@@ -19,15 +19,20 @@ export async function exportBoard(
   customBgImage: string | null,
   returnDataUrl  = false,
 ): Promise<string | void> {
-  const W   = returnDataUrl ? 480  : BOARD_W;
-  const H   = returnDataUrl ? 300  : BOARD_H;
-  const DPR = returnDataUrl ? 1    : 2;
+  const outW = returnDataUrl ? 480 : BOARD_W;
+  const outH = returnDataUrl ? 300 : BOARD_H;
+  const DPR  = returnDataUrl ? 1   : 2;
 
   const canvas  = document.createElement('canvas');
-  canvas.width  = W * DPR;
-  canvas.height = H * DPR;
+  canvas.width  = outW * DPR;
+  canvas.height = outH * DPR;
   const ctx = canvas.getContext('2d')!;
-  ctx.scale(DPR, DPR);
+  // All drawing below happens in BOARD coordinates (1400×900) — the transform
+  // maps them onto the output. Thumbnails previously drew board coords onto a
+  // 480×300 canvas with no scale, cropping everything but the top-left corner.
+  ctx.scale((outW / BOARD_W) * DPR, (outH / BOARD_H) * DPR);
+  const W = BOARD_W;
+  const H = BOARD_H;
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = 'high';
 
@@ -176,6 +181,39 @@ export async function exportBoard(
         img.onerror = () => res();
         img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
       });
+    } else if (el.type === 'shape') {
+      const lw = el.strokeWidth ?? 2;
+      ctx.strokeStyle = el.stroke || '#3b3328';
+      ctx.lineWidth   = lw;
+      ctx.lineCap     = 'round';
+      if (el.shape === 'line' || el.shape === 'arrow') {
+        // x/y is the start endpoint, x2/y2 the end — both absolute board coords
+        const x1 = el.x, y1 = el.y;
+        const x2 = el.x2 ?? el.x + el.w, y2 = el.y2 ?? el.y;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        if (el.shape === 'arrow') {
+          const ang  = Math.atan2(y2 - y1, x2 - x1);
+          const head = Math.max(10, lw * 3.5);
+          ctx.beginPath();
+          ctx.moveTo(x2, y2);
+          ctx.lineTo(x2 - head * Math.cos(ang - Math.PI / 6), y2 - head * Math.sin(ang - Math.PI / 6));
+          ctx.moveTo(x2, y2);
+          ctx.lineTo(x2 - head * Math.cos(ang + Math.PI / 6), y2 - head * Math.sin(ang + Math.PI / 6));
+          ctx.stroke();
+        }
+      } else {
+        ctx.beginPath();
+        if (el.shape === 'circle') {
+          ctx.ellipse(el.x + el.w / 2, el.y + el.h / 2, el.w / 2, el.h / 2, 0, 0, Math.PI * 2);
+        } else {
+          ctx.rect(el.x, el.y, el.w, el.h);
+        }
+        const alpha = (el.fillOpacity ?? 100) / 100;
+        if (el.fill && el.fill !== 'transparent' && alpha > 0) {
+          ctx.save(); ctx.globalAlpha = alpha; ctx.fillStyle = el.fill; ctx.fill(); ctx.restore();
+        }
+        if (lw > 0) ctx.stroke();
+      }
     }
 
     ctx.restore();

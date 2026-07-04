@@ -10,6 +10,7 @@ import {
 import useAppStore from '../../store/appStore.js';
 import useBoardStore from '../../store/boardStore.js';
 import { makeShapeElement, makePhotoElement, makeTextElement } from '../../store/boardStore.js';
+import { BOARD_W, BOARD_H } from '../../constants/board.js';
 import { makeThumb } from '../../utils/imageThumb.js';
 import StickerPicker from '../ui/StickerPicker.jsx';
 import BgPicker from '../ui/BgPicker.jsx';
@@ -119,11 +120,16 @@ export default function Toolbar({ open, onToggle }: Props) {
   }
 
   function addShape(shape: ShapeElement['shape']) {
-    const el = document.querySelector('[data-board-canvas]') as HTMLElement | null;
-    const cw = el?.clientWidth  ?? 900;
-    const ch = el?.clientHeight ?? 600;
-    const cx = (cw / 2 - panX) / zoom;
-    const cy = (ch / 2 - panY) / zoom;
+    // Centre of the visible board area, in board coordinates. Measured with
+    // getBoundingClientRect — clientWidth can read 0 (and 0 ?? x keeps the 0),
+    // which used to strand new shapes at negative coords off the board.
+    const rect = (document.querySelector('[data-board-canvas]') as HTMLElement | null)
+      ?.getBoundingClientRect();
+    const cw = rect?.width  || 900;
+    const ch = rect?.height || 600;
+    // Clamp into the board so no pan/zoom state can place a shape out of reach
+    const cx = Math.min(Math.max((cw / 2 - panX) / zoom, 100), BOARD_W - 100);
+    const cy = Math.min(Math.max((ch / 2 - panY) / zoom, 80),  BOARD_H - 80);
 
     const isLine = shape === 'line' || shape === 'arrow';
     const extra = isLine
