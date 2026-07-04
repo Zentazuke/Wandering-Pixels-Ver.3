@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { ImagePlus, RefreshCw, X } from 'lucide-react';
 import useAppStore from '../../store/appStore.js';
-import { dbSave, dbLoad, dbDelete } from '../../db/boardDB.js';
+import { dbSave, dbLoad, dbDelete, dbGetByPrefix } from '../../db/boardDB.js';
+import { ensurePersistentStorage } from '../../db/persistentStorage.js';
 import { LABELS } from './diaryLabels.js';
+import { findOnThisDay, type Memory } from '../../utils/onThisDay.js';
+import MemoryViewer from '../Archive/MemoryViewer.jsx';
+import type { DiaryEntry } from '../Archive/ArchiveView.jsx';
 import styles from './DiaryView.module.css';
 
 // Draft key must NOT start with 'diary-' — ArchiveView lists entries via
@@ -61,6 +65,8 @@ export default function DiaryView() {
   const [photo, setPhoto]       = useState<string | null>(null);
   const [photoPos, setPhotoPos] = useState(CENTERED);
   const [saved, setSaved]       = useState(false);
+  const [memories, setMemories]       = useState<Memory[]>([]);
+  const [memoryIndex, setMemoryIndex] = useState<number | null>(null);
   const fileRef     = useRef<HTMLInputElement>(null);
   const draftLoaded = useRef(false);
   // Live drag state — a ref so pointer moves don't re-render until the position changes
@@ -80,6 +86,13 @@ export default function DiaryView() {
       })
       .catch(() => {}) // a failed read just means no restore
       .finally(() => { draftLoaded.current = true; });
+  }, []);
+
+  // "On this day" — resurface entries from a year / six months / a month ago
+  useEffect(() => {
+    dbGetByPrefix('diary-')
+      .then(({ vals }) => setMemories(findOnThisDay((vals as DiaryEntry[]).filter((e) => e && e.id))))
+      .catch(() => {}); // no memories is fine
   }, []);
 
   // Debounced draft autosave (800ms, same rhythm as board persistence).
@@ -145,6 +158,9 @@ export default function DiaryView() {
     };
     try {
       await dbSave(entry.id, entry);
+      // First real entry saved — ask the browser to shield the diary from
+      // storage eviction (fire-and-forget, inside the user-gesture chain).
+      ensurePersistentStorage();
       // The entry is safe in the archive — the draft has done its job.
       // (Fields stay on screen; editing again simply starts a new draft.)
       dbDelete(DRAFT_KEY).catch(() => {});
@@ -162,6 +178,18 @@ export default function DiaryView() {
       <div className={styles.card}>
         <div className={styles.date}>{todayStr()}</div>
         <h2 className={styles.heading}>Journal Entry</h2>
+
+        {/* ── On this day — a memory resurfaces above the fresh page ── */}
+        {memories.length > 0 && (
+          <button className={styles.onThisDay} onClick={() => setMemoryIndex(0)}>
+            <span className={styles.otdBadge} aria-hidden="true">✦</span>
+            <span className={styles.otdLabel}>{memories[0].label}</span>
+            <span className={styles.otdTitle}>
+              {memories[0].entry.field1 || 'read the entry'}
+            </span>
+            {memories.length > 1 && <span className={styles.otdMore}>+{memories.length - 1} more</span>}
+          </button>
+        )}
 
         <div className={styles.layout}>
           {/* ── Left: photo — the first thing you do ── */}
@@ -242,6 +270,15 @@ export default function DiaryView() {
           {saved ? '✦ Saved' : 'Save Entry'}
         </button>
       </div>
+
+      {memoryIndex !== null && (
+        <MemoryViewer
+          entries={memories.map((m) => m.entry)}
+          index={memoryIndex}
+          onClose={() => setMemoryIndex(null)}
+          onNavigate={setMemoryIndex}
+        />
+      )}
     </div>
   );
 }

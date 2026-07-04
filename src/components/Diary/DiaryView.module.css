@@ -34,6 +34,52 @@
   margin-bottom: 28px;
 }
 
+/* ── On this day — a memory resurfaces above the fresh page ── */
+.onThisDay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: -12px 0 24px;
+  padding: 9px 14px;
+  border: 1px dashed var(--gold-35);
+  border-radius: var(--r-pill);
+  background: var(--gold-08);
+  color: var(--ink-mid);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: background var(--t-fast), border-color var(--t-fast);
+}
+
+.onThisDay:hover { background: var(--gold-15); border-color: var(--gold-55); }
+
+.otdBadge { color: var(--gold); }
+
+.otdLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
+  white-space: nowrap;
+}
+
+.otdTitle {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.otdMore {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
 /* ── Two-column layout: photo left, info right ── */
 .layout {
   display: grid;

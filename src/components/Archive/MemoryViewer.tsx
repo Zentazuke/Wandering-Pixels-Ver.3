@@ -5,12 +5,13 @@ import type { DiaryEntry } from './ArchiveView.jsx';
 import styles from './MemoryViewer.module.css';
 
 interface Props {
-  entries:      DiaryEntry[];
-  index:        number;
-  onClose:      () => void;
-  onNavigate:   (index: number) => void;
-  onAddToBoard: (entry: DiaryEntry) => void;
-  onDelete:     (entry: DiaryEntry) => void;
+  entries:       DiaryEntry[];
+  index:         number;
+  onClose:       () => void;
+  onNavigate:    (index: number) => void;
+  /* optional — the On This Day viewer reads memories without board actions */
+  onAddToBoard?: (entry: DiaryEntry) => void;
+  onDelete?:     (entry: DiaryEntry) => void;
 }
 
 function longDate(iso: string): string {
@@ -113,8 +114,8 @@ export default function MemoryViewer({ entries, index, onClose, onNavigate, onAd
           <footer className={styles.pageFoot}>
             <span className={styles.entryCount}>entry {index + 1} of {entries.length}</span>
             <div className={styles.pageActions}>
-              <button className={styles.actionBtn} onClick={() => onAddToBoard(entry)}>Add to board</button>
-              <button className={`${styles.actionBtn} ${styles.release}`} onClick={() => onDelete(entry)}>Release</button>
+              {onAddToBoard && <button className={styles.actionBtn} onClick={() => onAddToBoard(entry)}>Add to board</button>}
+              {onDelete && <button className={`${styles.actionBtn} ${styles.release}`} onClick={() => onDelete(entry)}>Release</button>}
             </div>
           </footer>
         </article>
