@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
-import { BookOpenText, LayoutGrid } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { BookOpenText, LayoutGrid, DownloadCloud, UploadCloud } from 'lucide-react';
 import useBoardStore, { makePhotoElement, makeTextElement } from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import { dbGetByPrefix, dbSave, dbDelete } from '../../db/boardDB.js';
+import { ensurePersistentStorage } from '../../db/persistentStorage.js';
+import { downloadBackup, restoreBackup } from '../../utils/backup.js';
 import { exportBoard } from '../../utils/exportBoard.js';
 import { makeThumb } from '../../utils/imageThumb.js';
 import { escapeHtml } from '../../utils/sanitizeHtml.js';
@@ -48,10 +50,41 @@ export default function ArchiveView() {
   const [entries, setEntries]     = useState<DiaryEntry[]>([]);
   const [saving, setSaving]       = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
-  const loadBoard = useBoardStore((s) => s.loadBoard);
-  const flash     = useFlash();
+  const loadBoard  = useBoardStore((s) => s.loadBoard);
+  const flash      = useFlash();
+  const restoreRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { loadSnapshots(); loadEntries(); }, []);
+
+  // ── Backup — the device is the only copy; the backup file is the insurance ──
+
+  async function handleBackup() {
+    try {
+      await downloadBackup();
+      useAppStore.getState().showToast('Backup downloaded — keep it somewhere safe', 'success');
+    } catch {
+      useAppStore.getState().showToast('Couldn\'t create the backup', 'error');
+    }
+  }
+
+  async function handleRestore(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!window.confirm(
+      'Restore this backup? Entries and boards from the file will be added; ' +
+      'anything with the same id is overwritten.'
+    )) return;
+    try {
+      const count = await restoreBackup(file);
+      useAppStore.getState().showToast(`Restored ${count} records — reloading…`, 'success');
+      // The board store hydrates from IDB on mount only — a reload is the
+      // honest way to apply everything the file brought back.
+      setTimeout(() => window.location.reload(), 900);
+    } catch {
+      useAppStore.getState().showToast('That doesn\'t look like a Wandering Pixels backup', 'error');
+    }
+  }
 
   // ── Boards ──────────────────────────────────────────────────────────────────
 
@@ -79,6 +112,7 @@ export default function ArchiveView() {
         thumb, elements, currentBg, customBgColor, customBgImage,
       };
       await dbSave(snap.key, snap);
+      ensurePersistentStorage();
       await loadSnapshots();
       useAppStore.getState().showToast('Board saved to archive', 'success');
     } catch {
@@ -189,11 +223,20 @@ export default function ArchiveView() {
             </button>
           </div>
         </div>
-        {tab === 'boards' && (
-          <button className={styles.saveBtn} onClick={saveSnapshot} disabled={saving}>
-            {saving ? 'Saving…' : '✦ Save current board'}
+        <div className={styles.headerActions}>
+          <button className={styles.backupBtn} onClick={handleBackup} title="Download every entry and board as one backup file">
+            <DownloadCloud size={13} /> Back up
           </button>
-        )}
+          <button className={styles.backupBtn} onClick={() => restoreRef.current?.click()} title="Restore from a backup file">
+            <UploadCloud size={13} /> Restore
+          </button>
+          <input ref={restoreRef} type="file" accept="application/json,.json" style={{ display: 'none' }} onChange={handleRestore} />
+          {tab === 'boards' && (
+            <button className={styles.saveBtn} onClick={saveSnapshot} disabled={saving}>
+              {saving ? 'Saving…' : '✦ Save current board'}
+            </button>
+          )}
+        </div>
       </div>
 
       {tab === 'boards' && (

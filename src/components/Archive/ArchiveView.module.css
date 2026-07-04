@@ -79,6 +79,34 @@
 }
 .saveBtn:disabled { opacity: 0.6; cursor: default; }
 
+/* ── Backup / restore — quiet utilities beside the primary action ── */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.backupBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: none;
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-pill);
+  color: var(--ink-mid);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast);
+}
+
+.backupBtn:hover {
+  background: var(--gold-08);
+  color: var(--ink);
+  border-color: var(--gold-35);
+}
+
 .empty {
   flex: 1;
   display: flex;
