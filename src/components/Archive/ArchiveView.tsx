@@ -12,6 +12,9 @@ import { escapeHtml } from '../../utils/sanitizeHtml.js';
 import { useFlash } from '../../hooks/useFlash.js';
 import MemoryViewer from './MemoryViewer.jsx';
 import DiaryCalendar from './DiaryCalendar.jsx';
+import TemplatePicker from './TemplatePicker.jsx';
+import { createBoardFromTemplate } from '../../templates/createBoardFromTemplate.js';
+import type { MoodboardTemplate } from '../../templates/moodboardTemplates.js';
 import { dayKey } from '../../utils/dayKey.js';
 import { normalizeEntry, type DiaryEntry } from '../../types/diary.js';
 import { moodDef } from '../../data/moods.js';
@@ -45,6 +48,7 @@ export default function ArchiveView() {
   const [entries, setEntries]     = useState<DiaryEntry[]>([]);
   const [saving, setSaving]       = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const [templateEntry, setTemplateEntry] = useState<DiaryEntry | null>(null);
   const [query, setQuery]         = useState('');
   const [dayFilter, setDayFilter] = useState<string | null>(null);
   const loadBoard  = useBoardStore((s) => s.loadBoard);
@@ -213,6 +217,37 @@ export default function ArchiveView() {
     flash(() => useAppStore.getState().setView('board'));
   }
 
+  // ── Create Moodboard — the diary-to-board transformation ───────────────────
+
+  async function createMoodboard(entry: DiaryEntry, template: MoodboardTemplate) {
+    try {
+      const elements = createBoardFromTemplate(entry, template);
+      // Persist as a board snapshot so it lives in the Boards tab…
+      const thumb = await exportBoard(elements, template.bg, null, null, true) as string;
+      const snap: Snapshot = {
+        key:   `snap-${Date.now()}`,
+        ts:    Date.now(),
+        label: `${template.name} — ${entryDateLabel(entry.date)}`,
+        thumb, elements, currentBg: template.bg,
+        customBgColor: null, customBgImage: null,
+      };
+      await dbSave(snap.key, snap);
+      // …and remember the connection on the entry itself
+      await dbSave(entry.id, { ...entry, linkedBoardIds: [...entry.linkedBoardIds, snap.key] });
+      setTemplateEntry(null);
+      setViewerIndex(null);
+      loadSnapshots();
+      loadEntries();
+      useAppStore.getState().showToast('Memory board created ✦ tweak it as you like', 'success');
+      flash(() => {
+        loadBoard(elements, template.bg);
+        useAppStore.getState().setView('board');
+      });
+    } catch {
+      useAppStore.getState().showToast('Couldn\'t create the board', 'error');
+    }
+  }
+
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
@@ -340,6 +375,7 @@ export default function ArchiveView() {
                     </p>
                   )}
                   <div className={styles.cardActions}>
+                    <button className={styles.restoreBtn} onClick={(e) => { e.stopPropagation(); setTemplateEntry(entry); }}>✦ Moodboard</button>
                     <button className={styles.restoreBtn} onClick={(e) => { e.stopPropagation(); addEntryToBoard(entry); }}>Add to board</button>
                     <button className={styles.deleteBtn}  onClick={(e) => { e.stopPropagation(); deleteEntry(entry); }}>✕</button>
                   </div>
@@ -365,6 +401,15 @@ export default function ArchiveView() {
             useAppStore.getState().setEditingEntryId(entry.id);
             flash(() => useAppStore.getState().setView('diary'));
           }}
+          onCreateBoard={(entry) => setTemplateEntry(entry)}
+        />
+      )}
+
+      {templateEntry && (
+        <TemplatePicker
+          entry={templateEntry}
+          onClose={() => setTemplateEntry(null)}
+          onPick={(template) => createMoodboard(templateEntry, template)}
         />
       )}
     </div>

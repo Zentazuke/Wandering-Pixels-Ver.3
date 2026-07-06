@@ -1,0 +1,126 @@
+/* ── Template picker — choose the shape a memory takes ── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(24, 18, 10, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.panel {
+  position: relative;
+  width: min(860px, calc(100vw - 48px));
+  background: var(--surface-card);
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 28px 32px 30px;
+}
+
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: none;
+  color: var(--ink-mid);
+  cursor: pointer;
+}
+
+.close:hover { background: var(--gold-08); }
+
+.title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.subtitle {
+  margin: 4px 0 20px;
+  font-size: 13px;
+  color: var(--ink-mid);
+  font-style: italic;
+  font-family: 'Lora', serif;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1.5px solid var(--topbar-border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--t-fast), transform var(--t-fast), box-shadow var(--t-fast);
+}
+
+.card:hover {
+  border-color: var(--gold-50);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.badge {
+  position: absolute;
+  top: -9px;
+  right: 10px;
+  padding: 2px 10px;
+  border-radius: var(--r-pill);
+  background: var(--gold);
+  color: #fff;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.preview {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 14 / 9;
+  background: #f3ecdd;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+
+.slot {
+  position: absolute;
+  background: rgba(120, 100, 70, 0.22);
+  border-radius: 1px;
+}
+
+.slotPhoto { background: rgba(181, 148, 58, 0.5); }
+.slotMood  { background: rgba(196, 112, 141, 0.55); border-radius: 99px; }
+
+.name {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.desc {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-mid);
+  font-family: 'Lora', serif;
+}
