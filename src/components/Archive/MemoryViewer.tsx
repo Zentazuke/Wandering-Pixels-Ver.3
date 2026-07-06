@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { LABELS } from '../Diary/diaryLabels.js';
+import { moodDef } from '../../data/moods.js';
 import type { DiaryEntry } from '../../types/diary.js';
 import styles from './MemoryViewer.module.css';
 
@@ -96,6 +97,17 @@ export default function MemoryViewer({ entries, index, onClose, onNavigate, onAd
               <dt>Spread</dt>
               <dd><span className={styles.modeTag}>{entry.mode}</span></dd>
             </div>
+            {entry.mood && moodDef(entry.mood) && (
+              <div className={styles.fieldRow}>
+                <dt>Felt</dt>
+                <dd>
+                  <span className={styles.modeTag} style={{ color: moodDef(entry.mood)!.color }}>
+                    {moodDef(entry.mood)!.label}
+                    {entry.moodIntensity ? ` · ${entry.moodIntensity}` : ''}
+                  </span>
+                </dd>
+              </div>
+            )}
           </dl>
 
           <div className={styles.pageDivider} aria-hidden="true">

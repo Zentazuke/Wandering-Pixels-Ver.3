@@ -13,6 +13,7 @@ import MemoryViewer from './MemoryViewer.jsx';
 import DiaryCalendar from './DiaryCalendar.jsx';
 import { dayKey } from '../../utils/dayKey.js';
 import { normalizeEntry, type DiaryEntry } from '../../types/diary.js';
+import { moodDef } from '../../data/moods.js';
 import type { BoardElement } from '../../types';
 import styles from './ArchiveView.module.css';
 
@@ -54,7 +55,7 @@ export default function ArchiveView() {
   const q = query.trim().toLowerCase();
   const visibleEntries = entries.filter((e) =>
     (!dayFilter || dayKey(new Date(e.date)) === dayFilter) &&
-    (!q || [e.field1, e.field2, e.field3, e.reflection, e.mode]
+    (!q || [e.field1, e.field2, e.field3, e.reflection, e.mode, e.mood]
       .some((f) => (f || '').toLowerCase().includes(q))));
 
   useEffect(() => { loadSnapshots(); loadEntries(); }, []);
@@ -315,7 +316,14 @@ export default function ArchiveView() {
                 <div className={styles.entryBody}>
                   <div className={styles.entryMeta}>
                     <span className={styles.entryDate}>{entryDateLabel(entry.date)}</span>
-                    <span className={styles.entryMode}>{entry.mode}</span>
+                    <span className={styles.metaRight}>
+                      {entry.mood && moodDef(entry.mood) && (
+                        <span className={styles.entryMood} style={{ color: moodDef(entry.mood)!.color }}>
+                          ● {moodDef(entry.mood)!.label}
+                        </span>
+                      )}
+                      <span className={styles.entryMode}>{entry.mode}</span>
+                    </span>
                   </div>
                   {entry.field1 && <div className={styles.entryTitle}>{entry.field1}</div>}
                   {entry.reflection && (

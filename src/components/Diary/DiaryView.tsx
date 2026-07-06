@@ -7,7 +7,8 @@ import { LABELS } from './diaryLabels.js';
 import { getDailyPrompt, getRandomPrompt } from '../../constants/prompts.js';
 import { findOnThisDay, type Memory } from '../../utils/onThisDay.js';
 import MemoryViewer from '../Archive/MemoryViewer.jsx';
-import { normalizeEntry, type DiaryEntry } from '../../types/diary.js';
+import { normalizeEntry, type DiaryEntry, type MoodValue, type MoodIntensity } from '../../types/diary.js';
+import MoodPicker from './MoodPicker.jsx';
 import styles from './DiaryView.module.css';
 
 // Draft key must NOT start with 'diary-' — ArchiveView lists entries via
@@ -15,12 +16,14 @@ import styles from './DiaryView.module.css';
 const DRAFT_KEY = 'draft-diary';
 
 interface DiaryDraft {
-  field1:     string;
-  field2:     string;
-  field3:     string;
-  reflection: string;
-  photo:      string | null;
-  photoPos?:  { x: number; y: number };
+  field1:         string;
+  field2:         string;
+  field3:         string;
+  reflection:     string;
+  photo:          string | null;
+  photoPos?:      { x: number; y: number };
+  mood?:          MoodValue;
+  moodIntensity?: MoodIntensity;
 }
 
 const CENTERED = { x: 50, y: 50 };
@@ -65,6 +68,8 @@ export default function DiaryView() {
   const [reflection, setRef] = useState('');
   const [photo, setPhoto]       = useState<string | null>(null);
   const [photoPos, setPhotoPos] = useState(CENTERED);
+  const [mood, setMood]                   = useState<MoodValue | undefined>();
+  const [moodIntensity, setMoodIntensity] = useState<MoodIntensity | undefined>();
   const [saved, setSaved]       = useState(false);
   const [memories, setMemories]       = useState<Memory[]>([]);
   const [memoryIndex, setMemoryIndex] = useState<number | null>(null);
@@ -84,6 +89,7 @@ export default function DiaryView() {
   function clearForm() {
     setField1(''); setField2(''); setField3('');
     setRef(''); setPhoto(null); setPhotoPos(CENTERED);
+    setMood(undefined); setMoodIntensity(undefined);
   }
 
   function loadDraft(): Promise<void> {
@@ -96,6 +102,8 @@ export default function DiaryView() {
         setRef(d.reflection ?? '');
         setPhoto(d.photo ?? null);
         setPhotoPos(d.photoPos ?? CENTERED);
+        setMood(d.mood);
+        setMoodIntensity(d.moodIntensity);
       })
       .catch(() => {}); // a failed read just means no restore
   }
@@ -109,6 +117,8 @@ export default function DiaryView() {
     setRef(entry.reflection ?? '');
     setPhoto(entry.photo ?? null);
     setPhotoPos(entry.photoPos ?? CENTERED);
+    setMood(entry.mood);
+    setMoodIntensity(entry.moodIntensity);
   }
 
   /** Leave edit mode; any in-progress draft comes back to the form. */
@@ -158,10 +168,10 @@ export default function DiaryView() {
         dbDelete(DRAFT_KEY).catch(() => {});
         return;
       }
-      dbSave(DRAFT_KEY, { field1, field2, field3, reflection, photo, photoPos }).catch(() => {});
+      dbSave(DRAFT_KEY, { field1, field2, field3, reflection, photo, photoPos, mood, moodIntensity }).catch(() => {});
     }, 800);
     return () => clearTimeout(t);
-  }, [field1, field2, field3, reflection, photo, photoPos, editing]);
+  }, [field1, field2, field3, reflection, photo, photoPos, mood, moodIntensity, editing]);
 
   async function handleFile(file: File | undefined) {
     if (!file || !file.type.startsWith('image/')) return;
@@ -210,6 +220,8 @@ export default function DiaryView() {
       field1, field2, field3, reflection,
       photo,
       photoPos: photo ? photoPos : undefined,
+      mood,
+      moodIntensity: mood ? moodIntensity : undefined,
     };
     try {
       await dbSave(entry.id, entry);
@@ -323,6 +335,13 @@ export default function DiaryView() {
 
             <label className={styles.label}>{labels.label3}</label>
             <input  className={styles.input}    placeholder={labels.ph3} value={field3} onChange={(e) => setField3(e.target.value)} />
+
+            <label className={styles.label}>How did this feel?</label>
+            <MoodPicker
+              mood={mood}
+              intensity={moodIntensity}
+              onChange={(m, i) => { setMood(m); setMoodIntensity(i); }}
+            />
           </div>
         </div>
 
