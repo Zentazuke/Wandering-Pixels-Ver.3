@@ -358,6 +358,17 @@
   border-color: rgba(181,90,90,0.4);
 }
 
+/* ── Voice section ── */
+.voiceSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.voiceSection > div { width: 100%; }
+
 /* ── Save ── */
 .saveBtn {
   width: 100%;

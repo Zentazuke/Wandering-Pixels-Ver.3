@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { BookOpenText, LayoutGrid, DownloadCloud, UploadCloud } from 'lucide-react';
+import { BookOpenText, LayoutGrid, DownloadCloud, UploadCloud, Mic } from 'lucide-react';
 import useBoardStore, { makePhotoElement, makeTextElement } from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import { dbGetByPrefix, dbSave, dbDelete } from '../../db/boardDB.js';
 import { ensurePersistentStorage } from '../../db/persistentStorage.js';
+import { deleteAudioBlob } from '../../db/audioStorage.js';
 import { downloadBackup, restoreBackup } from '../../utils/backup.js';
 import { exportBoard } from '../../utils/exportBoard.js';
 import { makeThumb } from '../../utils/imageThumb.js';
@@ -166,6 +167,8 @@ export default function ArchiveView() {
     if (!window.confirm(`Delete diary entry "${label}"? This can't be undone.`)) return;
     try {
       await dbDelete(entry.id);
+      // its voice recordings go with it — no orphaned audio assets
+      entry.voiceNotes.forEach((n) => deleteAudioBlob(n.assetKey).catch(() => {}));
       await loadEntries();
     } catch {
       useAppStore.getState().showToast('Couldn\'t delete entry', 'error');
@@ -317,6 +320,11 @@ export default function ArchiveView() {
                   <div className={styles.entryMeta}>
                     <span className={styles.entryDate}>{entryDateLabel(entry.date)}</span>
                     <span className={styles.metaRight}>
+                      {entry.voiceNotes.length > 0 && (
+                        <span className={styles.entryVoice} title={`${entry.voiceNotes.length} voice note(s)`}>
+                          <Mic size={10} /> {entry.voiceNotes.length}
+                        </span>
+                      )}
                       {entry.mood && moodDef(entry.mood) && (
                         <span className={styles.entryMood} style={{ color: moodDef(entry.mood)!.color }}>
                           ● {moodDef(entry.mood)!.label}

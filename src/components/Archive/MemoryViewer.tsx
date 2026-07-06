@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { LABELS } from '../Diary/diaryLabels.js';
 import { moodDef } from '../../data/moods.js';
+import AudioPlayer from '../Diary/AudioPlayer.jsx';
 import type { DiaryEntry } from '../../types/diary.js';
 import styles from './MemoryViewer.module.css';
 
@@ -122,6 +123,13 @@ export default function MemoryViewer({ entries, index, onClose, onNavigate, onAd
                 {reflection.slice(1)}
               </p>
             </>
+          )}
+
+          {entry.voiceNotes.length > 0 && (
+            <div className={styles.voiceBlock}>
+              <span className={styles.pageLabel}>Spoken</span>
+              {entry.voiceNotes.map((n) => <AudioPlayer key={n.id} note={n} />)}
+            </div>
           )}
 
           <footer className={styles.pageFoot}>

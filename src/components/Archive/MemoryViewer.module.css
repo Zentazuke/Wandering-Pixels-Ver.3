@@ -330,3 +330,11 @@
   color: var(--danger-text);
   box-shadow: 0 0 0 1px rgba(176, 88, 74, 0.4), var(--shadow-btn-hover);
 }
+
+/* ── Spoken — voice notes on the journal page ── */
+.voiceBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}

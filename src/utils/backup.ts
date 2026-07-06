@@ -19,11 +19,39 @@ interface BackupPayload {
   data:       Record<string, unknown>;
 }
 
+// ── Blob transport — voice-note audio is stored as Blobs, which JSON would
+//    silently flatten to {}. They cross the backup file as base64 envelopes.
+interface BlobEnvelope { __wpBlob: 1; mime: string; b64: string; }
+
+function isBlobEnvelope(v: unknown): v is BlobEnvelope {
+  return typeof v === 'object' && v !== null && (v as BlobEnvelope).__wpBlob === 1;
+}
+
+async function blobToEnvelope(blob: Blob): Promise<BlobEnvelope> {
+  const buf = new Uint8Array(await blob.arrayBuffer());
+  let bin = '';
+  const CHUNK = 0x8000;
+  for (let i = 0; i < buf.length; i += CHUNK) {
+    bin += String.fromCharCode(...buf.subarray(i, i + CHUNK));
+  }
+  return { __wpBlob: 1, mime: blob.type, b64: btoa(bin) };
+}
+
+function envelopeToBlob(env: BlobEnvelope): Blob {
+  const bin = atob(env.b64);
+  const buf = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+  return new Blob([buf], { type: env.mime });
+}
+
 /** Serialize the whole store and hand it to the user as a download. */
 export async function downloadBackup(): Promise<void> {
   const { keys, vals } = await dbGetAll();
   const data: Record<string, unknown> = {};
-  keys.forEach((k, i) => { data[k] = vals[i]; });
+  for (let i = 0; i < keys.length; i++) {
+    const v = vals[i];
+    data[keys[i]] = v instanceof Blob ? await blobToEnvelope(v) : v;
+  }
 
   const payload: BackupPayload = {
     app: BACKUP_APP, version: BACKUP_VERSION,
@@ -52,7 +80,7 @@ export async function restoreBackup(file: File): Promise<number> {
   }
   const records = Object.entries(payload.data);
   for (const [key, value] of records) {
-    await dbSave(key, value);
+    await dbSave(key, isBlobEnvelope(value) ? envelopeToBlob(value) : value);
   }
   return records.length;
 }

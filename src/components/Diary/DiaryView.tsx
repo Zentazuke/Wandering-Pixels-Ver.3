@@ -7,8 +7,11 @@ import { LABELS } from './diaryLabels.js';
 import { getDailyPrompt, getRandomPrompt } from '../../constants/prompts.js';
 import { findOnThisDay, type Memory } from '../../utils/onThisDay.js';
 import MemoryViewer from '../Archive/MemoryViewer.jsx';
-import { normalizeEntry, type DiaryEntry, type MoodValue, type MoodIntensity } from '../../types/diary.js';
+import { normalizeEntry, type DiaryEntry, type MoodValue, type MoodIntensity, type VoiceNote } from '../../types/diary.js';
+import { saveAudioBlob, deleteAudioBlob } from '../../db/audioStorage.js';
 import MoodPicker from './MoodPicker.jsx';
+import VoiceRecorder from './VoiceRecorder.jsx';
+import AudioPlayer from './AudioPlayer.jsx';
 import styles from './DiaryView.module.css';
 
 // Draft key must NOT start with 'diary-' — ArchiveView lists entries via
@@ -24,6 +27,7 @@ interface DiaryDraft {
   photoPos?:      { x: number; y: number };
   mood?:          MoodValue;
   moodIntensity?: MoodIntensity;
+  voiceNotes?:    VoiceNote[];
 }
 
 const CENTERED = { x: 50, y: 50 };
@@ -70,6 +74,7 @@ export default function DiaryView() {
   const [photoPos, setPhotoPos] = useState(CENTERED);
   const [mood, setMood]                   = useState<MoodValue | undefined>();
   const [moodIntensity, setMoodIntensity] = useState<MoodIntensity | undefined>();
+  const [voiceNotes, setVoiceNotes]       = useState<VoiceNote[]>([]);
   const [saved, setSaved]       = useState(false);
   const [memories, setMemories]       = useState<Memory[]>([]);
   const [memoryIndex, setMemoryIndex] = useState<number | null>(null);
@@ -90,6 +95,25 @@ export default function DiaryView() {
     setField1(''); setField2(''); setField3('');
     setRef(''); setPhoto(null); setPhotoPos(CENTERED);
     setMood(undefined); setMoodIntensity(undefined);
+    setVoiceNotes([]);
+  }
+
+  async function addVoiceNote(blob: Blob, durationMs: number, mimeType: string) {
+    try {
+      const assetKey = await saveAudioBlob(blob);
+      const note: VoiceNote = {
+        id: `voice-${Date.now()}`, assetKey, durationMs, mimeType,
+        createdAt: Date.now(),
+      };
+      setVoiceNotes((prev) => [...prev, note]);
+    } catch {
+      useAppStore.getState().showToast('Couldn\'t save the voice note — storage may be full', 'error');
+    }
+  }
+
+  function removeVoiceNote(note: VoiceNote) {
+    deleteAudioBlob(note.assetKey).catch(() => {});
+    setVoiceNotes((prev) => prev.filter((n) => n.id !== note.id));
   }
 
   function loadDraft(): Promise<void> {
@@ -104,6 +128,7 @@ export default function DiaryView() {
         setPhotoPos(d.photoPos ?? CENTERED);
         setMood(d.mood);
         setMoodIntensity(d.moodIntensity);
+        setVoiceNotes(Array.isArray(d.voiceNotes) ? d.voiceNotes : []);
       })
       .catch(() => {}); // a failed read just means no restore
   }
@@ -119,6 +144,7 @@ export default function DiaryView() {
     setPhotoPos(entry.photoPos ?? CENTERED);
     setMood(entry.mood);
     setMoodIntensity(entry.moodIntensity);
+    setVoiceNotes(entry.voiceNotes);
   }
 
   /** Leave edit mode; any in-progress draft comes back to the form. */
@@ -164,14 +190,14 @@ export default function DiaryView() {
     if (!draftLoaded.current) return;
     if (editing) return; // edits touch the real entry, never the draft
     const t = setTimeout(() => {
-      if (!field1 && !field2 && !field3 && !reflection && !photo) {
+      if (!field1 && !field2 && !field3 && !reflection && !photo && voiceNotes.length === 0) {
         dbDelete(DRAFT_KEY).catch(() => {});
         return;
       }
-      dbSave(DRAFT_KEY, { field1, field2, field3, reflection, photo, photoPos, mood, moodIntensity }).catch(() => {});
+      dbSave(DRAFT_KEY, { field1, field2, field3, reflection, photo, photoPos, mood, moodIntensity, voiceNotes }).catch(() => {});
     }, 800);
     return () => clearTimeout(t);
-  }, [field1, field2, field3, reflection, photo, photoPos, mood, moodIntensity, editing]);
+  }, [field1, field2, field3, reflection, photo, photoPos, mood, moodIntensity, voiceNotes, editing]);
 
   async function handleFile(file: File | undefined) {
     if (!file || !file.type.startsWith('image/')) return;
@@ -222,6 +248,7 @@ export default function DiaryView() {
       photoPos: photo ? photoPos : undefined,
       mood,
       moodIntensity: mood ? moodIntensity : undefined,
+      voiceNotes,
     };
     try {
       await dbSave(entry.id, entry);
@@ -381,6 +408,15 @@ export default function DiaryView() {
             value={reflection}
             onChange={(e) => setRef(e.target.value)}
           />
+        </div>
+
+        {/* ── Spoken — leave yourself a voice note ── */}
+        <div className={styles.voiceSection}>
+          <label className={styles.label}>Voice</label>
+          <VoiceRecorder onSave={addVoiceNote} />
+          {voiceNotes.map((n) => (
+            <AudioPlayer key={n.id} note={n} onDelete={() => removeVoiceNote(n)} />
+          ))}
         </div>
 
         <button className={`${styles.saveBtn} ${saved ? styles.saveBtnDone : ''}`} onClick={save}>
