@@ -147,3 +147,11 @@ export function getDailyPrompt(mode: WorkspaceMode, today = new Date()): string 
   const offset = [...mode].reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   return list[(dayOfYear(today) + offset) % list.length];
 }
+
+/** A random prompt from the spread's bank — never the one already showing,
+ *  so the shuffle button always visibly does something. */
+export function getRandomPrompt(mode: WorkspaceMode, exclude?: string): string {
+  const list = PROMPTS[mode] ?? PROMPTS.default;
+  const pool = list.filter((p) => p !== exclude);
+  return pool[Math.floor(Math.random() * pool.length)] ?? list[0];
+}

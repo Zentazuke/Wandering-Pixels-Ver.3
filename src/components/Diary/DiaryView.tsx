@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { ImagePlus, RefreshCw, X } from 'lucide-react';
+import { ImagePlus, RefreshCw, Shuffle, X } from 'lucide-react';
 import useAppStore from '../../store/appStore.js';
 import { dbSave, dbLoad, dbDelete, dbGetByPrefix } from '../../db/boardDB.js';
 import { ensurePersistentStorage } from '../../db/persistentStorage.js';
 import { LABELS } from './diaryLabels.js';
-import { getDailyPrompt } from '../../constants/prompts.js';
+import { getDailyPrompt, getRandomPrompt } from '../../constants/prompts.js';
 import { findOnThisDay, type Memory } from '../../utils/onThisDay.js';
 import MemoryViewer from '../Archive/MemoryViewer.jsx';
 import type { DiaryEntry } from '../Archive/ArchiveView.jsx';
@@ -70,6 +70,10 @@ export default function DiaryView() {
   const [memoryIndex, setMemoryIndex] = useState<number | null>(null);
   // When set, the form is editing an existing entry — same id, original date
   const [editing, setEditing] = useState<Pick<DiaryEntry, 'id' | 'date' | 'mode'> | null>(null);
+  // Shuffled prompt for restless days — remembered per spread, so switching
+  // spreads naturally falls back to that spread's own daily prompt
+  const [shuffled, setShuffled] = useState<{ mode: string; prompt: string } | null>(null);
+  const prompt = shuffled && shuffled.mode === mode ? shuffled.prompt : getDailyPrompt(mode);
   const fileRef     = useRef<HTMLInputElement>(null);
   const draftLoaded = useRef(false);
   // Live drag state — a ref so pointer moves don't re-render until the position changes
@@ -321,21 +325,32 @@ export default function DiaryView() {
         {/* ── The entry itself — full-width ruled writing surface ── */}
         <div className={styles.entrySection}>
           <label className={styles.label} htmlFor="diary-entry">Entry</label>
-          {/* Today's prompt — tap it and the question opens the page for you */}
-          <button
-            type="button"
-            className={styles.promptLine}
-            title="Start writing from today's prompt"
-            onClick={() => {
-              const prompt = getDailyPrompt(mode);
-              setRef((prev) => (prev.trim() ? `${prev}\n\n${prompt}\n` : `${prompt}\n\n`));
-              document.getElementById('diary-entry')?.focus();
-            }}
-          >
-            <span className={styles.promptMark} aria-hidden="true">✎</span>
-            <span className={styles.promptText}>{getDailyPrompt(mode)}</span>
-            <span className={styles.promptHint}>tap to start</span>
-          </button>
+          {/* Today's prompt — tap it and the question opens the page for you;
+              the shuffle deals a different question from this spread's bank */}
+          <div className={styles.promptRow}>
+            <button
+              type="button"
+              className={styles.promptLine}
+              title="Start writing from this prompt"
+              onClick={() => {
+                setRef((prev) => (prev.trim() ? `${prev}\n\n${prompt}\n` : `${prompt}\n\n`));
+                document.getElementById('diary-entry')?.focus();
+              }}
+            >
+              <span className={styles.promptMark} aria-hidden="true">✎</span>
+              <span className={styles.promptText}>{prompt}</span>
+              <span className={styles.promptHint}>tap to start</span>
+            </button>
+            <button
+              type="button"
+              className={styles.promptShuffle}
+              title="Try a different prompt"
+              aria-label="Try a different prompt"
+              onClick={() => setShuffled({ mode, prompt: getRandomPrompt(mode, prompt) })}
+            >
+              <Shuffle size={13} />
+            </button>
+          </div>
           <textarea
             id="diary-entry"
             className={styles.entryArea}

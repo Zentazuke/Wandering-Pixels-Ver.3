@@ -157,7 +157,15 @@
 .input:focus { border-color: var(--viridian); }
 
 /* ── Daily prompt — a question to open the page with ── */
+.promptRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .promptLine {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: baseline;
   gap: 8px;
@@ -167,6 +175,27 @@
   text-align: left;
   cursor: pointer;
   color: var(--ink-mid);
+}
+
+.promptShuffle {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--topbar-border);
+  border-radius: 50%;
+  background: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+}
+
+.promptShuffle:hover {
+  background: var(--gold-08);
+  color: var(--gold-dark);
+  border-color: var(--gold-35);
+  transform: rotate(180deg);
 }
 
 .promptMark { color: var(--gold); font-size: 13px; }
