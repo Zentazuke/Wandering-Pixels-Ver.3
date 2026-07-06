@@ -3,7 +3,7 @@
  * A year (or years) ago today, six months ago, or a month ago — the small
  * ritual that makes a diary worth keeping.
  */
-import type { DiaryEntry } from '../components/Archive/ArchiveView.jsx';
+import type { DiaryEntry } from '../types/diary.js';
 
 export interface Memory {
   entry: DiaryEntry;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { dayKey } from '../../utils/dayKey.js';
-import type { DiaryEntry } from './ArchiveView.jsx';
+import type { DiaryEntry } from '../../types/diary.js';
 import styles from './DiaryCalendar.module.css';
 
 interface Props {

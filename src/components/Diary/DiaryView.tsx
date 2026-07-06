@@ -7,7 +7,7 @@ import { LABELS } from './diaryLabels.js';
 import { getDailyPrompt, getRandomPrompt } from '../../constants/prompts.js';
 import { findOnThisDay, type Memory } from '../../utils/onThisDay.js';
 import MemoryViewer from '../Archive/MemoryViewer.jsx';
-import type { DiaryEntry } from '../Archive/ArchiveView.jsx';
+import { normalizeEntry, type DiaryEntry } from '../../types/diary.js';
 import styles from './DiaryView.module.css';
 
 // Draft key must NOT start with 'diary-' — ArchiveView lists entries via
@@ -68,8 +68,10 @@ export default function DiaryView() {
   const [saved, setSaved]       = useState(false);
   const [memories, setMemories]       = useState<Memory[]>([]);
   const [memoryIndex, setMemoryIndex] = useState<number | null>(null);
-  // When set, the form is editing an existing entry — same id, original date
-  const [editing, setEditing] = useState<Pick<DiaryEntry, 'id' | 'date' | 'mode'> | null>(null);
+  // When set, the form is editing an existing entry — same id, original date.
+  // Holds the WHOLE entry so fields the form doesn't surface (linkedBoardIds,
+  // future extras) survive a round-trip through editing.
+  const [editing, setEditing] = useState<DiaryEntry | null>(null);
   // Shuffled prompt for restless days — remembered per spread, so switching
   // spreads naturally falls back to that spread's own daily prompt
   const [shuffled, setShuffled] = useState<{ mode: string; prompt: string } | null>(null);
@@ -99,7 +101,7 @@ export default function DiaryView() {
   }
 
   function startEditing(entry: DiaryEntry) {
-    setEditing({ id: entry.id, date: entry.date, mode: entry.mode });
+    setEditing(entry);
     useAppStore.getState().setMode(entry.mode); // show the entry's own spread labels
     setField1(entry.field1 ?? '');
     setField2(entry.field2 ?? '');
@@ -129,7 +131,7 @@ export default function DiaryView() {
     if (editId) {
       useAppStore.getState().setEditingEntryId(null);
       dbLoad<DiaryEntry>(editId)
-        .then((e) => { if (e) startEditing(e); })
+        .then((e) => { if (e) startEditing(normalizeEntry(e)); })
         .catch(() => {})
         .finally(() => { draftLoaded.current = true; });
     } else {
@@ -140,7 +142,8 @@ export default function DiaryView() {
   // "On this day" — resurface entries from a year / six months / a month ago
   useEffect(() => {
     dbGetByPrefix('diary-')
-      .then(({ vals }) => setMemories(findOnThisDay((vals as DiaryEntry[]).filter((e) => e && e.id))))
+      .then(({ vals }) => setMemories(findOnThisDay(
+        (vals as DiaryEntry[]).filter((e) => e && e.id).map(normalizeEntry))))
       .catch(() => {}); // no memories is fine
   }, []);
 
@@ -199,7 +202,8 @@ export default function DiaryView() {
   }
 
   async function save() {
-    const entry = {
+    const entry: DiaryEntry = {
+      ...(editing ?? { voiceNotes: [], tags: [], linkedBoardIds: [] }),
       id:   editing ? editing.id   : `diary-${Date.now()}`,
       date: editing ? editing.date : new Date().toISOString(), // edits keep their day
       mode: editing ? editing.mode : mode,

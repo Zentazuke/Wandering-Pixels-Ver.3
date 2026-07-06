@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { findOnThisDay } from './onThisDay';
-import type { DiaryEntry } from '../components/Archive/ArchiveView';
+import { normalizeEntry, type DiaryEntry } from '../types/diary';
 
-const entry = (id: string, iso: string): DiaryEntry => ({
+const entry = (id: string, iso: string): DiaryEntry => normalizeEntry({
   id, date: iso, mode: 'default',
   field1: '', field2: '', field3: '', reflection: '',
 });

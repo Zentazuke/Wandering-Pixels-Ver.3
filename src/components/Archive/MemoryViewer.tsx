@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { LABELS } from '../Diary/diaryLabels.js';
-import type { DiaryEntry } from './ArchiveView.jsx';
+import type { DiaryEntry } from '../../types/diary.js';
 import styles from './MemoryViewer.module.css';
 
 interface Props {

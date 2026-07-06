@@ -12,7 +12,8 @@ import { useFlash } from '../../hooks/useFlash.js';
 import MemoryViewer from './MemoryViewer.jsx';
 import DiaryCalendar from './DiaryCalendar.jsx';
 import { dayKey } from '../../utils/dayKey.js';
-import type { BoardElement, WorkspaceMode } from '../../types';
+import { normalizeEntry, type DiaryEntry } from '../../types/diary.js';
+import type { BoardElement } from '../../types';
 import styles from './ArchiveView.module.css';
 
 interface Snapshot {
@@ -26,18 +27,8 @@ interface Snapshot {
   customBgImage: string | null;
 }
 
-export interface DiaryEntry {
-  id:         string;
-  date:       string;       // ISO
-  mode:       WorkspaceMode;
-  field1:     string;
-  field2:     string;
-  field3:     string;
-  reflection: string;
-  photo?:     string | null;
-  /** How the photo was framed in its diary crop (object-position %). */
-  photoPos?:  { x: number; y: number };
-}
+// DiaryEntry now lives in src/types/diary.ts — re-exported for old importers.
+export type { DiaryEntry };
 
 type Tab = 'boards' | 'diary';
 
@@ -161,6 +152,7 @@ export default function ArchiveView() {
       const { vals } = await dbGetByPrefix('diary-');
       const list = (vals as DiaryEntry[])
         .filter((e) => e && e.id)
+        .map(normalizeEntry) // older records gain voiceNotes/tags/linkedBoardIds
         .sort((a, b) => (a.date < b.date ? 1 : -1));
       setEntries(list);
     } catch {
