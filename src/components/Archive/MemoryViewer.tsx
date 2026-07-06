@@ -12,6 +12,7 @@ interface Props {
   /* optional — the On This Day viewer reads memories without board actions */
   onAddToBoard?: (entry: DiaryEntry) => void;
   onDelete?:     (entry: DiaryEntry) => void;
+  onEdit?:       (entry: DiaryEntry) => void;
 }
 
 function longDate(iso: string): string {
@@ -21,7 +22,7 @@ function longDate(iso: string): string {
 }
 
 /** Full-screen reader for a diary entry — taped memory photo beside its journal page. */
-export default function MemoryViewer({ entries, index, onClose, onNavigate, onAddToBoard, onDelete }: Props) {
+export default function MemoryViewer({ entries, index, onClose, onNavigate, onAddToBoard, onDelete, onEdit }: Props) {
   const entry = entries[index];
 
   useEffect(() => {
@@ -114,6 +115,7 @@ export default function MemoryViewer({ entries, index, onClose, onNavigate, onAd
           <footer className={styles.pageFoot}>
             <span className={styles.entryCount}>entry {index + 1} of {entries.length}</span>
             <div className={styles.pageActions}>
+              {onEdit && <button className={styles.actionBtn} onClick={() => onEdit(entry)}>Edit</button>}
               {onAddToBoard && <button className={styles.actionBtn} onClick={() => onAddToBoard(entry)}>Add to board</button>}
               {onDelete && <button className={`${styles.actionBtn} ${styles.release}`} onClick={() => onDelete(entry)}>Release</button>}
             </div>

@@ -42,6 +42,10 @@ export interface AppState {
   mode:        WorkspaceMode;
   setMode:     (mode: WorkspaceMode) => void;
 
+  /** Entry id handed from the Archive/viewer to the Diary for editing. */
+  editingEntryId:    string | null;
+  setEditingEntryId: (id: string | null) => void;
+
   selId:       string | null;
   setSelId:    (id: string) => void;
   deselect:    () => void;

@@ -125,6 +125,47 @@
   gap: 24px;
 }
 
+/* ── Diary tab — calendar + search sidebar beside the entries ── */
+.diaryLayout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.diarySide {
+  width: 272px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.diaryMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.search {
+  padding: 9px 14px;
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-pill);
+  background: var(--surface-card);
+  color: var(--ink);
+  font-size: 13px;
+  font-family: 'Lora', serif;
+  outline: none;
+  transition: border-color var(--t-fast);
+  user-select: text;
+}
+
+.search:focus { border-color: var(--viridian); }
+.search::placeholder { color: var(--ink-faint); font-style: italic; }
+
+@media (max-width: 860px) {
+  .diaryLayout { flex-direction: column; }
+  .diarySide   { width: 100%; max-width: 340px; }
+}
+
 .card {
   background: var(--surface-card);
   border: 1px solid var(--topbar-border);

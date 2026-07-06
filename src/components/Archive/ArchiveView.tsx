@@ -10,6 +10,8 @@ import { makeThumb } from '../../utils/imageThumb.js';
 import { escapeHtml } from '../../utils/sanitizeHtml.js';
 import { useFlash } from '../../hooks/useFlash.js';
 import MemoryViewer from './MemoryViewer.jsx';
+import DiaryCalendar from './DiaryCalendar.jsx';
+import { dayKey } from '../../utils/dayKey.js';
 import type { BoardElement, WorkspaceMode } from '../../types';
 import styles from './ArchiveView.module.css';
 
@@ -50,9 +52,19 @@ export default function ArchiveView() {
   const [entries, setEntries]     = useState<DiaryEntry[]>([]);
   const [saving, setSaving]       = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const [query, setQuery]         = useState('');
+  const [dayFilter, setDayFilter] = useState<string | null>(null);
   const loadBoard  = useBoardStore((s) => s.loadBoard);
   const flash      = useFlash();
   const restoreRef = useRef<HTMLInputElement>(null);
+
+  // Search across everything written, plus the spread name; day filter from
+  // the calendar composes with it.
+  const q = query.trim().toLowerCase();
+  const visibleEntries = entries.filter((e) =>
+    (!dayFilter || dayKey(new Date(e.date)) === dayFilter) &&
+    (!q || [e.field1, e.field2, e.field3, e.reflection, e.mode]
+      .some((f) => (f || '').toLowerCase().includes(q))));
 
   useEffect(() => { loadSnapshots(); loadEntries(); }, []);
 
@@ -274,8 +286,27 @@ export default function ArchiveView() {
             <p>Write one in the Diary tab — it'll appear here.</p>
           </div>
         ) : (
+          <div className={styles.diaryLayout}>
+            <aside className={styles.diarySide}>
+              <input
+                className={styles.search}
+                type="search"
+                placeholder="Search your entries…"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+              />
+              <DiaryCalendar entries={entries} selectedDay={dayFilter} onSelectDay={setDayFilter} />
+            </aside>
+
+            <div className={styles.diaryMain}>
+              {visibleEntries.length === 0 ? (
+                <div className={styles.empty}>
+                  <p>Nothing matches{dayFilter ? ' that day' : ''}{q ? ` “${query.trim()}”` : ''}.</p>
+                  <p>Try clearing the search or the selected day.</p>
+                </div>
+              ) : (
           <div className={styles.grid}>
-            {entries.map((entry, i) => (
+            {visibleEntries.map((entry, i) => (
               <div key={entry.id} className={styles.card}
                 style={{ cursor: 'pointer' }}
                 onClick={() => setViewerIndex(i)}
@@ -308,17 +339,24 @@ export default function ArchiveView() {
               </div>
             ))}
           </div>
+              )}
+            </div>
+          </div>
         )
       )}
 
-      {viewerIndex !== null && viewerIndex < entries.length && (
+      {viewerIndex !== null && viewerIndex < visibleEntries.length && (
         <MemoryViewer
-          entries={entries}
+          entries={visibleEntries}
           index={viewerIndex}
           onClose={() => setViewerIndex(null)}
           onNavigate={setViewerIndex}
           onAddToBoard={addEntryToBoard}
           onDelete={deleteEntry}
+          onEdit={(entry) => {
+            useAppStore.getState().setEditingEntryId(entry.id);
+            flash(() => useAppStore.getState().setView('diary'));
+          }}
         />
       )}
     </div>

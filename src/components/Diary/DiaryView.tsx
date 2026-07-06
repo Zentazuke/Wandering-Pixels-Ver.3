@@ -4,6 +4,7 @@ import useAppStore from '../../store/appStore.js';
 import { dbSave, dbLoad, dbDelete, dbGetByPrefix } from '../../db/boardDB.js';
 import { ensurePersistentStorage } from '../../db/persistentStorage.js';
 import { LABELS } from './diaryLabels.js';
+import { getDailyPrompt } from '../../constants/prompts.js';
 import { findOnThisDay, type Memory } from '../../utils/onThisDay.js';
 import MemoryViewer from '../Archive/MemoryViewer.jsx';
 import type { DiaryEntry } from '../Archive/ArchiveView.jsx';
@@ -67,14 +68,20 @@ export default function DiaryView() {
   const [saved, setSaved]       = useState(false);
   const [memories, setMemories]       = useState<Memory[]>([]);
   const [memoryIndex, setMemoryIndex] = useState<number | null>(null);
+  // When set, the form is editing an existing entry — same id, original date
+  const [editing, setEditing] = useState<Pick<DiaryEntry, 'id' | 'date' | 'mode'> | null>(null);
   const fileRef     = useRef<HTMLInputElement>(null);
   const draftLoaded = useRef(false);
   // Live drag state — a ref so pointer moves don't re-render until the position changes
   const dragRef = useRef<{ startX: number; startY: number; posX: number; posY: number } | null>(null);
 
-  // Restore an unsaved draft on mount — a diary must never eat someone's writing.
-  useEffect(() => {
-    dbLoad<DiaryDraft>(DRAFT_KEY)
+  function clearForm() {
+    setField1(''); setField2(''); setField3('');
+    setRef(''); setPhoto(null); setPhotoPos(CENTERED);
+  }
+
+  function loadDraft(): Promise<void> {
+    return dbLoad<DiaryDraft>(DRAFT_KEY)
       .then((d) => {
         if (!d) return;
         setField1(d.field1 ?? '');
@@ -84,8 +91,46 @@ export default function DiaryView() {
         setPhoto(d.photo ?? null);
         setPhotoPos(d.photoPos ?? CENTERED);
       })
-      .catch(() => {}) // a failed read just means no restore
-      .finally(() => { draftLoaded.current = true; });
+      .catch(() => {}); // a failed read just means no restore
+  }
+
+  function startEditing(entry: DiaryEntry) {
+    setEditing({ id: entry.id, date: entry.date, mode: entry.mode });
+    useAppStore.getState().setMode(entry.mode); // show the entry's own spread labels
+    setField1(entry.field1 ?? '');
+    setField2(entry.field2 ?? '');
+    setField3(entry.field3 ?? '');
+    setRef(entry.reflection ?? '');
+    setPhoto(entry.photo ?? null);
+    setPhotoPos(entry.photoPos ?? CENTERED);
+  }
+
+  /** Leave edit mode; any in-progress draft comes back to the form. */
+  function stopEditing() {
+    setEditing(null);
+    clearForm();
+    loadDraft();
+  }
+
+  // On mount: an entry handed over for editing wins; otherwise restore the
+  // draft — a diary must never eat someone's writing.
+  // bootRan guards StrictMode's double effect-run: the first run consumes the
+  // edit hand-off, so a second run would fall through and load the draft over
+  // the entry being edited.
+  const bootRan = useRef(false);
+  useEffect(() => {
+    if (bootRan.current) return;
+    bootRan.current = true;
+    const editId = useAppStore.getState().editingEntryId;
+    if (editId) {
+      useAppStore.getState().setEditingEntryId(null);
+      dbLoad<DiaryEntry>(editId)
+        .then((e) => { if (e) startEditing(e); })
+        .catch(() => {})
+        .finally(() => { draftLoaded.current = true; });
+    } else {
+      loadDraft().finally(() => { draftLoaded.current = true; });
+    }
   }, []);
 
   // "On this day" — resurface entries from a year / six months / a month ago
@@ -100,6 +145,7 @@ export default function DiaryView() {
   // overwrite an existing draft (see loadedRef bug in the captain's log).
   useEffect(() => {
     if (!draftLoaded.current) return;
+    if (editing) return; // edits touch the real entry, never the draft
     const t = setTimeout(() => {
       if (!field1 && !field2 && !field3 && !reflection && !photo) {
         dbDelete(DRAFT_KEY).catch(() => {});
@@ -108,7 +154,7 @@ export default function DiaryView() {
       dbSave(DRAFT_KEY, { field1, field2, field3, reflection, photo, photoPos }).catch(() => {});
     }, 800);
     return () => clearTimeout(t);
-  }, [field1, field2, field3, reflection, photo, photoPos]);
+  }, [field1, field2, field3, reflection, photo, photoPos, editing]);
 
   async function handleFile(file: File | undefined) {
     if (!file || !file.type.startsWith('image/')) return;
@@ -150,9 +196,10 @@ export default function DiaryView() {
 
   async function save() {
     const entry = {
-      id: `diary-${Date.now()}`,
-      date: new Date().toISOString(),
-      mode, field1, field2, field3, reflection,
+      id:   editing ? editing.id   : `diary-${Date.now()}`,
+      date: editing ? editing.date : new Date().toISOString(), // edits keep their day
+      mode: editing ? editing.mode : mode,
+      field1, field2, field3, reflection,
       photo,
       photoPos: photo ? photoPos : undefined,
     };
@@ -161,6 +208,11 @@ export default function DiaryView() {
       // First real entry saved — ask the browser to shield the diary from
       // storage eviction (fire-and-forget, inside the user-gesture chain).
       ensurePersistentStorage();
+      if (editing) {
+        useAppStore.getState().showToast('Entry updated', 'success');
+        stopEditing();
+        return;
+      }
       // The entry is safe in the archive — the draft has done its job.
       // (Fields stay on screen; editing again simply starts a new draft.)
       dbDelete(DRAFT_KEY).catch(() => {});
@@ -179,8 +231,20 @@ export default function DiaryView() {
         <div className={styles.date}>{todayStr()}</div>
         <h2 className={styles.heading}>Journal Entry</h2>
 
+        {/* ── Editing an existing entry ── */}
+        {editing && (
+          <div className={styles.editingBanner}>
+            <span>
+              Editing the entry from{' '}
+              {new Date(editing.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+              {' '}— saving overwrites the original
+            </span>
+            <button className={styles.editingCancel} onClick={stopEditing}>Cancel</button>
+          </div>
+        )}
+
         {/* ── On this day — a memory resurfaces above the fresh page ── */}
-        {memories.length > 0 && (
+        {!editing && memories.length > 0 && (
           <button className={styles.onThisDay} onClick={() => setMemoryIndex(0)}>
             <span className={styles.otdBadge} aria-hidden="true">✦</span>
             <span className={styles.otdLabel}>{memories[0].label}</span>
@@ -257,6 +321,21 @@ export default function DiaryView() {
         {/* ── The entry itself — full-width ruled writing surface ── */}
         <div className={styles.entrySection}>
           <label className={styles.label} htmlFor="diary-entry">Entry</label>
+          {/* Today's prompt — tap it and the question opens the page for you */}
+          <button
+            type="button"
+            className={styles.promptLine}
+            title="Start writing from today's prompt"
+            onClick={() => {
+              const prompt = getDailyPrompt(mode);
+              setRef((prev) => (prev.trim() ? `${prev}\n\n${prompt}\n` : `${prompt}\n\n`));
+              document.getElementById('diary-entry')?.focus();
+            }}
+          >
+            <span className={styles.promptMark} aria-hidden="true">✎</span>
+            <span className={styles.promptText}>{getDailyPrompt(mode)}</span>
+            <span className={styles.promptHint}>tap to start</span>
+          </button>
           <textarea
             id="diary-entry"
             className={styles.entryArea}
@@ -267,7 +346,7 @@ export default function DiaryView() {
         </div>
 
         <button className={`${styles.saveBtn} ${saved ? styles.saveBtnDone : ''}`} onClick={save}>
-          {saved ? '✦ Saved' : 'Save Entry'}
+          {saved ? '✦ Saved' : editing ? 'Save Changes' : 'Save Entry'}
         </button>
       </div>
 
@@ -277,6 +356,7 @@ export default function DiaryView() {
           index={memoryIndex}
           onClose={() => setMemoryIndex(null)}
           onNavigate={setMemoryIndex}
+          onEdit={(entry) => { setMemoryIndex(null); startEditing(entry); }}
         />
       )}
     </div>

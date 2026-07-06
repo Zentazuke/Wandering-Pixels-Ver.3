@@ -34,6 +34,37 @@
   margin-bottom: 28px;
 }
 
+/* ── Editing banner — the form is holding an old entry ── */
+.editingBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -12px 0 24px;
+  padding: 9px 14px;
+  border: 1px solid var(--gold-35);
+  border-radius: var(--r-md);
+  background: var(--gold-08);
+  color: var(--ink-mid);
+  font-size: 12.5px;
+  font-style: italic;
+  font-family: 'Lora', serif;
+}
+
+.editingCancel {
+  padding: 5px 12px;
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--ink-mid);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast), color var(--t-fast);
+}
+
+.editingCancel:hover { background: var(--danger-bg); color: var(--danger-text); }
+
 /* ── On this day — a memory resurfaces above the fresh page ── */
 .onThisDay {
   display: flex;
@@ -124,6 +155,43 @@
 }
 
 .input:focus { border-color: var(--viridian); }
+
+/* ── Daily prompt — a question to open the page with ── */
+.promptLine {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 2px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink-mid);
+}
+
+.promptMark { color: var(--gold); font-size: 13px; }
+
+.promptText {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 13.5px;
+  transition: color var(--t-fast);
+}
+
+.promptLine:hover .promptText { color: var(--ink); }
+
+.promptHint {
+  margin-left: auto;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--t-fast);
+}
+
+.promptLine:hover .promptHint { opacity: 1; }
 
 /* ── Long-form entry — a full-width ruled writing surface ── */
 .entrySection {

@@ -23,6 +23,10 @@ const useAppStore = create<AppState>()(
       mode: 'default' as WorkspaceMode,
       setMode: (mode) => set({ mode }, false, 'setMode'),
 
+      // ── Entry editing hand-off (Archive/viewer → Diary) ──
+      editingEntryId: null,
+      setEditingEntryId: (editingEntryId) => set({ editingEntryId }, false, 'setEditingEntryId'),
+
       // ── Selection ────────────────────────────────────
       selId: null,
       setSelId: (selId) => set({ selId }, false, 'setSelId'),
