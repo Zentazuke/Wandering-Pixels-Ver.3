@@ -3,15 +3,26 @@
 
 ---
 
-## Project Identity
+## Project Identity — V4 (market-plan rebuild)
 
-- **App:** Wandering Pixels — a **digital diary first** (July 2026 pivot); mood
-  boards are the creative layer you build *from* diary entries and other things
-- **Direction:** menu lands on the diary; text-only entries are first-class
-  (no photo → no polaroid/placeholder anywhere; no title → date is the heading)
+- **App:** Wandering Pixels v4 — *"a private visual diary where your words,
+  photos, and voice notes become beautiful memory boards."*
+- **The core loop (the product):** open → today's journal → write / speak /
+  photo / mood → save → **"Turn this into a memory board?"** → pick template →
+  the app generates a beautiful board. Everything else supports that loop.
+- **Privacy contract:** mobile-first, device-only storage; nothing leaves the
+  phone unless the person shares. Backup = local file; sharing = explicit export.
+- **V4 shipped so far:** canonical diary model (types/diary.ts, normalizeEntry
+  on read); mood picker (10 feelings + intensity); voice notes (MediaRecorder →
+  IDB blob assets, backup carries audio as base64 envelopes); 3 moodboard
+  templates + Create Moodboard with recommendations and linkedBoardIds.
+- **Next per plan:** mobile-simple board editing panel; archive filters
+  (voice/mood/photos); PWA layer (manifest, offline, install); then Capacitor.
+  AI (transcription, titles, mood detection) only after the loop is addictive.
 - **Owner:** Ricardo (Zentazuke)
-- **Repo:** https://github.com/Zentazuke/Wandering-Pixels-Ver.3
-- **Local path:** `C:\Users\Ricardo\Desktop\Work\PROJECTOS\WANDERING PIXELS\wandering-pixels-react`
+- **Repo:** local only for now (forked from Wandering-Pixels-Ver.3 @ ede433f —
+  full history preserved). Create a new GitHub repo before deploying v4.
+- **Local path:** `C:\Users\Ricardo\Desktop\Work\PROJECTOS\WANDERING PIXELS\wandering-pixels-v4`
 - **Dev server:** `npm run dev` → http://localhost:5173
 - **Tests:** `npm test` (CI runs typecheck + lint + tests on every push — trust CI, not this line)
 - **Build:** `npm run build` (runs `tsc --noEmit` first, then Vite)
