@@ -9,13 +9,10 @@
  * normalising on read (see normalizeEntry), not by renaming stored fields.
  */
 import type { WorkspaceMode } from './store';
+import type { MoodValue, MoodIntensity } from './mood';
 
-// ── Mood ─────────────────────────────────────────────────────────────────────
-export type MoodValue =
-  | 'peaceful' | 'heavy' | 'romantic' | 'chaotic' | 'grateful'
-  | 'lonely' | 'inspired' | 'angry' | 'hopeful' | 'nostalgic';
-
-export type MoodIntensity = 'soft' | 'medium' | 'strong';
+// Mood types live in ./mood — re-exported so existing importers keep working.
+export type { MoodValue, MoodIntensity };
 
 // ── Voice ────────────────────────────────────────────────────────────────────
 export interface VoiceNote {
@@ -48,6 +45,14 @@ export interface DiaryEntry {
   tags:           string[];
   /** Boards generated from this memory (snapshot keys). */
   linkedBoardIds: string[];
+  /** Who this memory is shared with (Companion ids — see types/companions). */
+  companionIds:   string[];
+  /** Collections this memory belongs to (MemoryCollection ids). */
+  linkedCollectionIds: string[];
+  isFavorite?:    boolean;
+  /** Epoch ms — optional because entries predate these fields; save() stamps them. */
+  createdAt?:     number;
+  updatedAt?:     number;
 }
 
 /** Upgrade any stored record (old app versions included) to the full shape. */
@@ -58,8 +63,10 @@ export function normalizeEntry(raw: Partial<DiaryEntry> & { id: string }): Diary
     field1: '', field2: '', field3: '',
     reflection: '',
     ...raw,
-    voiceNotes:     Array.isArray(raw.voiceNotes)     ? raw.voiceNotes     : [],
-    tags:           Array.isArray(raw.tags)           ? raw.tags           : [],
-    linkedBoardIds: Array.isArray(raw.linkedBoardIds) ? raw.linkedBoardIds : [],
+    voiceNotes:          Array.isArray(raw.voiceNotes)          ? raw.voiceNotes          : [],
+    tags:                Array.isArray(raw.tags)                ? raw.tags                : [],
+    linkedBoardIds:      Array.isArray(raw.linkedBoardIds)      ? raw.linkedBoardIds      : [],
+    companionIds:        Array.isArray(raw.companionIds)        ? raw.companionIds        : [],
+    linkedCollectionIds: Array.isArray(raw.linkedCollectionIds) ? raw.linkedCollectionIds : [],
   };
 }

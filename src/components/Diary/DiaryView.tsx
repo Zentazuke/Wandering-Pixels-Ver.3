@@ -239,10 +239,12 @@ export default function DiaryView() {
 
   async function save() {
     const entry: DiaryEntry = {
-      ...(editing ?? { voiceNotes: [], tags: [], linkedBoardIds: [] }),
+      ...(editing ?? { voiceNotes: [], tags: [], linkedBoardIds: [], companionIds: [], linkedCollectionIds: [] }),
       id:   editing ? editing.id   : `diary-${Date.now()}`,
       date: editing ? editing.date : new Date().toISOString(), // edits keep their day
       mode: editing ? editing.mode : mode,
+      createdAt: editing?.createdAt ?? Date.now(),
+      updatedAt: Date.now(),
       field1, field2, field3, reflection,
       photo,
       photoPos: photo ? photoPos : undefined,

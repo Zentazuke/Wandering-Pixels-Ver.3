@@ -6,44 +6,11 @@
  * photo, words, date, mood, voice — and skips slots the entry can't fill.
  * Three templates that work beautifully beat twenty that don't.
  */
-import type { WorkspaceMode } from '../types';
+import type { MoodboardTemplate } from '../types/templates';
 
-export type SlotKind =
-  | 'mainPhoto'   // the entry's photo
-  | 'title'       // field1, falling back to the long date
-  | 'date'        // small long-date line
-  | 'entryText'   // the written entry (trimmed)
-  | 'quote'       // first sentence of the entry, as a pull-quote
-  | 'meta'        // field2 · field3
-  | 'mood'        // mood chip (skipped when no mood)
-  | 'voice';      // spoken-memory marker (skipped when no voice note)
-
-export interface TemplateSlot {
-  slot: SlotKind;
-  x: number; y: number; w: number; h: number;
-  rotation?: number;
-  /* photo styling */
-  frame?: string;
-  /* text styling */
-  noteFrame?:  string;
-  fontFamily?: 'Lora' | 'Playfair' | 'DM Sans';
-  fontSize?:   number;
-  bold?:       boolean;
-  italic?:     boolean;
-  align?:      'left' | 'center' | 'right';
-  color?:      string;
-  bg?:         string;
-}
-
-export interface MoodboardTemplate {
-  id:          string;
-  name:        string;
-  description: string;
-  /** Board background id (constants/backgrounds). */
-  bg:          string;
-  modes?:      WorkspaceMode[];
-  layout:      TemplateSlot[];
-}
+// Type contracts live in src/types/templates.ts; re-exported here so
+// existing importers keep working.
+export type { SlotKind, TemplateSlot, MoodboardTemplate } from '../types/templates';
 
 export const MOODBOARD_TEMPLATES: MoodboardTemplate[] = [
   {
