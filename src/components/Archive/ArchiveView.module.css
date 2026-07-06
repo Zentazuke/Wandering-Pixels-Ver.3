@@ -334,3 +334,43 @@
     rgba(93, 81, 64, 0.09) 21px, rgba(93, 81, 64, 0.09) 22px
   );
 }
+
+/* ── People & Pets ── */
+.backLink {
+  border: none; background: none; cursor: pointer;
+  color: var(--ink-mid); font-size: 12.5px; padding: 0 0 10px;
+}
+.backLink:hover { color: var(--gold-dark); }
+
+.threadTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 600; color: var(--ink);
+  margin-bottom: 18px;
+}
+
+.companionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.companionCard {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 26px 16px 20px;
+  background: var(--surface-card);
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: box-shadow var(--t-fast), transform var(--t-fast);
+}
+.companionCard:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+.companionIcon { font-size: 30px; }
+.companionName {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-weight: 600; color: var(--ink);
+}
+.companionCount { font-size: 11px; color: var(--ink-faint); font-style: italic; }
+
+.entryCompanions { font-size: 11px; color: var(--ink-mid); }

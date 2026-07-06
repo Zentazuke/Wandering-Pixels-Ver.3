@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { LABELS } from '../Diary/diaryLabels.js';
 import { moodDef } from '../../data/moods.js';
 import AudioPlayer from '../Diary/AudioPlayer.jsx';
+import { COMPANION_ICON } from '../../data/companionIcons.js';
+import type { Companion } from '../../types/companions.js';
 import type { DiaryEntry } from '../../types/diary.js';
 import styles from './MemoryViewer.module.css';
 
@@ -16,6 +18,8 @@ interface Props {
   onDelete?:      (entry: DiaryEntry) => void;
   onEdit?:        (entry: DiaryEntry) => void;
   onCreateBoard?: (entry: DiaryEntry) => void;
+  /** For resolving companionIds → names; callers pass their loaded list. */
+  companions?:    Companion[];
 }
 
 function longDate(iso: string): string {
@@ -25,7 +29,7 @@ function longDate(iso: string): string {
 }
 
 /** Full-screen reader for a diary entry — taped memory photo beside its journal page. */
-export default function MemoryViewer({ entries, index, onClose, onNavigate, onAddToBoard, onDelete, onEdit, onCreateBoard }: Props) {
+export default function MemoryViewer({ entries, index, onClose, onNavigate, onAddToBoard, onDelete, onEdit, onCreateBoard, companions = [] }: Props) {
   const entry = entries[index];
 
   useEffect(() => {
@@ -99,6 +103,18 @@ export default function MemoryViewer({ entries, index, onClose, onNavigate, onAd
               <dt>Spread</dt>
               <dd><span className={styles.modeTag}>{entry.mode}</span></dd>
             </div>
+            {entry.companionIds.length > 0 && (
+              <div className={styles.fieldRow}>
+                <dt>With</dt>
+                <dd>
+                  {entry.companionIds
+                    .map((id) => companions.find((c) => c.id === id))
+                    .filter(Boolean)
+                    .map((c) => `${COMPANION_ICON[c!.type]} ${c!.name}`)
+                    .join('  ·  ') || '—'}
+                </dd>
+              </div>
+            )}
             {entry.mood && moodDef(entry.mood) && (
               <div className={styles.fieldRow}>
                 <dt>Felt</dt>

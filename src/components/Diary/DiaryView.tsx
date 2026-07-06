@@ -10,6 +10,9 @@ import MemoryViewer from '../Archive/MemoryViewer.jsx';
 import { normalizeEntry, type DiaryEntry, type MoodValue, type MoodIntensity, type VoiceNote } from '../../types/diary.js';
 import { saveAudioBlob, deleteAudioBlob } from '../../db/audioStorage.js';
 import MoodPicker from './MoodPicker.jsx';
+import CompanionPicker from './CompanionPicker.jsx';
+import { loadCompanions, createCompanion } from '../../db/companionStore.js';
+import type { Companion, CompanionType } from '../../types/companions.js';
 import VoiceRecorder from './VoiceRecorder.jsx';
 import AudioPlayer from './AudioPlayer.jsx';
 import styles from './DiaryView.module.css';
@@ -28,6 +31,7 @@ interface DiaryDraft {
   mood?:          MoodValue;
   moodIntensity?: MoodIntensity;
   voiceNotes?:    VoiceNote[];
+  companionIds?:  string[];
 }
 
 const CENTERED = { x: 50, y: 50 };
@@ -75,6 +79,24 @@ export default function DiaryView() {
   const [mood, setMood]                   = useState<MoodValue | undefined>();
   const [moodIntensity, setMoodIntensity] = useState<MoodIntensity | undefined>();
   const [voiceNotes, setVoiceNotes]       = useState<VoiceNote[]>([]);
+  const [companionIds, setCompanionIds]   = useState<string[]>([]);
+  const [companions, setCompanions]       = useState<Companion[]>([]);
+
+  useEffect(() => { loadCompanions().then(setCompanions).catch(() => {}); }, []);
+
+  function toggleCompanion(id: string) {
+    setCompanionIds((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
+  }
+
+  async function addCompanion(name: string, type: CompanionType) {
+    try {
+      const c = await createCompanion(name, type);
+      setCompanions((prev) => [...prev, c].sort((a, b) => a.name.localeCompare(b.name)));
+      setCompanionIds((prev) => [...prev, c.id]);
+    } catch {
+      useAppStore.getState().showToast('Couldn\'t save companion', 'error');
+    }
+  }
   const [saved, setSaved]       = useState(false);
   const [memories, setMemories]       = useState<Memory[]>([]);
   const [memoryIndex, setMemoryIndex] = useState<number | null>(null);
@@ -95,7 +117,7 @@ export default function DiaryView() {
     setField1(''); setField2(''); setField3('');
     setRef(''); setPhoto(null); setPhotoPos(CENTERED);
     setMood(undefined); setMoodIntensity(undefined);
-    setVoiceNotes([]);
+    setVoiceNotes([]); setCompanionIds([]);
   }
 
   async function addVoiceNote(blob: Blob, durationMs: number, mimeType: string) {
@@ -129,6 +151,7 @@ export default function DiaryView() {
         setMood(d.mood);
         setMoodIntensity(d.moodIntensity);
         setVoiceNotes(Array.isArray(d.voiceNotes) ? d.voiceNotes : []);
+        setCompanionIds(Array.isArray(d.companionIds) ? d.companionIds : []);
       })
       .catch(() => {}); // a failed read just means no restore
   }
@@ -145,6 +168,7 @@ export default function DiaryView() {
     setMood(entry.mood);
     setMoodIntensity(entry.moodIntensity);
     setVoiceNotes(entry.voiceNotes);
+    setCompanionIds(entry.companionIds);
   }
 
   /** Leave edit mode; any in-progress draft comes back to the form. */
@@ -194,10 +218,10 @@ export default function DiaryView() {
         dbDelete(DRAFT_KEY).catch(() => {});
         return;
       }
-      dbSave(DRAFT_KEY, { field1, field2, field3, reflection, photo, photoPos, mood, moodIntensity, voiceNotes }).catch(() => {});
+      dbSave(DRAFT_KEY, { field1, field2, field3, reflection, photo, photoPos, mood, moodIntensity, voiceNotes, companionIds }).catch(() => {});
     }, 800);
     return () => clearTimeout(t);
-  }, [field1, field2, field3, reflection, photo, photoPos, mood, moodIntensity, voiceNotes, editing]);
+  }, [field1, field2, field3, reflection, photo, photoPos, mood, moodIntensity, voiceNotes, companionIds, editing]);
 
   async function handleFile(file: File | undefined) {
     if (!file || !file.type.startsWith('image/')) return;
@@ -251,6 +275,7 @@ export default function DiaryView() {
       mood,
       moodIntensity: mood ? moodIntensity : undefined,
       voiceNotes,
+      companionIds,
     };
     try {
       await dbSave(entry.id, entry);
@@ -371,6 +396,14 @@ export default function DiaryView() {
               intensity={moodIntensity}
               onChange={(m, i) => { setMood(m); setMoodIntensity(i); }}
             />
+
+            <label className={styles.label}>Who was there?</label>
+            <CompanionPicker
+              companions={companions}
+              selectedIds={companionIds}
+              onToggle={toggleCompanion}
+              onCreate={addCompanion}
+            />
           </div>
         </div>
 
@@ -433,6 +466,7 @@ export default function DiaryView() {
           onClose={() => setMemoryIndex(null)}
           onNavigate={setMemoryIndex}
           onEdit={(entry) => { setMemoryIndex(null); startEditing(entry); }}
+          companions={companions}
         />
       )}
     </div>

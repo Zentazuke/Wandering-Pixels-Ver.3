@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { BookOpenText, LayoutGrid, DownloadCloud, UploadCloud, Mic } from 'lucide-react';
+import { BookOpenText, LayoutGrid, DownloadCloud, UploadCloud, Mic, Search as SearchIcon, PawPrint } from 'lucide-react';
 import useBoardStore, { makePhotoElement, makeTextElement } from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import { dbGetByPrefix, dbSave, dbDelete } from '../../db/boardDB.js';
 import { ensurePersistentStorage } from '../../db/persistentStorage.js';
 import { deleteAudioBlob } from '../../db/audioStorage.js';
+import { loadCompanions } from '../../db/companionStore.js';
+import type { Companion } from '../../types/companions.js';
+import JournalReader from './JournalReader.jsx';
+import { COMPANION_ICON } from '../../data/companionIcons.js';
 import { downloadBackup, restoreBackup } from '../../utils/backup.js';
 import { exportBoard } from '../../utils/exportBoard.js';
 import { makeThumb } from '../../utils/imageThumb.js';
@@ -35,7 +39,7 @@ interface Snapshot {
 // DiaryEntry now lives in src/types/diary.ts — re-exported for old importers.
 export type { DiaryEntry };
 
-type Tab = 'boards' | 'diary';
+type Tab = 'journal' | 'browse' | 'people' | 'boards';
 
 function entryDateLabel(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -43,11 +47,13 @@ function entryDateLabel(iso: string): string {
 
 /** Archive — saved board snapshots and past diary entries. */
 export default function ArchiveView() {
-  const [tab, setTab]             = useState<Tab>('boards');
+  const [tab, setTab]             = useState<Tab>('journal');
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [entries, setEntries]     = useState<DiaryEntry[]>([]);
+  const [companions, setCompanions] = useState<Companion[]>([]);
+  const [companionFilter, setCompanionFilter] = useState<string | null>(null);
   const [saving, setSaving]       = useState(false);
-  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const [viewer, setViewer] = useState<{ list: DiaryEntry[]; index: number } | null>(null);
   const [templateEntry, setTemplateEntry] = useState<DiaryEntry | null>(null);
   const [query, setQuery]         = useState('');
   const [dayFilter, setDayFilter] = useState<string | null>(null);
@@ -63,7 +69,10 @@ export default function ArchiveView() {
     (!q || [e.field1, e.field2, e.field3, e.reflection, e.mode, e.mood]
       .some((f) => (f || '').toLowerCase().includes(q))));
 
-  useEffect(() => { loadSnapshots(); loadEntries(); }, []);
+  useEffect(() => {
+    loadSnapshots(); loadEntries();
+    loadCompanions().then(setCompanions).catch(() => {});
+  }, []);
 
   // ── Backup — the device is the only copy; the backup file is the insurance ──
 
@@ -235,7 +244,7 @@ export default function ArchiveView() {
       // …and remember the connection on the entry itself
       await dbSave(entry.id, { ...entry, linkedBoardIds: [...entry.linkedBoardIds, snap.key] });
       setTemplateEntry(null);
-      setViewerIndex(null);
+      setViewer(null);
       loadSnapshots();
       loadEntries();
       useAppStore.getState().showToast('Memory board created ✦ tweak it as you like', 'success');
@@ -256,13 +265,21 @@ export default function ArchiveView() {
         <div className={styles.headerLeft}>
           <h2 className={styles.title}>Archive</h2>
           <div className={styles.tabs}>
+            <button className={`${styles.tabBtn} ${tab === 'journal' ? styles.tabActive : ''}`}
+              onClick={() => setTab('journal')}>
+              <BookOpenText size={13} /> Journal
+            </button>
+            <button className={`${styles.tabBtn} ${tab === 'browse' ? styles.tabActive : ''}`}
+              onClick={() => setTab('browse')}>
+              <SearchIcon size={13} /> Browse
+            </button>
+            <button className={`${styles.tabBtn} ${tab === 'people' ? styles.tabActive : ''}`}
+              onClick={() => { setTab('people'); setCompanionFilter(null); }}>
+              <PawPrint size={13} /> People & Pets
+            </button>
             <button className={`${styles.tabBtn} ${tab === 'boards' ? styles.tabActive : ''}`}
               onClick={() => setTab('boards')}>
               <LayoutGrid size={13} /> Boards
-            </button>
-            <button className={`${styles.tabBtn} ${tab === 'diary' ? styles.tabActive : ''}`}
-              onClick={() => setTab('diary')}>
-              <BookOpenText size={13} /> Diary
             </button>
           </div>
         </div>
@@ -310,7 +327,53 @@ export default function ArchiveView() {
         )
       )}
 
-      {tab === 'diary' && (
+      {tab === 'journal' && (
+        <JournalReader
+          entries={entries}
+          companions={companions}
+          onOpen={(list, index) => setViewer({ list, index })}
+        />
+      )}
+
+      {tab === 'people' && (
+        companionFilter ? (
+          <div>
+            <button className={styles.backLink} onClick={() => setCompanionFilter(null)}>
+              ← All people & pets
+            </button>
+            <h3 className={styles.threadTitle}>
+              {(() => { const c = companions.find((x) => x.id === companionFilter); return c ? `${COMPANION_ICON[c.type]} ${c.name}’s journal` : ''; })()}
+            </h3>
+            <JournalReader
+              entries={entries.filter((e) => e.companionIds.includes(companionFilter))}
+              companions={companions}
+              onOpen={(list, index) => setViewer({ list, index })}
+            />
+          </div>
+        ) : companions.length === 0 ? (
+          <div className={styles.empty}>
+            <p>No people or pets yet.</p>
+            <p>Tag someone in a diary entry ("Who was there?") and they'll appear here.</p>
+          </div>
+        ) : (
+          <div className={styles.companionGrid}>
+            {companions.map((c) => {
+              const count = entries.filter((e) => e.companionIds.includes(c.id)).length;
+              return (
+                <button key={c.id} className={styles.companionCard} onClick={() => setCompanionFilter(c.id)}>
+                  <span className={styles.companionIcon} aria-hidden="true">{COMPANION_ICON[c.type]}</span>
+                  <span className={styles.companionName}>{c.name}</span>
+                  <span className={styles.companionCount}>
+                    {count} {count === 1 ? 'memory' : 'memories'}{c.species ? ` · ${c.species}` : ''}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )
+      )}
+
+      {tab === 'browse' && (
         entries.length === 0 ? (
           <div className={styles.empty}>
             <p>No diary entries yet.</p>
@@ -340,7 +403,7 @@ export default function ArchiveView() {
             {visibleEntries.map((entry, i) => (
               <div key={entry.id} className={styles.card}
                 style={{ cursor: 'pointer' }}
-                onClick={() => setViewerIndex(i)}
+                onClick={() => setViewer({ list: visibleEntries, index: i })}
                 title="Open entry">
                 {/* text-only entries skip the image slot — the words are the card */}
                 {entry.photo && (
@@ -369,6 +432,14 @@ export default function ArchiveView() {
                     </span>
                   </div>
                   {entry.field1 && <div className={styles.entryTitle}>{entry.field1}</div>}
+                  {entry.companionIds.length > 0 && (
+                    <div className={styles.entryCompanions}>
+                      {entry.companionIds.map((id) => {
+                        const c = companions.find((x) => x.id === id);
+                        return c ? `${COMPANION_ICON[c.type]} ${c.name}` : null;
+                      }).filter(Boolean).join('  ')}
+                    </div>
+                  )}
                   {entry.reflection && (
                     <p className={`${styles.entryExcerpt} ${entry.photo ? '' : styles.entryExcerptFull}`}>
                       {entry.reflection}
@@ -389,12 +460,13 @@ export default function ArchiveView() {
         )
       )}
 
-      {viewerIndex !== null && viewerIndex < visibleEntries.length && (
+      {viewer && viewer.index < viewer.list.length && (
         <MemoryViewer
-          entries={visibleEntries}
-          index={viewerIndex}
-          onClose={() => setViewerIndex(null)}
-          onNavigate={setViewerIndex}
+          entries={viewer.list}
+          index={viewer.index}
+          onClose={() => setViewer(null)}
+          onNavigate={(i) => setViewer({ ...viewer, index: i })}
+          companions={companions}
           onAddToBoard={addEntryToBoard}
           onDelete={deleteEntry}
           onEdit={(entry) => {
