@@ -184,3 +184,26 @@
   .toolBtn { width: 42px; height: 42px; }
   .collapseTab { display: none; }
 }
+
+/* The tool dock rides above the bottom nav */
+@media (max-width: 700px), ((pointer: coarse) and (max-width: 900px)) {
+  .toolbar {
+    position: fixed;
+    left: 0; right: 0; top: auto;
+    bottom: calc(52px + env(safe-area-inset-bottom));
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border-right: none;
+    border-top: 1px solid var(--topbar-border);
+    z-index: 90;
+  }
+  .toolbarClosed { margin: 0; }
+  .group   { flex-direction: row; }
+  .divider { width: 1px; height: 24px; margin: 0 4px; align-self: center; }
+  .spacer  { display: none; }
+  .collapseTab { display: none; }
+}

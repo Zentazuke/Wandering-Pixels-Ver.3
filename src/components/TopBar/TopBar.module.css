@@ -252,3 +252,9 @@
   .historyGroup { display: none; } /* undo lives on the board; keyboardless phones tap-hold instead */
   .tab { padding: 6px 7px; font-size: 10.5px; letter-spacing: 0.02em; }
 }
+
+/* With the bottom nav navigating, the top tabs bow out on phones */
+@media (max-width: 700px), ((pointer: coarse) and (max-width: 900px)) {
+  .tabs { display: none; }
+  .sep  { display: none; }
+}
