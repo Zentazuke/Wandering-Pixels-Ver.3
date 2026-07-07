@@ -63,3 +63,11 @@ button { cursor: pointer; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Mobile foundations ── */
+html { -webkit-text-size-adjust: 100%; }
+button, a { touch-action: manipulation; } /* no 300ms/double-tap zoom on taps */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}

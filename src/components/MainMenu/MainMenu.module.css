@@ -259,3 +259,11 @@
 }
 
 .archiveBtn:hover { color: var(--gold-dark); }
+
+/* ── Mobile ── */
+@media (max-width: 560px) {
+  .backdrop { padding: 20px 16px; overflow-y: auto; }
+  .panel    { padding: 28px 22px; width: 100%; }
+  .title    { font-size: 30px; }
+  .chapters { gap: 2px 8px; }
+}

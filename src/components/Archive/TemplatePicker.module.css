@@ -124,3 +124,9 @@
   color: var(--ink-mid);
   font-family: 'Lora', serif;
 }
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+  .panel { padding: 22px 18px; max-height: calc(100vh - 40px); overflow-y: auto; }
+  .cards { grid-template-columns: 1fr; }
+}

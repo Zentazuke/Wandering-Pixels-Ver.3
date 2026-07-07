@@ -338,3 +338,16 @@
   gap: 6px;
   margin-top: 10px;
 }
+
+/* ── Mobile — the photo and page stack, the overlay scrolls ── */
+@media (max-width: 760px) {
+  .overlay { align-items: flex-start; overflow-y: auto; padding: 52px 0 24px; }
+  .stage { flex-direction: column; gap: 30px; padding: 16px; max-width: 100%; width: 100%; align-items: center; }
+  .photo { max-width: 78vw; max-height: 40vh; }
+  .page  { width: 100%; max-width: 470px; padding: 28px 24px 20px 44px; }
+  .nav   { top: auto; bottom: 14px; transform: none; }
+  .navLeft  { left: 14px; }
+  .navRight { right: 14px; }
+  .nav:active { transform: scale(var(--press)); }
+  .pageActions { flex-wrap: wrap; justify-content: flex-end; }
+}

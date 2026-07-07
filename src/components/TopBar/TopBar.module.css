@@ -230,3 +230,13 @@
   0%   { box-shadow: 0 0 0 0 rgba(217,164,65,0.5); }
   100% { box-shadow: 0 0 0 14px rgba(217,164,65,0); }
 }
+
+/* ── Mobile — compact bar, labels give way to the work ── */
+@media (max-width: 640px) {
+  .logoText  { display: none; }
+  .saveDot   { display: none; }
+  .zoomGroup { display: none; }
+  .sep       { display: none; }
+  .bar       { padding: 0 8px; gap: 6px; }
+  .tab       { padding: 6px 9px; font-size: 11px; }
+}

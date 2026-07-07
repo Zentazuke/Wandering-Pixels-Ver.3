@@ -387,3 +387,14 @@
 
 .saveBtn:hover { background: var(--gold-18); border-color: var(--gold-50); }
 .saveBtnDone   { background: rgba(30,158,117,0.12); border-color: rgba(30,158,117,0.4); color: #1d9e75; }
+
+/* ── Mobile ── */
+@media (max-width: 560px) {
+  .wrap  { padding: 16px 12px 32px; }
+  .card  { padding: 24px 18px 22px; }
+  .heading { font-size: 22px; }
+  .entryArea { min-height: 260px; font-size: 16px; } /* 16px stops iOS zoom-on-focus */
+  .input { font-size: 16px; }
+  .photoCol { max-width: 300px; margin: 0 auto; width: 100%; }
+  .onThisDay, .editingBanner { flex-wrap: wrap; }
+}
