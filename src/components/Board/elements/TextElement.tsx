@@ -1,7 +1,9 @@
-import { useRef, useCallback, memo } from 'react';
+import { useRef, useCallback, useEffect, useState, memo } from 'react';
+import { Play, Pause } from 'lucide-react';
 import useAppStore from '../../../store/appStore.js';
 import useBoardStore from '../../../store/boardStore.js';
 import { NOTE_FRAME_STYLES, NOTE_FRAME_BG_OVERRIDES } from '../../../constants/noteFrames.js';
+import { loadAudioBlob } from '../../../db/audioStorage.js';
 import { sanitizeHtml } from '../../../utils/sanitizeHtml.js';
 import SelectionHandles from './SelectionHandles.jsx';
 import type { TextElement as TextEl } from '../../../types';
@@ -40,6 +42,37 @@ const TextElement = memo(function TextElement({ el, onPointerDown, onRotate, onR
   const selId      = useAppStore((s) => s.selId);
   const isSelected = selId === el.id;
   const updateEl   = useBoardStore((s) => s.updateElement);
+
+  // ── Voice-memory chips play their recording in the editor ──
+  const [playing, setPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const urlRef   = useRef<string | null>(null);
+
+  useEffect(() => () => {
+    audioRef.current?.pause();
+    if (urlRef.current) URL.revokeObjectURL(urlRef.current);
+  }, []);
+
+  async function togglePlay(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (audioRef.current && !audioRef.current.paused) {
+      audioRef.current.pause();
+      setPlaying(false);
+      return;
+    }
+    if (!audioRef.current) {
+      const blob = await loadAudioBlob(el.audioAssetKey!).catch(() => undefined);
+      if (!blob) {
+        useAppStore.getState().showToast('Voice note missing from storage', 'error');
+        return;
+      }
+      urlRef.current = URL.createObjectURL(blob);
+      const a = new Audio(urlRef.current);
+      a.onended = () => setPlaying(false);
+      audioRef.current = a;
+    }
+    audioRef.current.play().then(() => setPlaying(true)).catch(() => {});
+  }
 
   const frameKey   = el.noteFrame || 'shadow';
   const frameBgOver = NOTE_FRAME_BG_OVERRIDES[frameKey];
@@ -152,6 +185,18 @@ const TextElement = memo(function TextElement({ el, onPointerDown, onRotate, onR
           onMouseDown={(e) => { if (e.currentTarget.contentEditable === 'true') e.stopPropagation(); }}
         />
       </div>
+
+      {el.audioAssetKey && (
+        <button
+          className={styles.playBtn}
+          title={playing ? 'Pause voice note' : 'Play voice note'}
+          onPointerDown={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => e.stopPropagation()}
+          onClick={togglePlay}
+        >
+          {playing ? <Pause size={13} /> : <Play size={13} />}
+        </button>
+      )}
 
       {isSelected && (
         <SelectionHandles

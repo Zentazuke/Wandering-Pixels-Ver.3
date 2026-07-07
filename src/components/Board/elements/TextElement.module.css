@@ -59,3 +59,23 @@
   filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
   pointer-events: none;
 }
+
+/* ── Voice-memory chip — the recording plays in the editor ── */
+.playBtn {
+  position: absolute;
+  top: -13px;
+  right: -13px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--gold, #b5943a);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+  transition: transform var(--t-fast), background var(--t-fast);
+}
+.playBtn:hover { transform: scale(1.12); }

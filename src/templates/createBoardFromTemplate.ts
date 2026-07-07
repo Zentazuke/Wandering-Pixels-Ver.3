@@ -100,6 +100,10 @@ export function createBoardFromTemplate(entry: DiaryEntry, template: MoodboardTe
     elements.push({
       ...makeTextElement(z++, {
         ...base,
+        // the spoken-memory chip carries its recording — playable in the editor
+        ...(slot.slot === 'voice' && entry.voiceNotes[0]
+          ? { audioAssetKey: entry.voiceNotes[0].assetKey }
+          : {}),
         content: asHtml(text),
         fontFamily: slot.fontFamily ?? 'Lora',
         fontSize:   slot.fontSize ?? 15,

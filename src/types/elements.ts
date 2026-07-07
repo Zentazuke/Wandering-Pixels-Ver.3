@@ -73,6 +73,10 @@ export interface TextElement extends BaseElement {
   // Background & frame
   bg?:          string;
   noteFrame?:   string;
+
+  /** Voice-memory chips: IDB audio asset this note can play in the editor.
+   *  Exports stay visual — a board is a picture; the sound lives in the app. */
+  audioAssetKey?: string;
 }
 
 // ── Sticker ───────────────────────────────────────────────────────────────────
