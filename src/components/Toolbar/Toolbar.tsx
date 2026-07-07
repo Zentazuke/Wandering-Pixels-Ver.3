@@ -54,13 +54,19 @@ export default function Toolbar({ open, onToggle }: Props) {
   const [flyoutPos,        setFlyoutPos]        = useState({ top: 0, left: 0 });
 
   const shapeBtnRef   = useRef<HTMLButtonElement>(null);
+  const flyoutRef     = useRef<HTMLDivElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
-  // Close flyout when clicking outside
+  // Close flyout when pressing outside. The flyout itself MUST count as
+  // inside: this fires on pointerdown, which precedes click — treating the
+  // flyout's own buttons as "outside" unmounted them before their click
+  // could land, so pressing Rect/Circle silently did nothing.
   useEffect(() => {
     if (!showShapesFlyout) return;
     function handleOutside(e: MouseEvent) {
-      if (shapeBtnRef.current?.contains(e.target as Node)) return;
+      const t = e.target as Node;
+      if (shapeBtnRef.current?.contains(t)) return;
+      if (flyoutRef.current?.contains(t)) return;
       setShowShapesFlyout(false);
     }
     document.addEventListener('pointerdown', handleOutside);
@@ -244,6 +250,7 @@ export default function Toolbar({ open, onToggle }: Props) {
       {/* ── Shapes flyout — fixed position, not clipped by overflow:hidden ── */}
       {showShapesFlyout && (
         <div
+          ref={flyoutRef}
           className={styles.flyout}
           style={{ top: flyoutPos.top, left: flyoutPos.left }}
         >
