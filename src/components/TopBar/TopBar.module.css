@@ -240,3 +240,15 @@
   .bar       { padding: 0 8px; gap: 6px; }
   .tab       { padding: 6px 9px; font-size: 11px; }
 }
+
+/* Icon-only actions + tighter chrome so Board/Diary/Archive always fit */
+@media (max-width: 640px) {
+  .exportBtn { font-size: 0; gap: 0; padding: 9px; }
+  .center    { gap: 6px; }
+  .historyGroup { gap: 0; }
+  .barBtn    { width: 30px; height: 30px; }
+}
+@media (max-width: 400px) {
+  .historyGroup { display: none; } /* undo lives on the board; keyboardless phones tap-hold instead */
+  .tab { padding: 6px 7px; font-size: 10.5px; letter-spacing: 0.02em; }
+}
