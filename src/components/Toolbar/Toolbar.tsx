@@ -107,7 +107,12 @@ export default function Toolbar({ open, onToggle }: Props) {
     if (showShapesFlyout) { setShowShapesFlyout(false); return; }
     if (shapeBtnRef.current) {
       const rect = shapeBtnRef.current.getBoundingClientRect();
-      setFlyoutPos({ top: rect.top, left: rect.right + 6 });
+      // Bottom dock (mobile): open ABOVE the button as a row strip;
+      // desktop rail: to the right, as before.
+      const docked = window.matchMedia('(max-width: 700px), ((pointer: coarse) and (max-width: 900px))').matches;
+      setFlyoutPos(docked
+        ? { top: rect.top - 64, left: Math.max(8, Math.min(rect.left - 90, window.innerWidth - 296)) }
+        : { top: rect.top, left: rect.right + 6 });
     }
     setShowShapesFlyout(true);
   }

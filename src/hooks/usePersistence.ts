@@ -24,10 +24,35 @@ import useBoardStore from '../store/boardStore';
 import useAppStore from '../store/appStore';
 import { dbSave, dbLoad } from '../db/boardDB';
 import { makeThumb } from '../utils/imageThumb';
+import { BOARD_W, BOARD_H } from '../constants/board';
 import type { BoardElement } from '../types';
 
 const SAVE_KEY    = 'board-state';
 const DEBOUNCE_MS = 800;
+
+/**
+ * Rescue elements stranded fully OUTSIDE the board — an old addShape bug
+ * placed new shapes at negative coordinates, where they were invisible and
+ * unreachable forever. Anything with no overlap at all gets pulled back in;
+ * elements merely poking over an edge are a legitimate look and stay put.
+ */
+function rescueStranded(elements: BoardElement[]): BoardElement[] {
+  return elements.map((el) => {
+    const w = el.w || 100;
+    const h = el.h || 100;
+    const outside = el.x >= BOARD_W || el.y >= BOARD_H || el.x + w <= 0 || el.y + h <= 0;
+    if (!outside) return el;
+    const nx = Math.min(Math.max(el.x, 60), BOARD_W - w - 60);
+    const ny = Math.min(Math.max(el.y, 60), BOARD_H - h - 60);
+    const moved: BoardElement = { ...el, x: nx, y: ny };
+    // lines/arrows carry an absolute second endpoint — shift it by the same amount
+    if (moved.type === 'shape' && moved.x2 !== undefined && moved.y2 !== undefined) {
+      moved.x2 += nx - el.x;
+      moved.y2 += ny - el.y;
+    }
+    return moved;
+  });
+}
 
 interface SavedBoard {
   elements:      BoardElement[];
@@ -86,7 +111,7 @@ export function usePersistence(): void {
       dbLoad<SavedBoard>(SAVE_KEY)
         .then((saved) => {
           if (saved?.elements) {
-            useBoardStore.getState().loadBoard(saved.elements, saved.currentBg);
+            useBoardStore.getState().loadBoard(rescueStranded(saved.elements), saved.currentBg);
             if (saved.customBgColor) useBoardStore.setState({ customBgColor: saved.customBgColor });
             if (saved.customBgImage) useBoardStore.setState({ customBgImage: saved.customBgImage });
             // Fire-and-forget: thumbs for photos saved before the pipeline existed

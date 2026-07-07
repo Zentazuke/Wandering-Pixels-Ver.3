@@ -207,3 +207,14 @@
   .spacer  { display: none; }
   .collapseTab { display: none; }
 }
+
+/* Docked (mobile): the shapes flyout is a row strip above the dock */
+@media (max-width: 700px), ((pointer: coarse) and (max-width: 900px)) {
+  .flyout {
+    flex-direction: row;
+    gap: 4px;
+    min-width: 0;
+    transform-origin: center bottom;
+  }
+  .flyoutBtn { padding: 9px 10px; }
+}
