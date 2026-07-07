@@ -57,6 +57,12 @@ function drawWatermark(canvas: HTMLCanvasElement): void {
   ctx.fillText('Wandering Pixels', canvas.width - 12 * EXPORT_SCALE, canvas.height - 8 * EXPORT_SCALE);
 }
 
+/** The mounted board as a raw canvas (no watermark, no download) —
+ *  the share composer fits it into social formats. */
+export async function captureBoardCanvas(): Promise<HTMLCanvasElement | null> {
+  return captureBoard();
+}
+
 /**
  * Export the mounted board as a PNG download.
  * Returns true on success, false when the board DOM isn't available

@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
-import { Undo2, Redo2, ZoomIn, ZoomOut, Maximize2, Download } from 'lucide-react';
+import { Undo2, Redo2, ZoomIn, ZoomOut, Maximize2, Download, Share2 } from 'lucide-react';
 import useAppStore from '../../store/appStore.js';
 import useBoardStore from '../../store/boardStore.js';
 import { useFlash } from '../../hooks/useFlash.js';
 import { exportBoard } from '../../utils/exportBoard.js';
-import { exportBoardDom } from '../../utils/exportBoardDom.js';
+import { exportBoardDom, captureBoardCanvas } from '../../utils/exportBoardDom.js';
+import ShareComposer from '../share/ShareComposer.jsx';
 import type { View } from '../../types';
 import styles from './TopBar.module.css';
 
@@ -25,6 +26,7 @@ export default function TopBar() {
   const flash    = useFlash();
 
   const [exportDone, setExportDone] = useState(false);
+  const [shareBoard, setShareBoard] = useState<HTMLCanvasElement | null>(null);
   const exportPulseTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   function pulseExport() {
@@ -112,6 +114,19 @@ export default function TopBar() {
         )}
 
         <button
+          className={styles.exportBtn}
+          title="Share this board"
+          onClick={async () => {
+            useAppStore.getState().deselect();
+            const canvas = await captureBoardCanvas();
+            if (canvas) setShareBoard(canvas);
+            else useAppStore.getState().showToast('Open the board view to share it', 'error');
+          }}>
+          <Share2 size={12} />
+          Share
+        </button>
+
+        <button
           className={`${styles.exportBtn} ${exportDone ? styles.exportDone : ''}`}
           title="Export PNG"
           onClick={async () => {
@@ -133,6 +148,8 @@ export default function TopBar() {
           Export
         </button>
       </div>
+
+      {shareBoard && <ShareComposer board={shareBoard} onClose={() => setShareBoard(null)} />}
     </header>
   );
 }

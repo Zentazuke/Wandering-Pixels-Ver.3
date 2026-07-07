@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import ShareComposer from '../share/ShareComposer.jsx';
 import { LABELS } from '../Diary/diaryLabels.js';
 import { moodDef } from '../../data/moods.js';
 import AudioPlayer from '../Diary/AudioPlayer.jsx';
@@ -31,6 +32,7 @@ function longDate(iso: string): string {
 /** Full-screen reader for a diary entry — taped memory photo beside its journal page. */
 export default function MemoryViewer({ entries, index, onClose, onNavigate, onAddToBoard, onDelete, onEdit, onCreateBoard, companions = [] }: Props) {
   const entry = entries[index];
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -152,6 +154,7 @@ export default function MemoryViewer({ entries, index, onClose, onNavigate, onAd
           <footer className={styles.pageFoot}>
             <span className={styles.entryCount}>entry {index + 1} of {entries.length}</span>
             <div className={styles.pageActions}>
+              <button className={styles.actionBtn} onClick={() => setSharing(true)}>Share</button>
               {onCreateBoard && <button className={styles.actionBtn} onClick={() => onCreateBoard(entry)}>✦ Create Moodboard</button>}
               {onEdit && <button className={styles.actionBtn} onClick={() => onEdit(entry)}>Edit</button>}
               {onAddToBoard && <button className={styles.actionBtn} onClick={() => onAddToBoard(entry)}>Add to board</button>}
@@ -160,6 +163,13 @@ export default function MemoryViewer({ entries, index, onClose, onNavigate, onAd
           </footer>
         </article>
       </div>
+
+      {sharing && (
+        /* wrapper stops clicks reaching the viewer's close-on-backdrop */
+        <div onClick={(e) => e.stopPropagation()}>
+          <ShareComposer entry={entry} companions={companions} onClose={() => setSharing(false)} />
+        </div>
+      )}
     </div>
   );
 }
