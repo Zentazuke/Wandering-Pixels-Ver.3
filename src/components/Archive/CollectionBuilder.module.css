@@ -1,0 +1,92 @@
+/* ── Collection builder — choose the memories for a timeline ── */
+.overlay {
+  position: fixed; inset: 0; z-index: 600;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(24, 18, 10, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.panel {
+  position: relative;
+  width: min(560px, calc(100vw - 48px));
+  max-height: calc(100vh - 80px);
+  display: flex; flex-direction: column;
+  background: var(--surface-card);
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 26px 28px;
+}
+
+.close {
+  position: absolute; top: 12px; right: 12px;
+  width: 30px; height: 30px; border: none; border-radius: 50%;
+  display: grid; place-items: center;
+  background: none; color: var(--ink-mid); cursor: pointer;
+}
+.close:hover { background: var(--gold-08); }
+
+.title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 600; color: var(--ink);
+}
+
+.subtitle {
+  margin: 4px 0 14px;
+  font-size: 12.5px; font-style: italic;
+  font-family: 'Lora', serif; color: var(--ink-mid);
+}
+
+.nameInput {
+  padding: 9px 14px;
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px; font-family: 'Playfair Display', serif; font-weight: 600;
+  outline: none; margin-bottom: 12px; user-select: text;
+}
+.nameInput:focus { border-color: var(--viridian); }
+
+.list {
+  flex: 1; min-height: 0; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 2px;
+  border: 1px solid var(--topbar-border);
+  border-radius: var(--r-md);
+  padding: 8px;
+  margin-bottom: 14px;
+}
+
+.row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 8px;
+  border-radius: var(--r-sm);
+  font-size: 13px; cursor: pointer;
+}
+.row:hover { background: var(--gold-08); }
+
+.rowDate {
+  font-family: var(--font-mono, monospace);
+  font-size: 10.5px; color: var(--ink-faint); white-space: nowrap;
+}
+
+.rowTitle {
+  flex: 1; min-width: 0;
+  font-family: 'Lora', serif; color: var(--ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.rowBadge { font-size: 11px; }
+
+.createBtn {
+  padding: 12px;
+  background: var(--gold-light);
+  border: 1.5px solid var(--gold-35);
+  border-radius: var(--r-md);
+  color: var(--gold-dark);
+  font-size: 13px; font-family: 'Playfair Display', serif; font-weight: 600;
+  cursor: pointer;
+  transition: background var(--t-fast);
+}
+.createBtn:hover:not(:disabled) { background: var(--gold-18); }
+.createBtn:disabled { opacity: 0.5; cursor: default; }

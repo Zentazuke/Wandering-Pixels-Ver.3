@@ -374,3 +374,18 @@
 .companionCount { font-size: 11px; color: var(--ink-faint); font-style: italic; }
 
 .entryCompanions { font-size: 11px; color: var(--ink-mid); }
+
+/* ── Collections ── */
+.threadHead {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; margin-bottom: 18px;
+}
+.threadHead .threadTitle { margin-bottom: 0; }
+
+.collectionThumb {
+  width: 100%;
+  aspect-ratio: 14 / 9;
+  object-fit: cover;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--topbar-border);
+}

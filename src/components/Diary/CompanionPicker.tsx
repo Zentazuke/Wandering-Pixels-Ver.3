@@ -3,14 +3,14 @@ import { Plus } from 'lucide-react';
 import type { Companion, CompanionType } from '../../types/companions.js';
 import styles from './CompanionPicker.module.css';
 
+import { COMPANION_ICON } from '../../data/companionIcons.js';
+
 interface Props {
   companions:  Companion[];
   selectedIds: string[];
   onToggle:    (id: string) => void;
   onCreate:    (name: string, type: CompanionType) => void;
 }
-
-import { COMPANION_ICON } from '../../data/companionIcons.js';
 
 /** "Who was there?" — tag the people and pets a memory belongs to. */
 export default function CompanionPicker({ companions, selectedIds, onToggle, onCreate }: Props) {

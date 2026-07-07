@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { BookOpenText, LayoutGrid, DownloadCloud, UploadCloud, Mic, Search as SearchIcon, PawPrint } from 'lucide-react';
+import { BookOpenText, LayoutGrid, DownloadCloud, UploadCloud, Mic, Search as SearchIcon, PawPrint, Layers } from 'lucide-react';
 import useBoardStore, { makePhotoElement, makeTextElement } from '../../store/boardStore.js';
 import useAppStore from '../../store/appStore.js';
 import { dbGetByPrefix, dbSave, dbDelete } from '../../db/boardDB.js';
@@ -8,6 +8,11 @@ import { deleteAudioBlob } from '../../db/audioStorage.js';
 import { loadCompanions } from '../../db/companionStore.js';
 import type { Companion } from '../../types/companions.js';
 import JournalReader from './JournalReader.jsx';
+import CollectionBuilder from './CollectionBuilder.jsx';
+import { loadCollections } from '../../db/collectionStore.js';
+import { COLLECTION_TEMPLATES } from '../../templates/collectionTemplates.js';
+import { createBoardFromCollection } from '../../templates/createBoardFromCollection.js';
+import type { MemoryCollection } from '../../types/collections.js';
 import { COMPANION_ICON } from '../../data/companionIcons.js';
 import { downloadBackup, restoreBackup } from '../../utils/backup.js';
 import { exportBoard } from '../../utils/exportBoard.js';
@@ -39,7 +44,7 @@ interface Snapshot {
 // DiaryEntry now lives in src/types/diary.ts — re-exported for old importers.
 export type { DiaryEntry };
 
-type Tab = 'journal' | 'browse' | 'people' | 'boards';
+type Tab = 'journal' | 'browse' | 'people' | 'collections' | 'boards';
 
 function entryDateLabel(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -52,6 +57,9 @@ export default function ArchiveView() {
   const [entries, setEntries]     = useState<DiaryEntry[]>([]);
   const [companions, setCompanions] = useState<Companion[]>([]);
   const [companionFilter, setCompanionFilter] = useState<string | null>(null);
+  const [collections, setCollections] = useState<MemoryCollection[]>([]);
+  const [collectionFilter, setCollectionFilter] = useState<string | null>(null);
+  const [builderFor, setBuilderFor] = useState<Companion | null>(null);
   const [saving, setSaving]       = useState(false);
   const [viewer, setViewer] = useState<{ list: DiaryEntry[]; index: number } | null>(null);
   const [templateEntry, setTemplateEntry] = useState<DiaryEntry | null>(null);
@@ -72,6 +80,7 @@ export default function ArchiveView() {
   useEffect(() => {
     loadSnapshots(); loadEntries();
     loadCompanions().then(setCompanions).catch(() => {});
+    loadCollections().then(setCollections).catch(() => {});
   }, []);
 
   // ── Backup — the device is the only copy; the backup file is the insurance ──
@@ -226,6 +235,40 @@ export default function ArchiveView() {
     flash(() => useAppStore.getState().setView('board'));
   }
 
+  // ── Collections — "Through the Years" timeline boards ──────────────────────
+
+  async function createCollectionBoard(companion: Companion, title: string, selected: DiaryEntry[]) {
+    try {
+      const template = COLLECTION_TEMPLATES[0];
+      const ordered  = [...selected].sort((a, b) => (a.date < b.date ? -1 : 1)); // oldest first
+      const elements = createBoardFromCollection(title, ordered, template);
+      const thumb    = await exportBoard(elements, template.bg, null, null, true) as string;
+      const now      = Date.now();
+      const snapKey  = `snap-${now}`;
+      const collection: MemoryCollection = {
+        id: `collection-${now}`, title, type: companion.type === 'pet' ? 'pet_timeline' : 'custom',
+        entryIds: ordered.map((e) => e.id), companionIds: [companion.id],
+        linkedBoardIds: [snapKey], createdAt: now, updatedAt: now,
+      };
+      await dbSave(snapKey, { key: snapKey, ts: now, label: title, thumb, elements, currentBg: template.bg, customBgColor: null, customBgImage: null });
+      await dbSave(collection.id, collection);
+      // every included memory remembers the collection it belongs to
+      for (const e of ordered) {
+        await dbSave(e.id, { ...e, linkedCollectionIds: [...e.linkedCollectionIds, collection.id] });
+      }
+      setBuilderFor(null);
+      loadSnapshots(); loadEntries();
+      loadCollections().then(setCollections).catch(() => {});
+      useAppStore.getState().showToast('Timeline created ✦', 'success');
+      flash(() => {
+        loadBoard(elements, template.bg);
+        useAppStore.getState().setView('board');
+      });
+    } catch {
+      useAppStore.getState().showToast('Couldn\'t create the timeline', 'error');
+    }
+  }
+
   // ── Create Moodboard — the diary-to-board transformation ───────────────────
 
   async function createMoodboard(entry: DiaryEntry, template: MoodboardTemplate) {
@@ -276,6 +319,10 @@ export default function ArchiveView() {
             <button className={`${styles.tabBtn} ${tab === 'people' ? styles.tabActive : ''}`}
               onClick={() => { setTab('people'); setCompanionFilter(null); }}>
               <PawPrint size={13} /> People & Pets
+            </button>
+            <button className={`${styles.tabBtn} ${tab === 'collections' ? styles.tabActive : ''}`}
+              onClick={() => { setTab('collections'); setCollectionFilter(null); }}>
+              <Layers size={13} /> Collections
             </button>
             <button className={`${styles.tabBtn} ${tab === 'boards' ? styles.tabActive : ''}`}
               onClick={() => setTab('boards')}>
@@ -341,9 +388,19 @@ export default function ArchiveView() {
             <button className={styles.backLink} onClick={() => setCompanionFilter(null)}>
               ← All people & pets
             </button>
-            <h3 className={styles.threadTitle}>
-              {(() => { const c = companions.find((x) => x.id === companionFilter); return c ? `${COMPANION_ICON[c.type]} ${c.name}’s journal` : ''; })()}
-            </h3>
+            <div className={styles.threadHead}>
+              <h3 className={styles.threadTitle}>
+                {(() => { const c = companions.find((x) => x.id === companionFilter); return c ? `${COMPANION_ICON[c.type]} ${c.name}’s journal` : ''; })()}
+              </h3>
+              {entries.some((e) => e.companionIds.includes(companionFilter)) && (
+                <button
+                  className={styles.saveBtn}
+                  onClick={() => setBuilderFor(companions.find((x) => x.id === companionFilter) ?? null)}
+                >
+                  ✦ Through the Years
+                </button>
+              )}
+            </div>
             <JournalReader
               entries={entries.filter((e) => e.companionIds.includes(companionFilter))}
               companions={companions}
@@ -365,6 +422,52 @@ export default function ArchiveView() {
                   <span className={styles.companionName}>{c.name}</span>
                   <span className={styles.companionCount}>
                     {count} {count === 1 ? 'memory' : 'memories'}{c.species ? ` · ${c.species}` : ''}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )
+      )}
+
+      {tab === 'collections' && (
+        collectionFilter ? (
+          <div>
+            <button className={styles.backLink} onClick={() => setCollectionFilter(null)}>← All collections</button>
+            {(() => {
+              const col = collections.find((c) => c.id === collectionFilter);
+              if (!col) return null;
+              const colEntries = entries.filter((e) => col.entryIds.includes(e.id));
+              const snap = snapshots.find((s) => col.linkedBoardIds.includes(s.key));
+              return (
+                <div>
+                  <div className={styles.threadHead}>
+                    <h3 className={styles.threadTitle}>{col.title}</h3>
+                    {snap && <button className={styles.saveBtn} onClick={() => restoreSnapshot(snap)}>Open board</button>}
+                  </div>
+                  <JournalReader entries={colEntries} companions={companions}
+                    onOpen={(list, index) => setViewer({ list, index })} />
+                </div>
+              );
+            })()}
+          </div>
+        ) : collections.length === 0 ? (
+          <div className={styles.empty}>
+            <p>No collections yet.</p>
+            <p>Open People & Pets → someone's journal → "✦ Through the Years" to make one.</p>
+          </div>
+        ) : (
+          <div className={styles.companionGrid}>
+            {collections.map((col) => {
+              const snap = snapshots.find((s) => col.linkedBoardIds.includes(s.key));
+              return (
+                <button key={col.id} className={styles.companionCard} onClick={() => setCollectionFilter(col.id)}>
+                  {snap?.thumb
+                    ? <img src={snap.thumb} className={styles.collectionThumb} alt={col.title} />
+                    : <span className={styles.companionIcon} aria-hidden="true">🕰</span>}
+                  <span className={styles.companionName}>{col.title}</span>
+                  <span className={styles.companionCount}>
+                    {col.entryIds.length} {col.entryIds.length === 1 ? 'memory' : 'memories'}
                   </span>
                 </button>
               );
@@ -474,6 +577,15 @@ export default function ArchiveView() {
             flash(() => useAppStore.getState().setView('diary'));
           }}
           onCreateBoard={(entry) => setTemplateEntry(entry)}
+        />
+      )}
+
+      {builderFor && (
+        <CollectionBuilder
+          companion={builderFor}
+          entries={entries.filter((e) => e.companionIds.includes(builderFor.id))}
+          onClose={() => setBuilderFor(null)}
+          onCreate={(title, selected) => createCollectionBoard(builderFor, title, selected)}
         />
       )}
 
